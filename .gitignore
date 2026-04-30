@@ -32,6 +32,10 @@ coverage/
 .env
 .env.local
 .env.*.local
+.env.yml
+.env.yaml
+!.env.example
+!.env.example.yml
 
 # Editor / OS
 .DS_Store

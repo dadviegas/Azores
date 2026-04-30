@@ -1,0 +1,177 @@
+/* ============================================
+   AZORES DESIGN SYSTEM — Design Tokens
+   Inspired by the volcanic Atlantic: ocean,
+   basalt, mist, lava.
+   ============================================ */
+
+:root {
+  /* ---------- Palette: Light ---------- */
+  --az-bg:           #FAFAF7;   /* paper */
+  --az-bg-2:         #F2F2EE;   /* mist */
+  --az-bg-3:         #E8E8E2;
+  --az-surface:      #FFFFFF;
+  --az-surface-2:    #F7F7F3;
+  --az-line:         #E2E2DA;
+  --az-line-2:       #D2D2C8;
+  --az-text:         #14161A;   /* basalt */
+  --az-text-2:       #4A4E57;
+  --az-text-3:       #7A7E87;
+  --az-muted:        #9DA1AA;
+
+  /* Brand */
+  --az-ocean-50:     #EAF2F7;
+  --az-ocean-100:    #C8DCE8;
+  --az-ocean-200:    #95B9CF;
+  --az-ocean-300:    #5E91B0;
+  --az-ocean-400:    #2F6F94;
+  --az-ocean-500:    #0F4C75;   /* primary */
+  --az-ocean-600:    #093A5C;
+  --az-ocean-700:    #062A45;
+  --az-ocean-800:    #041C2E;
+
+  --az-lava-50:      #FBEFE9;
+  --az-lava-100:     #F6D7C5;
+  --az-lava-200:     #ECA88A;
+  --az-lava-300:     #E07B53;
+  --az-lava-400:     #D5582A;   /* accent */
+  --az-lava-500:     #B84417;
+  --az-lava-600:     #8E3210;
+
+  --az-moss-400:     #4A8A5C;   /* success */
+  --az-moss-500:     #2F6E42;
+  --az-amber-400:    #D9A441;   /* warning */
+  --az-amber-500:    #B58324;
+  --az-coral-400:    #D14848;   /* danger  */
+  --az-coral-500:    #A82F2F;
+
+  /* Semantic */
+  --az-primary:        var(--az-ocean-500);
+  --az-primary-hover:  var(--az-ocean-600);
+  --az-accent:         var(--az-lava-400);
+  --az-success:        var(--az-moss-500);
+  --az-warning:        var(--az-amber-500);
+  --az-danger:         var(--az-coral-500);
+
+  /* ---------- Radii ---------- */
+  --az-r-xs: 4px;
+  --az-r-sm: 6px;
+  --az-r-md: 10px;
+  --az-r-lg: 14px;
+  --az-r-xl: 20px;
+  --az-r-pill: 999px;
+
+  /* ---------- Spacing (4-step) ---------- */
+  --az-s-1: 4px;
+  --az-s-2: 8px;
+  --az-s-3: 12px;
+  --az-s-4: 16px;
+  --az-s-5: 20px;
+  --az-s-6: 24px;
+  --az-s-8: 32px;
+  --az-s-10: 40px;
+  --az-s-12: 48px;
+  --az-s-16: 64px;
+  --az-s-20: 80px;
+
+  /* ---------- Type ---------- */
+  --az-font-sans: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --az-font-display: "Fraunces", "Playfair Display", Georgia, serif;
+  --az-font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --az-fs-xs:   12px;
+  --az-fs-sm:   13px;
+  --az-fs-base: 14px;
+  --az-fs-md:   15px;
+  --az-fs-lg:   17px;
+  --az-fs-xl:   20px;
+  --az-fs-2xl:  24px;
+  --az-fs-3xl:  30px;
+  --az-fs-4xl:  38px;
+  --az-fs-5xl:  48px;
+  --az-fs-6xl:  64px;
+
+  --az-lh-tight: 1.15;
+  --az-lh-snug:  1.35;
+  --az-lh-base:  1.5;
+  --az-lh-loose: 1.7;
+
+  --az-fw-regular: 400;
+  --az-fw-medium:  500;
+  --az-fw-semi:    600;
+  --az-fw-bold:    700;
+
+  /* ---------- Shadows ---------- */
+  --az-shadow-xs: 0 1px 2px rgba(20, 22, 26, 0.04);
+  --az-shadow-sm: 0 1px 3px rgba(20, 22, 26, 0.06), 0 1px 2px rgba(20, 22, 26, 0.04);
+  --az-shadow-md: 0 4px 12px rgba(20, 22, 26, 0.06), 0 2px 4px rgba(20, 22, 26, 0.04);
+  --az-shadow-lg: 0 16px 32px rgba(20, 22, 26, 0.08), 0 4px 8px rgba(20, 22, 26, 0.04);
+  --az-shadow-xl: 0 32px 64px rgba(20, 22, 26, 0.12), 0 8px 16px rgba(20, 22, 26, 0.06);
+  --az-ring:      0 0 0 3px rgba(15, 76, 117, 0.18);
+
+  /* ---------- Motion ---------- */
+  --az-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --az-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --az-dur-fast: 120ms;
+  --az-dur-base: 200ms;
+  --az-dur-slow: 320ms;
+
+  /* ---------- Z-index ---------- */
+  --az-z-base: 1;
+  --az-z-dropdown: 100;
+  --az-z-sticky: 200;
+  --az-z-overlay: 900;
+  --az-z-modal: 1000;
+  --az-z-toast: 1100;
+}
+
+/* ---------- Dark mode ---------- */
+:root[data-theme="dark"] {
+  --az-bg:        #0B0E12;   /* basalt */
+  --az-bg-2:      #11151B;
+  --az-bg-3:      #161B22;
+  --az-surface:   #14181F;
+  --az-surface-2: #1A1F27;
+  --az-line:      #232831;
+  --az-line-2:    #2D333E;
+  --az-text:      #F0F1F3;
+  --az-text-2:    #B7BBC4;
+  --az-text-3:    #858A94;
+  --az-muted:     #5E636D;
+
+  --az-primary:        #4A9BC7;
+  --az-primary-hover:  #6FB1D6;
+  --az-accent:         #E07B53;
+
+  --az-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --az-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --az-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --az-shadow-lg: 0 16px 32px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+  --az-shadow-xl: 0 32px 64px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.4);
+  --az-ring:      0 0 0 3px rgba(74, 155, 199, 0.28);
+}
+
+/* ---------- Base resets ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--az-bg);
+  color: var(--az-text);
+  font-family: var(--az-font-sans);
+  font-size: var(--az-fs-base);
+  line-height: var(--az-lh-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: var(--az-ocean-200); color: var(--az-ocean-800); }
+:root[data-theme="dark"] ::selection { background: rgba(74,155,199,0.4); color: #fff; }
+button { font-family: inherit; }
+a { color: var(--az-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--az-line-2); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--az-text-3); background-clip: padding-box; border: 2px solid transparent; }

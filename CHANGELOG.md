@@ -10,7 +10,47 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Added
+- Phase 2 of [docs/plan.md](docs/plan.md) — `@azores/ui` primitives complete and
+  showcase shell live in `@azores/web`.
+  - New primitives: [Box](packages/ui/src/Box/),
+    [Kbd](packages/ui/src/Kbd/),
+    [BrandMark](packages/ui/src/BrandMark/),
+    [Background](packages/ui/src/Background/) (with curated variant
+    library in [backgrounds.ts](packages/ui/src/Background/backgrounds.ts);
+    light/dark via `[data-theme]`).
+  - [packages/ui/src/index.ts](packages/ui/src/index.ts) now re-exports
+    every primitive and the typed `tokens` map.
+  - Avatar now extends `HTMLAttributes<HTMLSpanElement>` so callers can
+    pass `style` / `className` directly
+    ([packages/ui/src/Avatar/Avatar.tsx](packages/ui/src/Avatar/Avatar.tsx)).
+- Showcase app shell in `@azores/web`: sidebar + topbar + hash-based nav
+  with a light/dark theme toggle wired to `data-theme`
+  ([apps/web/src/App.tsx](apps/web/src/App.tsx)).
+- Showcase pages porting the static mockups
+  ([docs/design/Azores/page-foundations.jsx](docs/design/Azores/page-foundations.jsx),
+  [docs/design/Azores/page-components.jsx](docs/design/Azores/page-components.jsx)):
+  [Foundations](apps/web/src/pages/Foundations.tsx) (color, typography,
+  spacing, radii, elevation) and
+  [Components](apps/web/src/pages/Components.tsx) (buttons, form
+  controls, badges, avatars, layout primitives, brand/keyboard,
+  backgrounds).
+- [apps/web/src/showcase.css](apps/web/src/showcase.css) — chrome
+  styles for the showcase shell (sidebar, topbar, page header, sections,
+  demo grid, token swatches, type rows). App-specific demo styling, not
+  part of the design system.
+- [apps/web/src/globals.d.ts](apps/web/src/globals.d.ts) — `*.css` module
+  declaration so TS accepts side-effect CSS imports.
+
 ### Changed
+- [apps/web/rspack.config.mjs](apps/web/rspack.config.mjs) — enabled
+  `experiments.css` and added a `type: "css"` rule so the entry can
+  import `tokens.css` (from `@azores/ui`) and `showcase.css` directly.
+- [apps/web/src/main.tsx](apps/web/src/main.tsx) — imports
+  `@azores/ui/src/styles/tokens.css` once at the app entry, plus the
+  showcase chrome stylesheet.
+- [apps/web/src/App.tsx](apps/web/src/App.tsx) — replaced the placeholder
+  greeting with the showcase shell.
 - Centralized shared third-party dep versions via pnpm `catalog:` in
   [pnpm-workspace.yaml](pnpm-workspace.yaml). `react`, `react-dom`,
   `@types/react`, `@types/react-dom`, `@emotion/react`, and

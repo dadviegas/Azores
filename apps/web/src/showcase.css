@@ -1,0 +1,212 @@
+/* Showcase chrome — sidebar shell + page header + demo grid layouts.
+   Ported from docs/design/Azores/components.css. App-specific demo styling;
+   not part of the design system, hence not in @azores/ui. */
+
+html, body, #app { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--az-font-sans);
+  font-size: var(--az-fs-base);
+  color: var(--az-text);
+  background: var(--az-bg);
+}
+
+/* App shell */
+.az-app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+.az-sidebar {
+  border-right: 1px solid var(--az-line);
+  background: var(--az-bg-2);
+  padding: var(--az-s-6) var(--az-s-4);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.az-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--az-s-3);
+  padding: 0 var(--az-s-3) var(--az-s-6);
+  margin-bottom: var(--az-s-4);
+  border-bottom: 1px solid var(--az-line);
+}
+.az-brand-name {
+  font-family: var(--az-font-display);
+  font-size: var(--az-fs-xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.az-brand-tag {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-text-3);
+  margin-top: 2px;
+}
+.az-nav { display: flex; flex-direction: column; gap: 2px; }
+.az-nav-section {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-muted);
+  padding: var(--az-s-4) var(--az-s-3) var(--az-s-2);
+}
+.az-nav-item {
+  display: flex; align-items: center; gap: var(--az-s-3);
+  padding: var(--az-s-2) var(--az-s-3);
+  border-radius: var(--az-r-sm);
+  color: var(--az-text-2);
+  font-size: var(--az-fs-base);
+  cursor: pointer;
+  user-select: none;
+  border: none; background: none; text-align: left; width: 100%;
+  font-family: inherit;
+  transition: background var(--az-dur-fast) var(--az-ease), color var(--az-dur-fast) var(--az-ease);
+}
+.az-nav-item:hover { background: var(--az-surface); color: var(--az-text); }
+.az-nav-item.is-active {
+  background: var(--az-surface);
+  color: var(--az-text);
+  box-shadow: var(--az-shadow-xs);
+  font-weight: var(--az-fw-medium);
+}
+
+.az-main { min-width: 0; padding: 0; }
+.az-topbar {
+  height: 56px;
+  border-bottom: 1px solid var(--az-line);
+  background: color-mix(in srgb, var(--az-bg) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky; top: 0; z-index: var(--az-z-sticky);
+  display: flex; align-items: center;
+  padding: 0 var(--az-s-8);
+  gap: var(--az-s-6);
+}
+.az-topbar-title { font-size: var(--az-fs-lg); font-weight: var(--az-fw-medium); }
+.az-topbar-spacer { flex: 1; }
+
+.az-content {
+  padding: var(--az-s-10) var(--az-s-12);
+  max-width: 1280px;
+}
+
+/* Page header */
+.az-page-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--az-accent);
+  font-weight: var(--az-fw-medium);
+  margin-bottom: var(--az-s-3);
+}
+.az-page-title {
+  font-family: var(--az-font-display);
+  font-size: var(--az-fs-5xl);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: var(--az-lh-tight);
+  margin: 0 0 var(--az-s-4);
+}
+.az-page-lead {
+  font-size: var(--az-fs-lg);
+  color: var(--az-text-2);
+  max-width: 720px;
+  line-height: var(--az-lh-snug);
+  margin: 0 0 var(--az-s-12);
+}
+
+/* Section */
+.az-section { margin-bottom: var(--az-s-16); }
+.az-section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  border-bottom: 1px solid var(--az-line);
+  padding-bottom: var(--az-s-3);
+  margin-bottom: var(--az-s-6);
+}
+.az-section-title {
+  font-size: var(--az-fs-2xl);
+  font-weight: var(--az-fw-semi);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.az-section-sub { font-size: var(--az-fs-sm); color: var(--az-text-3); }
+
+/* Token swatches */
+.az-tokens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--az-s-3);
+}
+.az-token {
+  border: 1px solid var(--az-line);
+  border-radius: var(--az-r-md);
+  background: var(--az-surface);
+  overflow: hidden;
+}
+.az-token-swatch { height: 64px; border-bottom: 1px solid var(--az-line); }
+.az-token-meta { padding: var(--az-s-2) var(--az-s-3); }
+.az-token-name { font-size: var(--az-fs-sm); font-weight: var(--az-fw-medium); }
+.az-token-val  { font-size: var(--az-fs-xs); color: var(--az-text-3); font-family: var(--az-font-mono); }
+
+/* Type rows */
+.az-type-row {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: var(--az-s-6);
+  padding: var(--az-s-4) 0;
+  border-bottom: 1px solid var(--az-line);
+  align-items: baseline;
+}
+.az-type-row:last-child { border-bottom: none; }
+.az-type-label { font-size: var(--az-fs-xs); color: var(--az-text-3); font-family: var(--az-font-mono); }
+.az-type-meta  { font-size: var(--az-fs-xs); color: var(--az-text-3); font-family: var(--az-font-mono); }
+
+/* Demo grid (Components page) */
+.az-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--az-s-4);
+}
+.az-demo-card {
+  border: 1px solid var(--az-line);
+  border-radius: var(--az-r-lg);
+  background: var(--az-surface);
+  overflow: hidden;
+}
+.az-demo-stage {
+  padding: var(--az-s-6);
+  display: flex; flex-wrap: wrap;
+  align-items: center; justify-content: center;
+  gap: var(--az-s-3);
+  min-height: 140px;
+  background:
+    repeating-linear-gradient(45deg, transparent 0, transparent 11px, var(--az-bg-2) 11px, var(--az-bg-2) 12px),
+    var(--az-surface);
+}
+.az-demo-label {
+  padding: var(--az-s-2) var(--az-s-4);
+  border-top: 1px solid var(--az-line);
+  background: var(--az-bg-2);
+  font-size: var(--az-fs-xs);
+  color: var(--az-text-3);
+  font-family: var(--az-font-mono);
+}
+
+/* Background card */
+.az-bg-card {
+  border: 1px solid var(--az-line);
+  border-radius: var(--az-r-lg);
+  overflow: hidden;
+  background: var(--az-surface);
+}
+.az-bg-preview { height: 140px; }
+.az-bg-meta { padding: var(--az-s-3) var(--az-s-4); border-top: 1px solid var(--az-line); }
+.az-bg-name { font-size: var(--az-fs-sm); font-weight: var(--az-fw-medium); }
+.az-bg-desc { font-size: var(--az-fs-xs); color: var(--az-text-3); margin-top: 2px; }
+
+.az-text-mono { font-family: var(--az-font-mono); }

@@ -1,3 +1,6 @@
+import "@azores/ui/src/styles/tokens.css";
+import "./showcase.css";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";

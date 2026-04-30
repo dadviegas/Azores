@@ -1,13 +1,12 @@
-import { type ReactNode } from "react";
+import { type HTMLAttributes, type ReactNode } from "react";
 import { StyledAvatar, StyledAvatarGroup, type AvatarSize } from "./Avatar.styles.js";
 
-export type AvatarProps = {
+export type AvatarProps = HTMLAttributes<HTMLSpanElement> & {
   size?: AvatarSize;
   src?: string;
   alt?: string;
   initials?: string;
   children?: ReactNode;
-  className?: string;
 };
 
 export const Avatar = ({
@@ -16,9 +15,9 @@ export const Avatar = ({
   alt,
   initials,
   children,
-  className,
+  ...rest
 }: AvatarProps): JSX.Element => (
-  <StyledAvatar $size={size} className={className} aria-label={alt}>
+  <StyledAvatar $size={size} aria-label={alt} {...rest}>
     {src ? <img src={src} alt={alt ?? ""} /> : (children ?? initials)}
   </StyledAvatar>
 );

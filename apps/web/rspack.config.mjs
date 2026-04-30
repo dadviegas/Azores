@@ -43,8 +43,13 @@ export default defineConfig({
         },
         type: "javascript/auto",
       },
+      {
+        test: /\.css$/,
+        type: "css",
+      },
     ],
   },
+  experiments: { css: true },
   plugins: [
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
     isDev && new ReactRefreshPlugin(),

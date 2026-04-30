@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
-import { BrandMark, Button, Icon } from "@azores/ui";
+import { useEffect, useMemo, useState } from "react";
+import { BrandMark, Button, Icon, Kbd } from "@azores/ui";
+import {
+  CommandPalette,
+  ToastProvider,
+  TweaksPanel,
+  useToast,
+  useTweaks,
+  type Command,
+} from "@azores/ux";
 import { Foundations } from "./pages/Foundations";
 import { Components } from "./pages/Components";
 
@@ -15,9 +23,16 @@ const readRoute = (): Route => {
   return ROUTES.some((r) => r.id === hash) ? (hash as Route) : "foundations";
 };
 
-export const App = (): JSX.Element => {
+const navigateTo = (id: Route): void => {
+  window.location.hash = `/${id}`;
+};
+
+const Shell = (): JSX.Element => {
   const [route, setRoute] = useState<Route>(readRoute);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const { tweaks, setTheme, setAccent, toggleTheme } = useTweaks();
+  const toast = useToast();
 
   useEffect(() => {
     const onHash = (): void => setRoute(readRoute());
@@ -26,12 +41,107 @@ export const App = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+    const onKey = (e: KeyboardEvent): void => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-  const navigate = (id: Route): void => {
-    window.location.hash = `/${id}`;
-  };
+  const commands = useMemo<ReadonlyArray<Command>>(
+    () => [
+      {
+        id: "nav-found",
+        label: "Go to Foundations",
+        group: "Navigate",
+        icon: "layers",
+        keywords: "color type tokens spacing radii",
+        run: () => navigateTo("foundations"),
+      },
+      {
+        id: "nav-comp",
+        label: "Go to Components",
+        group: "Navigate",
+        icon: "grid",
+        keywords: "buttons inputs badges",
+        run: () => navigateTo("components"),
+      },
+      {
+        id: "th-toggle",
+        label: "Toggle theme",
+        group: "Theme",
+        icon: "settings",
+        keywords: "light dark",
+        run: () => toggleTheme(),
+      },
+      {
+        id: "th-light",
+        label: "Switch to Light theme",
+        group: "Theme",
+        icon: "sun",
+        run: () => setTheme("light"),
+      },
+      {
+        id: "th-dark",
+        label: "Switch to Dark theme",
+        group: "Theme",
+        icon: "moon",
+        run: () => setTheme("dark"),
+      },
+      {
+        id: "ac-ocean",
+        label: "Accent · Ocean",
+        group: "Accent",
+        icon: "droplet",
+        run: () => setAccent("ocean"),
+      },
+      {
+        id: "ac-volcanic",
+        label: "Accent · Volcanic",
+        group: "Accent",
+        icon: "flame",
+        run: () => setAccent("volcanic"),
+      },
+      {
+        id: "ac-mono",
+        label: "Accent · Mono",
+        group: "Accent",
+        icon: "moreh",
+        run: () => setAccent("mono"),
+      },
+      {
+        id: "ac-violet",
+        label: "Accent · Violet",
+        group: "Accent",
+        icon: "sparkles",
+        run: () => setAccent("violet"),
+      },
+      {
+        id: "open-tweaks",
+        label: "Open Tweaks panel",
+        group: "Showcase",
+        icon: "settings",
+        run: () => setTweaksOpen(true),
+      },
+      {
+        id: "demo-toast",
+        label: "Fire a sample toast",
+        group: "Showcase",
+        icon: "bell",
+        keywords: "notification",
+        run: () =>
+          toast.push({
+            kind: "success",
+            title: "Saved",
+            message: "Tweaks persisted to localStorage.",
+          }),
+      },
+    ],
+    [setAccent, setTheme, toggleTheme, toast],
+  );
 
   const currentTitle = ROUTES.find((r) => r.id === route)?.label ?? "";
 
@@ -51,7 +161,7 @@ export const App = (): JSX.Element => {
             <button
               key={r.id}
               className={`az-nav-item${route === r.id ? " is-active" : ""}`}
-              onClick={() => navigate(r.id)}
+              onClick={() => navigateTo(r.id)}
               aria-current={route === r.id ? "page" : undefined}
             >
               <Icon name={r.icon} size={16} />
@@ -64,18 +174,41 @@ export const App = (): JSX.Element => {
         <div className="az-topbar">
           <span className="az-topbar-title">{currentTitle}</span>
           <span className="az-topbar-spacer" />
+          <Button variant="ghost" size="sm" onClick={() => setPaletteOpen(true)}>
+            <Icon name="search" size={14} />
+            Commands <Kbd>⌘K</Kbd>
+          </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            aria-label={theme === "light" ? "Switch to dark theme" : "Switch to light theme"}
+            onClick={() => setTweaksOpen(true)}
+            aria-label="Open tweaks"
           >
-            <Icon name={theme === "light" ? "moon" : "sun"} size={14} />
-            {theme === "light" ? "Dark" : "Light"}
+            <Icon name="settings" size={14} />
+            Tweaks
           </Button>
         </div>
         {route === "foundations" ? <Foundations /> : <Components />}
       </main>
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        commands={commands}
+      />
+      <TweaksPanel
+        open={tweaksOpen}
+        onClose={() => setTweaksOpen(false)}
+        theme={tweaks.theme}
+        accent={tweaks.accent}
+        onThemeChange={setTheme}
+        onAccentChange={setAccent}
+      />
     </div>
   );
 };
+
+export const App = (): JSX.Element => (
+  <ToastProvider>
+    <Shell />
+  </ToastProvider>
+);

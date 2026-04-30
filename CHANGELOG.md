@@ -11,6 +11,44 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- Phase 3 of [docs/plan.md](docs/plan.md) — `@azores/ux` flow primitives
+  with focus/keyboard/persistence behavior, plus integration into the
+  showcase shell.
+  - [Modal](packages/ux/src/Modal/) — portaled dialog with backdrop,
+    Escape-to-close, focus restore, body scroll lock, and an opt-out
+    `padded` body for full-bleed contents (used by the palette).
+  - [Drawer](packages/ux/src/Drawer/) — side panel (left/right), backdrop
+    optional, slide-in animation, focus restore.
+  - Shared overlay behavior in
+    [packages/ux/src/overlay/useOverlay.ts](packages/ux/src/overlay/useOverlay.ts).
+  - [Toast](packages/ux/src/Toast/) — `<ToastProvider>`, `useToast()`,
+    portaled bottom-right viewport with auto-dismiss timers; four
+    semantic kinds (info/success/warning/danger).
+  - [CommandPalette](packages/ux/src/CommandPalette/) — built on Modal,
+    arrow-key navigation, fuzzy substring filter over label + keywords +
+    group, grouped results, ENTER to run.
+  - [TweaksPanel](packages/ux/src/TweaksPanel/) — Drawer-based panel
+    with theme (light/dark) and accent (ocean/volcanic/mono/violet)
+    controls. State + persistence via
+    [useTweaks](packages/ux/src/TweaksPanel/useTweaks.ts) (localStorage
+    key `azores:tweaks`). Applies `data-theme` / `data-accent` on
+    `<html>`.
+  - Accent token overrides in
+    [packages/ui/src/styles/tokens.css](packages/ui/src/styles/tokens.css)
+    — `[data-accent="volcanic"|"mono"|"violet"]` rules for both light and
+    dark, swapping `--az-primary`, `--az-primary-hover`, and `--az-accent`.
+  - `react-dom` added as a peer of `@azores/ux`
+    ([packages/ux/package.json](packages/ux/package.json)) — required by
+    the portals in Modal/Drawer/Toast.
+  - Showcase shell wiring
+    ([apps/web/src/App.tsx](apps/web/src/App.tsx)): `⌘K` toggles the
+    palette, topbar gains "Commands" + "Tweaks" buttons, theme toggle
+    moved into the Tweaks panel, app wrapped in `<ToastProvider>`.
+    Palette commands cover navigation, theme, accent, opening tweaks,
+    and firing a sample toast.
+  - "Overlays & feedback" section in
+    [apps/web/src/pages/Components.tsx](apps/web/src/pages/Components.tsx)
+    demoing Modal + Toast + the ⌘K hint.
 - Phase 2 of [docs/plan.md](docs/plan.md) — `@azores/ui` primitives complete and
   showcase shell live in `@azores/web`.
   - New primitives: [Box](packages/ui/src/Box/),

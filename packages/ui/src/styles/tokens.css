@@ -150,6 +150,40 @@
   --az-ring:      0 0 0 3px rgba(74, 155, 199, 0.28);
 }
 
+/* ---------- Accents ----------
+   Override semantic accent + primary tokens. The default (no attribute)
+   is Ocean primary + Lava accent. Each attribute swaps both. */
+:root[data-accent="volcanic"] {
+  --az-primary:       var(--az-lava-400);
+  --az-primary-hover: var(--az-lava-500);
+  --az-accent:        var(--az-amber-500);
+}
+:root[data-theme="dark"][data-accent="volcanic"] {
+  --az-primary:       #E07B53;
+  --az-primary-hover: #ECA88A;
+  --az-accent:        #E5C47A;
+}
+:root[data-accent="mono"] {
+  --az-primary:       var(--az-text);
+  --az-primary-hover: var(--az-text-2);
+  --az-accent:        var(--az-text-2);
+}
+:root[data-theme="dark"][data-accent="mono"] {
+  --az-primary:       var(--az-text);
+  --az-primary-hover: var(--az-text-2);
+  --az-accent:        var(--az-text-2);
+}
+:root[data-accent="violet"] {
+  --az-primary:       #6B4FBB;
+  --az-primary-hover: #8466D6;
+  --az-accent:        #B07CD8;
+}
+:root[data-theme="dark"][data-accent="violet"] {
+  --az-primary:       #9678E0;
+  --az-primary-hover: #B49EEE;
+  --az-accent:        #D2AAEC;
+}
+
 /* ---------- Base resets ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 html, body {

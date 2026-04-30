@@ -23,6 +23,7 @@ import {
   Stack,
   Textarea,
 } from "@azores/ui";
+import { Modal, useToast } from "@azores/ux";
 
 type DemoCardProps = { label: string; children: ReactNode };
 const DemoCard = ({ label, children }: DemoCardProps): JSX.Element => (
@@ -36,6 +37,18 @@ export const Components = (): JSX.Element => {
   const [email, setEmail] = useState("catarina@azores.app");
   const [region, setRegion] = useState("lis");
   const [notes, setNotes] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const toast = useToast();
+
+  const fireToast = (kind: "info" | "success" | "warning" | "danger"): void => {
+    const presets = {
+      success: { title: "Deployed to production", message: "azores-prod · 2 services updated" },
+      warning: { title: "Quota almost reached", message: "92% of monthly minutes used" },
+      danger: { title: "Build failed", message: "Step `lint` exited with code 1" },
+      info: { title: "Sync complete", message: "12 records updated · 3 ignored" },
+    } as const;
+    toast.push({ kind, ...presets[kind] });
+  };
 
   return (
     <div className="az-content">
@@ -75,6 +88,53 @@ export const Components = (): JSX.Element => {
           </DemoCard>
         </div>
       </section>
+
+      <section className="az-section">
+        <div className="az-section-head">
+          <h2 className="az-section-title">Overlays & feedback</h2>
+        </div>
+        <div className="az-demo">
+          <DemoCard label="Modal">
+            <Button variant="primary" onClick={() => setModalOpen(true)}>
+              Open dialog
+            </Button>
+          </DemoCard>
+          <DemoCard label="Toasts">
+            <Inline gap={2} wrap justify="center">
+              <Button size="sm" onClick={() => fireToast("success")}>Success</Button>
+              <Button size="sm" onClick={() => fireToast("warning")}>Warning</Button>
+              <Button size="sm" onClick={() => fireToast("danger")}>Danger</Button>
+              <Button size="sm" onClick={() => fireToast("info")}>Info</Button>
+            </Inline>
+          </DemoCard>
+          <DemoCard label="Command palette">
+            <Inline gap={2} align="center">
+              <span style={{ fontSize: 13, color: "var(--az-text-3)" }}>Press</span>
+              <Kbd>⌘</Kbd>
+              <Kbd>K</Kbd>
+            </Inline>
+          </DemoCard>
+        </div>
+      </section>
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        title="Delete project?"
+        footer={
+          <>
+            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button variant="danger" onClick={() => setModalOpen(false)}>
+              Delete project
+            </Button>
+          </>
+        }
+      >
+        <p style={{ margin: 0, color: "var(--az-text-2)" }}>
+          This will permanently delete <strong>azores-prod</strong>, all its environments,
+          deployments and logs. This action cannot be undone.
+        </p>
+      </Modal>
 
       <section className="az-section">
         <div className="az-section-head">

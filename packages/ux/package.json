@@ -9,7 +9,8 @@
     "typecheck": "tsc -b"
   },
   "peerDependencies": {
-    "react": "catalog:"
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "dependencies": {
     "@azores/ui": "workspace:*",
@@ -17,6 +18,7 @@
     "@emotion/styled": "catalog:"
   },
   "devDependencies": {
-    "@types/react": "catalog:"
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:"
   }
 }

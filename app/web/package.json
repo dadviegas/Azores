@@ -1,0 +1,13 @@
+{
+  "name": "@azores/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@azores/core": "workspace:*",
+    "@azores/design": "workspace:*"
+  }
+}

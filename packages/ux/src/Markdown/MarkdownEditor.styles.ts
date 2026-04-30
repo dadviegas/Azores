@@ -9,6 +9,10 @@ export const Editor = styled.div({
   overflow: "hidden",
   background: tokens.surface,
   minHeight: "560px",
+  "@media (max-width: 768px)": {
+    gridTemplateColumns: "1fr",
+    minHeight: "auto",
+  },
 });
 
 export const Pane = styled.div({
@@ -19,6 +23,10 @@ export const Pane = styled.div({
 
 export const SourcePane = styled(Pane)({
   borderRight: `1px solid ${tokens.line}`,
+  "@media (max-width: 768px)": {
+    borderRight: "none",
+    borderBottom: `1px solid ${tokens.line}`,
+  },
 });
 
 export const Toolbar = styled.div({
@@ -66,6 +74,7 @@ export const SourceArea = styled.textarea({
   fontSize: tokens.fs.sm,
   lineHeight: 1.6,
   minHeight: 0,
+  "@media (max-width: 768px)": { minHeight: "320px" },
 });
 
 export const PreviewPane = styled.div({
@@ -73,4 +82,5 @@ export const PreviewPane = styled.div({
   overflow: "auto",
   padding: tokens.s[5],
   background: tokens.surface,
+  "@media (max-width: 768px)": { minHeight: "320px" },
 });

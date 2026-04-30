@@ -651,3 +651,20 @@
 :root[data-theme="dark"][data-accent="volcanic"] { --az-primary: #6FA67F; --az-primary-hover: #88BD98; }
 :root[data-theme="dark"][data-accent="mono"] { --az-primary: #F0F1F3; --az-primary-hover: #DADBDD; }
 :root[data-theme="dark"][data-accent="violet"] { --az-primary: #9B7FD4; --az-primary-hover: #B9A3E0; }
+
+/* ---------- Mobile responsiveness ---------- */
+.az-md-table-wrap { overflow-x: auto; margin: 1.2em 0; }
+.az-md-table-wrap > table { margin: 0; }
+.az-md-math-block { overflow-x: auto; }
+.az-md-codeblock { max-width: 100%; }
+
+@media (max-width: 768px) {
+  .az-md { font-size: 14px; }
+  .az-md h1 { font-size: 1.9em; }
+  .az-md h2 { font-size: 1.45em; }
+  .az-md h3 { font-size: 1.2em; }
+  .az-md pre { font-size: 12px; }
+  .az-md-callout { padding: 12px; gap: 10px; }
+  .az-md-codeblock-gutter { padding: 12px 8px; min-width: 32px; }
+  .az-md-codeblock-body { padding: 12px; font-size: 12px; }
+}

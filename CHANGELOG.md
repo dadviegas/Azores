@@ -11,6 +11,42 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Changed
+- Mobile responsiveness pass across the showcase + design system.
+  - **App shell**
+    ([apps/web/src/App.tsx](apps/web/src/App.tsx),
+    [apps/web/src/showcase.css](apps/web/src/showcase.css)): under
+    900px the sidebar collapses off-screen and slides in via a hamburger
+    in the topbar; backdrop dismisses; nav auto-closes on route change.
+    Topbar button labels (`Commands ⌘K`, `Tweaks`) hide at narrow
+    widths, leaving icon-only. Topbar stays above the drawer (so the
+    burger is always reachable to close it) and the drawer anchors
+    `top: 56px / bottom: 0` instead of `100vh` so iOS Safari sizes it
+    correctly. Topbar/sidebar/content padding respect
+    `env(safe-area-inset-*)` for notched devices. The `BrandMark` shows
+    in the topbar on mobile so the brand is visible whether the drawer
+    is open or closed.
+  - **Foundations**
+    ([apps/web/src/pages/Foundations.tsx](apps/web/src/pages/Foundations.tsx)):
+    fixed `1fr 1fr` and `repeat(5, 1fr)` grids replaced with
+    `auto-fit minmax()` so spacing/radii/elevation reflow.
+  - **Dashboard**
+    ([apps/web/src/pages/Dashboard.tsx](apps/web/src/pages/Dashboard.tsx)):
+    grid cols now responsive via `matchMedia` — 12 (≥900px) / 8
+    (480–900px) / 4 (<480px); widget widths get clamped by the existing
+    packing logic. Header wraps on narrow screens.
+  - **MarkdownEditor**
+    ([packages/ux/src/Markdown/MarkdownEditor.styles.ts](packages/ux/src/Markdown/MarkdownEditor.styles.ts)):
+    split panes stack vertically under 768px; per-pane minimum heights
+    keep both usable.
+  - **Markdown content**
+    ([packages/ux/src/Markdown/MarkdownView.tsx](packages/ux/src/Markdown/MarkdownView.tsx),
+    [packages/ux/src/Markdown/markdown.css](packages/ux/src/Markdown/markdown.css)):
+    tables wrapped in scroll containers; KaTeX math blocks scroll
+    horizontally; heading/code sizes shrink under 768px.
+  - **Toast**
+    ([packages/ux/src/Toast/Toast.styles.ts](packages/ux/src/Toast/Toast.styles.ts)):
+    viewport switches to full-width pinned bottom under 480px;
+    individual toasts respect the available width.
 - KaTeX wired into the markdown pipeline. Inline `$…$` and block `$$…$$`
   / fenced ` ```math ` are now rendered as real math instead of plain
   italic text.

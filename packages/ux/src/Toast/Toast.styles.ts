@@ -21,11 +21,19 @@ export const Viewport = styled.div({
   position: "fixed",
   bottom: tokens.s[6],
   right: tokens.s[6],
+  left: "auto",
   display: "flex",
   flexDirection: "column",
   gap: tokens.s[2],
   zIndex: tokens.z.toast,
   pointerEvents: "none",
+  maxWidth: `calc(100vw - ${tokens.s[8]})`,
+  "@media (max-width: 480px)": {
+    bottom: tokens.s[3],
+    right: tokens.s[3],
+    left: tokens.s[3],
+    maxWidth: "none",
+  },
 });
 
 export const ToastBox = styled.div<{ $kind: ToastKind }>(({ $kind }) => ({
@@ -34,8 +42,8 @@ export const ToastBox = styled.div<{ $kind: ToastKind }>(({ $kind }) => ({
   gridTemplateColumns: "auto 1fr auto",
   alignItems: "flex-start",
   gap: tokens.s[3],
-  minWidth: "280px",
-  maxWidth: "380px",
+  minWidth: "min(280px, 100%)",
+  maxWidth: "min(380px, 100%)",
   padding: `${tokens.s[3]} ${tokens.s[4]}`,
   background: tokens.surface,
   border: `1px solid ${tokens.line}`,

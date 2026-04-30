@@ -35,6 +35,7 @@ const Shell = (): JSX.Element => {
   const [route, setRoute] = useState<Route>(readRoute);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const { tweaks, setTheme, setAccent, toggleTheme } = useTweaks();
   const toast = useToast();
 
@@ -43,6 +44,15 @@ const Shell = (): JSX.Element => {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+
+  useEffect(() => {
+    document.body.dataset.navOpen = navOpen ? "true" : "false";
+  }, [navOpen]);
+
+  // Close mobile nav whenever route changes
+  useEffect(() => {
+    setNavOpen(false);
+  }, [route]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
@@ -167,6 +177,11 @@ const Shell = (): JSX.Element => {
 
   return (
     <div className="az-app">
+      <div
+        className="az-sidebar-backdrop"
+        aria-hidden="true"
+        onClick={() => setNavOpen(false)}
+      />
       <aside className="az-sidebar">
         <div className="az-brand">
           <BrandMark size="md" />
@@ -192,11 +207,25 @@ const Shell = (): JSX.Element => {
       </aside>
       <main className="az-main">
         <div className="az-topbar">
+          <button
+            className="az-burger"
+            type="button"
+            aria-label={navOpen ? "Close navigation" : "Open navigation"}
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((o) => !o)}
+          >
+            <Icon name={navOpen ? "x" : "menu"} size={18} />
+          </button>
+          <span className="az-topbar-brand" aria-hidden="true">
+            <BrandMark size="sm" />
+          </span>
           <span className="az-topbar-title">{currentTitle}</span>
           <span className="az-topbar-spacer" />
           <Button variant="ghost" size="sm" onClick={() => setPaletteOpen(true)}>
             <Icon name="search" size={14} />
-            Commands <Kbd>⌘K</Kbd>
+            <span className="az-topbar-btn-label">
+              Commands <Kbd>⌘K</Kbd>
+            </span>
           </Button>
           <Button
             variant="ghost"
@@ -205,7 +234,7 @@ const Shell = (): JSX.Element => {
             aria-label="Open tweaks"
           >
             <Icon name="settings" size={14} />
-            Tweaks
+            <span className="az-topbar-btn-label">Tweaks</span>
           </Button>
         </div>
         {route === "foundations" ? (

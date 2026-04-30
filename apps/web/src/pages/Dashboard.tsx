@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Background, Button, Icon, type BackgroundId } from "@azores/ui";
 import { Dashboard, type DashboardWidget } from "@azores/ux";
 import {
@@ -103,9 +103,32 @@ const renderBody = (widget: Widget): ReactNode => {
   }
 };
 
+// Watch viewport, return responsive grid cols.
+const useResponsiveCols = (): number => {
+  const [cols, setCols] = useState<number>(() => {
+    if (typeof window === "undefined") return 12;
+    if (window.matchMedia("(max-width: 480px)").matches) return 4;
+    if (window.matchMedia("(max-width: 1024px)").matches) return 8;
+    return 12;
+  });
+  useEffect(() => {
+    const sm = window.matchMedia("(max-width: 480px)");
+    const md = window.matchMedia("(max-width: 1024px)");
+    const update = (): void => setCols(sm.matches ? 4 : md.matches ? 8 : 12);
+    sm.addEventListener("change", update);
+    md.addEventListener("change", update);
+    return () => {
+      sm.removeEventListener("change", update);
+      md.removeEventListener("change", update);
+    };
+  }, []);
+  return cols;
+};
+
 export const DashboardPage = (): JSX.Element => {
   const [widgets, setWidgets] = useState<Widget[]>(INITIAL);
   const [bg, setBg] = useState<BackgroundId | "paper">("paper");
+  const cols = useResponsiveCols();
 
   const removeWidget = (id: string): void =>
     setWidgets((prev) => prev.filter((w) => w.id !== id));
@@ -113,7 +136,7 @@ export const DashboardPage = (): JSX.Element => {
   const reset = (): void => setWidgets(INITIAL);
 
   const content = (
-    <div className="az-content" style={{ maxWidth: "none", padding: "var(--az-s-8)" }}>
+    <div className="az-content" style={{ maxWidth: "none" }}>
       <div
         style={{
           display: "flex",
@@ -121,6 +144,7 @@ export const DashboardPage = (): JSX.Element => {
           justifyContent: "space-between",
           marginBottom: 24,
           gap: 16,
+          flexWrap: "wrap",
         }}
       >
         <div>
@@ -187,6 +211,8 @@ export const DashboardPage = (): JSX.Element => {
       <Dashboard<WidgetData[WidgetType]>
         widgets={widgets}
         onChange={setWidgets}
+        cols={cols}
+        minWidth={Math.min(2, cols)}
         renderTitle={(w) => TITLES[w.type as WidgetType] ?? w.type}
         renderBody={({ widget }) => renderBody(widget)}
         widgetActions={(w) => [

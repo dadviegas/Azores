@@ -132,7 +132,13 @@ export const Foundations = (): JSX.Element => (
         <h2 className="az-section-title">Spacing & Radii</h2>
         <span className="az-section-sub">4px base scale</span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 24,
+        }}
+      >
         <Card>
           <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
             <div style={{ fontWeight: 600, marginBottom: 8 }}>Spacing</div>
@@ -194,7 +200,13 @@ export const Foundations = (): JSX.Element => (
       <div className="az-section-head">
         <h2 className="az-section-title">Elevation</h2>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: 16,
+        }}
+      >
         {SHADOWS.map((s) => (
           <div
             key={s}

@@ -50,24 +50,26 @@ const renderBlocks = (blocks: Block[]): ReactNode =>
         );
       case "table":
         return (
-          <table key={i}>
-            <thead>
-              <tr>
-                {b.head.map((h, j) => (
-                  <th key={j}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {b.rows.map((r, j) => (
-                <tr key={j}>
-                  {r.map((c, k) => (
-                    <td key={k} dangerouslySetInnerHTML={{ __html: c }} />
+          <div key={i} className="az-md-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  {b.head.map((h, j) => (
+                    <th key={j}>{h}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {b.rows.map((r, j) => (
+                  <tr key={j}>
+                    {r.map((c, k) => (
+                      <td key={k} dangerouslySetInnerHTML={{ __html: c }} />
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         );
       case "image":
         return (

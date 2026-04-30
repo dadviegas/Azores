@@ -229,7 +229,7 @@ export const DashboardPage = (): JSX.Element => {
 
   if (bg === "paper") return content;
   return (
-    <div style={{ position: "relative", minHeight: "100%" }}>
+    <div style={{ position: "relative", minHeight: "calc(100dvh - 56px)" }}>
       <Background
         variant={bg}
         style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}

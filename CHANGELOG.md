@@ -71,6 +71,26 @@ with relative links so the entry stays clickable.
   ([packages/ux/src/Markdown/Mermaid.tsx](packages/ux/src/Markdown/Mermaid.tsx)).
 
 ### Added
+- App icon / favicon at [apps/web/icon.svg](apps/web/icon.svg) — single
+  SVG matching the `BrandMark` (ocean gradient + lava dot + `AZ`
+  wordmark). Wired in [apps/web/index.html](apps/web/index.html) via
+  `<link rel="icon">` + `<link rel="apple-touch-icon">` and copied to
+  `dist/` by `CopyRspackPlugin`
+  ([apps/web/rspack.config.mjs](apps/web/rspack.config.mjs)).
+- `BrandMark` now renders an "AZ" wordmark inside the gradient square
+  ([packages/ui/src/BrandMark/](packages/ui/src/BrandMark/)). Display
+  font, weight 600, sizes scale with `sm` / `md` / `lg`. Lava dot
+  badge unchanged.
+- Icons showcase route `#/icons` ported from
+  [docs/design/Azores/page-icons.jsx](docs/design/Azores/page-icons.jsx).
+  Single-file page in [apps/web/src/pages/Icons.tsx](apps/web/src/pages/Icons.tsx)
+  reusing existing primitives — `Icon` / `Input` / `Button` / `Badge` /
+  `Inline` from `@azores/ui` and `useToast()` from `@azores/ux` — instead
+  of re-rolling inputs, chips, code blocks, or a custom toast.
+  Sticky toolbar (search + size pills + stroke slider), category chip
+  filter, sectioned grid; clicking any tile copies its `<Icon name="…"/>`
+  tag and fires a toast. Wired into the sidebar nav and palette
+  ([apps/web/src/App.tsx](apps/web/src/App.tsx)).
 - Phase 5 of [docs/plan.md](docs/plan.md) — `@azores/ux` `MarkdownView` +
   `MarkdownEditor`, ported from
   [docs/design/Azores/page-markdown.jsx](docs/design/Azores/page-markdown.jsx)

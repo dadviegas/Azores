@@ -3,10 +3,10 @@ import { tokens } from "../styles/tokens.js";
 
 export type BrandSize = "sm" | "md" | "lg";
 
-const sizeMap: Record<BrandSize, { box: string; dot: string; offset: string }> = {
-  sm: { box: "24px", dot: "10px", offset: "-4px" },
-  md: { box: "32px", dot: "14px", offset: "-6px" },
-  lg: { box: "40px", dot: "16px", offset: "-6px" },
+const sizeMap: Record<BrandSize, { box: string; dot: string; offset: string; fs: string }> = {
+  sm: { box: "24px", dot: "10px", offset: "-4px", fs: "10px" },
+  md: { box: "32px", dot: "14px", offset: "-6px", fs: "13px" },
+  lg: { box: "40px", dot: "16px", offset: "-6px", fs: "16px" },
 };
 
 export const StyledBrandMark = styled.span<{ $size: BrandSize }>(({ $size }) => {
@@ -22,6 +22,11 @@ export const StyledBrandMark = styled.span<{ $size: BrandSize }>(({ $size }) => 
     position: "relative",
     overflow: "hidden",
     flexShrink: 0,
+    fontFamily: tokens.font.display,
+    fontSize: s.fs,
+    fontWeight: 600,
+    letterSpacing: "0.02em",
+    lineHeight: 1,
     "&::after": {
       content: '""',
       position: "absolute",

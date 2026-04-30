@@ -6,5 +6,7 @@ export type BrandMarkProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 export const BrandMark = ({ size = "md", ...rest }: BrandMarkProps): JSX.Element => (
-  <StyledBrandMark $size={size} aria-hidden {...rest} />
+  <StyledBrandMark $size={size} aria-hidden {...rest}>
+    AZ
+  </StyledBrandMark>
 );

@@ -52,6 +52,7 @@ export default defineConfig({
   experiments: { css: true },
   plugins: [
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
+    new rspack.CopyRspackPlugin({ patterns: [{ from: "icon.svg", to: "icon.svg" }] }),
     isDev && new ReactRefreshPlugin(),
   ].filter(Boolean),
   devServer: { port: 5173, historyApiFallback: true, hot: true },

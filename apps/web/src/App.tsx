@@ -12,12 +12,14 @@ import { Foundations } from "./pages/Foundations";
 import { Components } from "./pages/Components";
 import { DashboardPage } from "./pages/Dashboard";
 import { Markdown } from "./pages/Markdown";
+import { Icons } from "./pages/Icons";
 
-type Route = "foundations" | "components" | "ux" | "markdown";
+type Route = "foundations" | "components" | "ux" | "markdown" | "icons";
 
 const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
   { id: "foundations", label: "Foundations", icon: "layers" },
   { id: "components", label: "Components", icon: "grid" },
+  { id: "icons", label: "Icons", icon: "sparkles" },
   { id: "ux", label: "UX dashboard", icon: "dashboard" },
   { id: "markdown", label: "Markdown", icon: "bookopen" },
 ];
@@ -82,6 +84,14 @@ const Shell = (): JSX.Element => {
         icon: "grid",
         keywords: "buttons inputs badges",
         run: () => navigateTo("components"),
+      },
+      {
+        id: "nav-icons",
+        label: "Go to Icons",
+        group: "Navigate",
+        icon: "sparkles",
+        keywords: "icon library glyphs",
+        run: () => navigateTo("icons"),
       },
       {
         id: "nav-ux",
@@ -241,6 +251,8 @@ const Shell = (): JSX.Element => {
           <Foundations />
         ) : route === "components" ? (
           <Components />
+        ) : route === "icons" ? (
+          <Icons />
         ) : route === "ux" ? (
           <DashboardPage />
         ) : (

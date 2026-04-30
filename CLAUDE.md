@@ -6,10 +6,19 @@ anything that becomes stale rather than letting it rot.
 
 ## Stack
 
-- **Monorepo** — pnpm workspaces. Packages: `app/web` (consumer), `design/ui`
-  (design system), `packages/core` (shared logic), `packages/config` (typed
-  env/config). Cross-package imports use `@azores/<name>` and must be declared
-  as `workspace:*` deps in the consuming package.
+- **Monorepo** — pnpm workspaces. Packages live under `app/*` (deployables)
+  and `packages/*` (libraries):
+  - `@azores/web` — consumer app (rspack + React)
+  - `@azores/ui` — visual primitives & design tokens (buttons, inputs,
+    typography, color/spacing/radius). Pure presentation.
+  - `@azores/ux` — interaction & flow components (layouts, modals,
+    navigation, transitions, focus/keyboard). Composes `@azores/ui`; owns
+    behavior, not chrome.
+  - `@azores/core` — shared framework-agnostic logic.
+  - `@azores/config` — typed env/config loader.
+
+  Cross-package imports use the `@azores/<name>` specifier and must be
+  declared as `workspace:*` deps in the consuming package.
 - **Build** — rspack + swc-loader. No Babel. Dev server: `pnpm --filter
   @azores/web dev` on port 5173.
 - **UI** — React 18, function components, hooks. No class components.
@@ -51,16 +60,21 @@ anything that becomes stale rather than letting it rot.
 ## Styling
 
 - Inline `style={{}}` is fine for one-offs and theme tokens (see
-  `design/ui`'s `theme`). For anything reused across components, add a token
-  or component to `@azores/design` first.
+  `@azores/ui`'s `theme`). For anything reused across components, add a token
+  or component to `@azores/ui` first.
 - No CSS-in-JS runtime libraries (styled-components, emotion). If we need
   scoped styles, use CSS Modules via rspack.
-- Design tokens live in `design/ui/src` and are the single source of truth
-  for radius, spacing, color, typography. Components in `app/web` read tokens
-  from `@azores/design` — never hardcode hex values, pixel spacing, or font
-  stacks in app code.
-- Layout primitives (Stack, Inline, Box) belong in `@azores/design`. App
-  components compose them; they don't reinvent flex/grid.
+- Design tokens live in `packages/ui/src` and are the single source of truth
+  for radius, spacing, color, typography. Components in `app/web` read
+  tokens from `@azores/ui` — never hardcode hex values, pixel spacing, or
+  font stacks in app code.
+- Layout primitives (Stack, Inline, Box) and other behavior-bearing
+  components (modals, popovers, focus traps, transitions) belong in
+  `@azores/ux`. App components compose them; they don't reinvent flex/grid
+  or focus management.
+- **`ui` vs `ux` rule of thumb**: if it makes sense as a static screenshot,
+  it belongs in `@azores/ui`. If it only makes sense in motion (open/close,
+  focus, navigation, drag, async state) it belongs in `@azores/ux`.
 
 ## Accessibility (non-negotiable)
 
@@ -117,7 +131,7 @@ anything that becomes stale rather than letting it rot.
 
 ## When adding a new app or package
 
-1. Create under `app/`, `design/`, or `packages/` — match the existing
+1. Create under `app/` or `packages/` — match the existing
    convention (`@azores/<name>`).
 2. Copy a sibling's `package.json` + `tsconfig.json` as the starting point.
 3. Register the path in the root `tsconfig.json` `references` array.

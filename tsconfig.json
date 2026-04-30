@@ -4,7 +4,8 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./packages/config" },
-    { "path": "./design/ui" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/ux" },
     { "path": "./app/web/tsconfig.app.json" }
   ]
 }

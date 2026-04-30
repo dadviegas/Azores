@@ -9,25 +9,25 @@ importers:
   .:
     devDependencies:
       '@eslint/js':
-        specifier: ^9.12.0
+        specifier: ^9.39.4
         version: 9.39.4
       '@types/node':
-        specifier: ^22.7.5
+        specifier: ^22.19.17
         version: 22.19.17
       eslint:
-        specifier: ^9.12.0
+        specifier: ^9.39.4
         version: 9.39.4
       eslint-config-prettier:
-        specifier: ^9.1.0
+        specifier: ^9.1.2
         version: 9.1.2(eslint@9.39.4)
       prettier:
-        specifier: ^3.3.3
+        specifier: ^3.8.3
         version: 3.8.3
       typescript:
-        specifier: ^5.6.2
+        specifier: ^5.9.3
         version: 5.9.3
       typescript-eslint:
-        specifier: ^8.8.1
+        specifier: ^8.59.1
         version: 8.59.1(eslint@9.39.4)(typescript@5.9.3)
 
   app/web:
@@ -35,9 +35,12 @@ importers:
       '@azores/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@azores/design':
+      '@azores/ui':
         specifier: workspace:*
-        version: link:../../design/ui
+        version: link:../../packages/ui
+      '@azores/ux':
+        specifier: workspace:*
+        version: link:../../packages/ux
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -58,8 +61,6 @@ importers:
         specifier: ^18.3.1
         version: 18.3.7(@types/react@18.3.28)
 
-  design/ui: {}
-
   packages/config:
     dependencies:
       yaml:
@@ -67,6 +68,21 @@ importers:
         version: 2.8.3
 
   packages/core: {}
+
+  packages/ui:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+
+  packages/ux:
+    dependencies:
+      '@azores/ui':
+        specifier: workspace:*
+        version: link:../ui
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
 
 packages:
 
@@ -302,21 +318,25 @@ packages:
     resolution: {integrity: sha512-P0QrGRPbTWu6RKWfN0bDtbnEps3rXH0MWIMreZABoUrVmNQKtXR6e73J3ub6a+di5s2+K0M2LJ9Bh2/H4UsDUA==}
     cpu: [arm64]
     os: [linux]
+    libc: [glibc]
 
   '@rspack/binding-linux-arm64-musl@1.7.11':
     resolution: {integrity: sha512-6ky7R43VMjWwmx3Yx7Jl7faLBBMAgMDt+/bN35RgwjiPgsIByz65EwytUVuW9rikB43BGHvA/eqlnjLrUzNBqw==}
     cpu: [arm64]
     os: [linux]
+    libc: [musl]
 
   '@rspack/binding-linux-x64-gnu@1.7.11':
     resolution: {integrity: sha512-cuOJMfCOvb2Wgsry5enXJ3iT1FGUjdPqtGUBVupQlEG4ntSYsQ2PtF4wIDVasR3wdxC5nQbipOrDiN/u6fYsdQ==}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   '@rspack/binding-linux-x64-musl@1.7.11':
     resolution: {integrity: sha512-CoK37hva4AmHGh3VCsQXmGr40L36m1/AdnN5LEjUX6kx5rEH7/1nEBN6Ii72pejqDVvk9anEROmPDiPw10tpFg==}
     cpu: [x64]
     os: [linux]
+    libc: [musl]
 
   '@rspack/binding-wasm32-wasi@1.7.11':
     resolution: {integrity: sha512-OtrmnPUVJMxjNa3eDMfHyPdtlLRmmp/aIm0fQHlAOATbZvlGm12q7rhPW5BXTu1yh+1rQ1/uqvz+SzKEZXuJaQ==}

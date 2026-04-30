@@ -1,5 +1,5 @@
 import { greet } from "@azores/core";
-import { theme } from "@azores/design";
+import { theme } from "@azores/ui";
 
 export const App = (): JSX.Element => (
   <main style={{ borderRadius: theme.radius, padding: 16 }}>

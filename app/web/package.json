@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@azores/core": "workspace:*",
-    "@azores/design": "workspace:*",
+    "@azores/ui": "workspace:*",
+    "@azores/ux": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

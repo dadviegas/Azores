@@ -13,8 +13,9 @@ import { Components } from "./pages/Components";
 import { DashboardPage } from "./pages/Dashboard";
 import { Markdown } from "./pages/Markdown";
 import { Icons } from "./pages/Icons";
+import { LoginPage } from "./pages/Login";
 
-type Route = "foundations" | "components" | "ux" | "markdown" | "icons";
+type Route = "foundations" | "components" | "ux" | "markdown" | "icons" | "login";
 
 const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
   { id: "foundations", label: "Foundations", icon: "layers" },
@@ -22,6 +23,7 @@ const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
   { id: "icons", label: "Icons", icon: "sparkles" },
   { id: "ux", label: "UX dashboard", icon: "dashboard" },
   { id: "markdown", label: "Markdown", icon: "bookopen" },
+  { id: "login", label: "Login", icon: "user" },
 ];
 
 const readRoute = (): Route => {
@@ -110,6 +112,14 @@ const Shell = (): JSX.Element => {
         run: () => navigateTo("markdown"),
       },
       {
+        id: "nav-login",
+        label: "Go to Login",
+        group: "Navigate",
+        icon: "user",
+        keywords: "sign in auth",
+        run: () => navigateTo("login"),
+      },
+      {
         id: "th-toggle",
         label: "Toggle theme",
         group: "Theme",
@@ -184,6 +194,27 @@ const Shell = (): JSX.Element => {
   );
 
   const currentTitle = ROUTES.find((r) => r.id === route)?.label ?? "";
+
+  if (route === "login") {
+    return (
+      <>
+        <LoginPage />
+        <CommandPalette
+          open={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          commands={commands}
+        />
+        <TweaksPanel
+          open={tweaksOpen}
+          onClose={() => setTweaksOpen(false)}
+          theme={tweaks.theme}
+          accent={tweaks.accent}
+          onThemeChange={setTheme}
+          onAccentChange={setAccent}
+        />
+      </>
+    );
+  }
 
   return (
     <div className="az-app">

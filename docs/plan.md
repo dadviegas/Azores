@@ -6,10 +6,10 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–5 shipped (Emotion + tokens, `@azores/ui` primitives,
-flow primitives, dashboard, markdown). Remaining work is the login
-flow and the testing/lint-guard pass. See
-[`CHANGELOG.md`](../CHANGELOG.md) for what landed.
+Status: phases 1–6 shipped (Emotion + tokens, `@azores/ui` primitives,
+flow primitives, dashboard, markdown, login). Remaining work is the
+testing / lint-guard pass. See [`CHANGELOG.md`](../CHANGELOG.md) for
+what landed.
 
 ---
 
@@ -36,7 +36,6 @@ importing `@azores/ux` via an ESLint `no-restricted-imports` rule.
 
 | Phase | Scope | Done when |
 | --- | --- | --- |
-| 6 | Login flow in `@azores/ux/src/auth/`, ported from [`page-login.jsx`](./design/Azores/page-login.jsx). | Login showcase mirrors `page-login.jsx`. |
 | 7 | Tests (Vitest + RTL) for behavior in `@azores/ux`; basic visual smoke for `@azores/ui`. ESLint `no-restricted-imports` guard so `@azores/ui` can't import `@azores/ux`. | `pnpm test` green; lint forbids `@azores/ui` → `@azores/ux`. |
 
 Each phase is a single PR. Don't bundle phases — review surface stays

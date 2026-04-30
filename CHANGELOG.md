@@ -10,6 +10,25 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Added
+- Phase 6 of [docs/plan.md](docs/plan.md) — `LoginFlow` in
+  [`@azores/ux/src/auth/`](packages/ux/src/auth/), ported from
+  [docs/design/Azores/page-login.jsx](docs/design/Azores/page-login.jsx).
+  Two-pane layout (form + topo visual), OAuth provider row, email/password
+  with leading-icon input groups, "Forgot?" + "Create account" hooks,
+  spinner during submit. Visual pane collapses under 900px. Composes
+  `BrandMark`, `Button`, and `Icon` from `@azores/ui`; no new deps.
+  - Public API: `LoginFlow({ onLogin, onProvider, onForgotPassword,
+    onCreateAccount })` with `LoginCredentials` and `LoginProvider` types.
+  - New showcase route `#/login`
+    ([apps/web/src/App.tsx](apps/web/src/App.tsx)) plus palette command
+    "Go to Login". When active it bypasses the showcase shell so the
+    full-bleed login design renders edge-to-edge; the command palette
+    and tweaks panel remain reachable so the user can navigate away.
+  - [apps/web/src/pages/Login.tsx](apps/web/src/pages/Login.tsx) wires
+    the flow into the showcase with `useToast()` stand-ins for the
+    sign-in / provider / forgot / create-account callbacks.
+
 ### Changed
 - [docs/plan.md](docs/plan.md) trimmed to what's still actionable.
   Phases 1–5 (Emotion + tokens, `@azores/ui` primitives, flow

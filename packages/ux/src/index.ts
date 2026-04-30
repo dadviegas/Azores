@@ -10,3 +10,4 @@ export * from "./CommandPalette/index.js";
 export * from "./TweaksPanel/index.js";
 export * from "./Dashboard/index.js";
 export * from "./Markdown/index.js";
+export * from "./auth/index.js";

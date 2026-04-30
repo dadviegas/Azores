@@ -10,12 +10,14 @@ import {
 } from "@azores/ux";
 import { Foundations } from "./pages/Foundations";
 import { Components } from "./pages/Components";
+import { DashboardPage } from "./pages/Dashboard";
 
-type Route = "foundations" | "components";
+type Route = "foundations" | "components" | "ux";
 
 const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
   { id: "foundations", label: "Foundations", icon: "layers" },
   { id: "components", label: "Components", icon: "grid" },
+  { id: "ux", label: "UX dashboard", icon: "dashboard" },
 ];
 
 const readRoute = (): Route => {
@@ -68,6 +70,14 @@ const Shell = (): JSX.Element => {
         icon: "grid",
         keywords: "buttons inputs badges",
         run: () => navigateTo("components"),
+      },
+      {
+        id: "nav-ux",
+        label: "Go to UX dashboard",
+        group: "Navigate",
+        icon: "dashboard",
+        keywords: "widgets drag resize",
+        run: () => navigateTo("ux"),
       },
       {
         id: "th-toggle",
@@ -188,7 +198,13 @@ const Shell = (): JSX.Element => {
             Tweaks
           </Button>
         </div>
-        {route === "foundations" ? <Foundations /> : <Components />}
+        {route === "foundations" ? (
+          <Foundations />
+        ) : route === "components" ? (
+          <Components />
+        ) : (
+          <DashboardPage />
+        )}
       </main>
       <CommandPalette
         open={paletteOpen}

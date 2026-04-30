@@ -11,6 +11,32 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- Phase 4 of [docs/plan.md](docs/plan.md) — `@azores/ux` `Dashboard`
+  primitive with drag/resize, plus a UX dashboard showcase page using
+  `@azores/ui` `Background` variants.
+  - [Dashboard](packages/ux/src/Dashboard/) — generic 12-col grid with
+    HTML5 drag-to-reorder (live ghost preview during drag), corner
+    resize, packing, configurable cols/rowHeight/gap/min-max sizes.
+    Consumer supplies `renderTitle` + `renderBody` and optional per-widget
+    `widgetActions`. Pure layout helpers (packing + insertion reorder)
+    live in [layout.ts](packages/ux/src/Dashboard/layout.ts) and are
+    exported.
+  - New showcase route `#/ux`
+    ([apps/web/src/App.tsx](apps/web/src/App.tsx)) plus palette command
+    "Go to UX dashboard".
+  - [pages/Dashboard.tsx](apps/web/src/pages/Dashboard.tsx) — sample
+    layout with KPI / Chart / Tasks / Calendar / Notes / Clock / Team
+    widgets and a 6-option background picker (Paper, Atlantic, Blueprint,
+    Fog, Moss, Basalt) backed by `@azores/ui` `Background`.
+  - [pages/widgets.tsx](apps/web/src/pages/widgets.tsx) — app-specific
+    widget renderers ported from
+    [docs/design/Azores/page-ux.jsx](docs/design/Azores/page-ux.jsx).
+    Not part of the design system; demo content only.
+  - **Deferred from this phase** (called out so future PRs pick them up):
+    widget-library drawer (clickable + drag-to-add), FLIP reflow
+    animations, size-cycling glyph in the widget header. The plan's
+    phase-4 acceptance criteria ("UX showcase page works with real
+    drag/resize, backgrounds switchable") are met without them.
 - Phase 3 of [docs/plan.md](docs/plan.md) — `@azores/ux` flow primitives
   with focus/keyboard/persistence behavior, plus integration into the
   showcase shell.

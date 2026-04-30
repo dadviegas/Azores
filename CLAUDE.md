@@ -6,7 +6,7 @@ anything that becomes stale rather than letting it rot.
 
 ## Stack
 
-- **Monorepo** — pnpm workspaces. Packages live under `app/*` (deployables)
+- **Monorepo** — pnpm workspaces. Packages live under `apps/*` (deployables)
   and `packages/*` (libraries):
   - `@azores/web` — consumer app (rspack + React)
   - `@azores/ui` — visual primitives & design tokens (buttons, inputs,
@@ -19,6 +19,16 @@ anything that becomes stale rather than letting it rot.
 
   Cross-package imports use the `@azores/<name>` specifier and must be
   declared as `workspace:*` deps in the consuming package.
+- **Shared third-party deps** — versions of cross-cutting libraries
+  (`react`, `react-dom`, `@types/react`, `@types/react-dom`,
+  `@emotion/react`, `@emotion/styled`, and any future framework-level
+  shared dep) are pinned **once** in the `catalog:` block of
+  [pnpm-workspace.yaml](pnpm-workspace.yaml). Every package references
+  them as `"catalog:"` — never a literal version range. This guarantees a
+  single installed instance (no duplicate React, no type-mismatched
+  `@types/react`) and makes upgrades a one-line change. When adding a
+  new dep that more than one package will consume, put it in the catalog
+  first; don't let versions drift across `package.json`s.
 - **Build** — rspack + swc-loader. No Babel. Dev server: `pnpm --filter
   @azores/web dev` on port 5173.
 - **UI** — React 18, function components, hooks. No class components.
@@ -59,15 +69,31 @@ anything that becomes stale rather than letting it rot.
 
 ## Styling
 
-- Inline `style={{}}` is fine for one-offs and theme tokens (see
-  `@azores/ui`'s `theme`). For anything reused across components, add a token
-  or component to `@azores/ui` first.
-- No CSS-in-JS runtime libraries (styled-components, emotion). If we need
-  scoped styles, use CSS Modules via rspack.
-- Design tokens live in `packages/ui/src` and are the single source of truth
-  for radius, spacing, color, typography. Components in `app/web` read
-  tokens from `@azores/ui` — never hardcode hex values, pixel spacing, or
-  font stacks in app code.
+- **Emotion** (`@emotion/react` + `@emotion/styled`) is the component styling
+  layer. Each component owns its styles in a sibling `*.styles.ts` file.
+  Variants, states, and theme-aware values live there.
+- **Global tokens** (`tokens.css`) are plain CSS custom properties on
+  `<html>`, imported once from the app entry. Theme/accent switching uses
+  `data-theme` / `data-accent` attributes — no `<ThemeProvider>` needed.
+  Emotion styles read tokens via `var(--az-*)`.
+- **Per-component file layout** (in `@azores/ui` and `@azores/ux`):
+  ```
+  ComponentName/
+    ComponentName.tsx         # component
+    ComponentName.styles.ts   # Emotion styled + css definitions
+    ComponentName.css         # optional: keyframes, @font-face, base resets
+    index.ts                  # re-export
+  ```
+  Keep CSS and Emotion isolated per folder — never share style files
+  across components.
+- **Inline `style={{}}`** — fine for one-offs that reference tokens
+  (`style={{ background: 'var(--az-bg)' }}`). For anything reused, move it
+  into the component's `*.styles.ts`.
+- **No hardcoded values** — no hex, pixel spacing, or font stacks in app or
+  component code. Always reference tokens via `var(--az-*)` or the typed
+  `tokens.ts` map.
+- Design tokens live in `packages/ui/src/styles` and are the single source
+  of truth. App components read tokens from `@azores/ui`.
 - Layout primitives (Stack, Inline, Box) and other behavior-bearing
   components (modals, popovers, focus traps, transitions) belong in
   `@azores/ux`. App components compose them; they don't reinvent flex/grid
@@ -118,6 +144,12 @@ anything that becomes stale rather than letting it rot.
 
 ## Workflow rules
 
+- **Changelog is mandatory.** Every change to this repo — code, config,
+  docs, deps, CI — gets an entry in [CHANGELOG.md](CHANGELOG.md) under
+  the `## Unreleased` heading, in the same PR as the change. One-line
+  summary, plus Added / Changed / Removed / Fixed bullets as needed.
+  Reference files with relative markdown links. No entry = the change
+  isn't done.
 - **Verify, don't claim.** UI changes are not "done" until you've run the dev
   server and exercised the feature in a browser (golden path + the obvious
   edge cases). Type-checks pass ≠ feature works. If you can't run the
@@ -131,7 +163,7 @@ anything that becomes stale rather than letting it rot.
 
 ## When adding a new app or package
 
-1. Create under `app/` or `packages/` — match the existing
+1. Create under `apps/` or `packages/` — match the existing
    convention (`@azores/<name>`).
 2. Copy a sibling's `package.json` + `tsconfig.json` as the starting point.
 3. Register the path in the root `tsconfig.json` `references` array.

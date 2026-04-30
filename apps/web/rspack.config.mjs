@@ -2,8 +2,10 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { defineConfig } from "@rspack/cli";
 import { rspack } from "@rspack/core";
+import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isDev = process.env.NODE_ENV !== "production";
 
 export default defineConfig({
   entry: { main: "./src/main.tsx" },
@@ -15,6 +17,10 @@ export default defineConfig({
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx"],
+    extensionAlias: {
+      ".js": [".ts", ".tsx", ".js"],
+      ".jsx": [".tsx", ".jsx"],
+    },
   },
   module: {
     rules: [
@@ -26,7 +32,12 @@ export default defineConfig({
           jsc: {
             parser: { syntax: "typescript", tsx: true },
             transform: {
-              react: { runtime: "automatic", development: false, refresh: false },
+              react: {
+                runtime: "automatic",
+                development: isDev,
+                refresh: isDev,
+                importSource: "@emotion/react",
+              },
             },
           },
         },
@@ -34,6 +45,9 @@ export default defineConfig({
       },
     ],
   },
-  plugins: [new rspack.HtmlRspackPlugin({ template: "./index.html" })],
-  devServer: { port: 5173, historyApiFallback: true },
+  plugins: [
+    new rspack.HtmlRspackPlugin({ template: "./index.html" }),
+    isDev && new ReactRefreshPlugin(),
+  ].filter(Boolean),
+  devServer: { port: 5173, historyApiFallback: true, hot: true },
 });

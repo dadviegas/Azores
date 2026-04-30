@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "rspack serve",
+    "dev": "NODE_ENV=development rspack serve",
     "build": "rspack build",
     "typecheck": "tsc -b"
   },
@@ -12,13 +12,16 @@
     "@azores/core": "workspace:*",
     "@azores/ui": "workspace:*",
     "@azores/ux": "workspace:*",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@emotion/react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
   },
   "devDependencies": {
     "@rspack/cli": "^1.1.4",
     "@rspack/core": "^1.1.4",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1"
+    "@rspack/plugin-react-refresh": "^1.0.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react-refresh": "^0.14.2"
   }
 }

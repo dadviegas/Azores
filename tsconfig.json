@@ -4,6 +4,6 @@
   "references": [
     { "path": "./packages/core" },
     { "path": "./design/ui" },
-    { "path": "./app/web" }
+    { "path": "./app/web/tsconfig.app.json" }
   ]
 }

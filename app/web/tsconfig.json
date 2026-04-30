@@ -1,13 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
-    "composite": true
-  },
-  "include": ["src"],
-  "references": [
-    { "path": "../../packages/core" },
-    { "path": "../../design/ui" }
-  ]
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }]
 }

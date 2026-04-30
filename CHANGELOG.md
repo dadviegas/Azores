@@ -10,6 +10,45 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Fixed
+- Code-block gutter line numbers misaligned with the code rows. Two
+  bugs in
+  [packages/ux/src/Markdown/markdown.css](packages/ux/src/Markdown/markdown.css):
+  (1) gutter `font-size` was 12px while the body was 13px so rows
+  drifted; (2) the generic `.az-md pre` rule (specificity 0,1,1) was
+  overriding `.az-md-codeblock-body` (0,1,0), so the `<pre>` actually
+  rendered with `font-size: 0.86em`, `line-height: 1.55`, and
+  `margin: 1.2em 0` — the top margin pushed the body down inside the
+  flex wrap relative to the gutter. Bumped the codeblock rules to
+  `.az-md pre.az-md-codeblock-body` and `.az-md-codeblock
+  .az-md-codeblock-gutter` so they actually win, matched
+  font-size/line-height across both, and explicitly zeroed the body
+  margin.
+
+### Added
+- Phase 7 of [docs/plan.md](docs/plan.md) — test infrastructure and the
+  UI/UX import guard.
+  - Vitest + jsdom + React Testing Library wired at the repo root
+    ([vitest.config.ts](vitest.config.ts),
+    [vitest.setup.ts](vitest.setup.ts)). Single config covers all
+    packages; tests live next to components as `*.test.tsx`. New
+    scripts: `pnpm test` (run once) and `pnpm test:watch`.
+  - First behavior tests:
+    [Button.test.tsx](packages/ui/src/Button/Button.test.tsx) (smoke:
+    render, click, disabled) and
+    [Modal.test.tsx](packages/ux/src/Modal/Modal.test.tsx) (open/closed,
+    aria, Escape close, `closeOnEscape={false}`, dialog
+    `stopPropagation`).
+  - ESLint `no-restricted-imports` rule in
+    [eslint.config.js](eslint.config.js) forbids `@azores/ui` from
+    importing `@azores/ux` or any subpath, codifying the UI-vs-UX split
+    from [CLAUDE.md](CLAUDE.md).
+  - New catalog entries in [pnpm-workspace.yaml](pnpm-workspace.yaml):
+    `vitest`, `jsdom`, `@testing-library/{react,jest-dom,user-event}`,
+    `@vitejs/plugin-react`. `react` / `react-dom` added as root
+    devDependencies so the test-runner JSX transform can resolve them
+    outside any single package.
+
 ### Added
 - Phase 6 of [docs/plan.md](docs/plan.md) — `LoginFlow` in
   [`@azores/ux/src/auth/`](packages/ux/src/auth/), ported from

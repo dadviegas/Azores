@@ -151,18 +151,19 @@
 .az-md-codeblock-copy-label { display: none; }
 .az-md-codeblock-copy.is-copied .az-md-codeblock-copy-label { display: inline; }
 .az-md-codeblock-wrap { display: flex; background: var(--az-bg-2); }
-.az-md-codeblock-gutter {
+.az-md-codeblock .az-md-codeblock-gutter {
   flex-shrink: 0;
+  margin: 0;
   padding: 14px 12px 14px 14px;
   text-align: right;
   font-family: var(--az-font-mono);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.65;
   color: var(--az-muted);
   user-select: none;
   border-right: 1px solid var(--az-line);
 }
-.az-md-codeblock-body {
+.az-md pre.az-md-codeblock-body {
   flex: 1;
   margin: 0;
   padding: 14px 16px;
@@ -665,6 +666,6 @@
   .az-md h3 { font-size: 1.2em; }
   .az-md pre { font-size: 12px; }
   .az-md-callout { padding: 12px; gap: 10px; }
-  .az-md-codeblock-gutter { padding: 12px 8px; min-width: 32px; }
-  .az-md-codeblock-body { padding: 12px; font-size: 12px; }
+  .az-md-codeblock .az-md-codeblock-gutter { padding: 12px 8px; min-width: 32px; font-size: 12px; }
+  .az-md pre.az-md-codeblock-body { padding: 12px; font-size: 12px; }
 }

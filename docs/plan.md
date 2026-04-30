@@ -6,10 +6,10 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–6 shipped (Emotion + tokens, `@azores/ui` primitives,
-flow primitives, dashboard, markdown, login). Remaining work is the
-testing / lint-guard pass. See [`CHANGELOG.md`](../CHANGELOG.md) for
-what landed.
+Status: phases 1–7 shipped (Emotion + tokens, `@azores/ui` primitives,
+flow primitives, dashboard, markdown, login, tests + lint guard). See
+[`CHANGELOG.md`](../CHANGELOG.md) for what landed. Remaining work is
+the deferred items in §3 and the open questions in §4.
 
 ---
 
@@ -29,17 +29,14 @@ heuristic:
   `LoginFlow`, `TweaksPanel` (theme/accent persistence), `Modal` /
   `Drawer` (focus trap, escape handling), `Toast` system.
 
-Lint guard pending in phase 7: `@azores/ui` must be forbidden from
-importing `@azores/ux` via an ESLint `no-restricted-imports` rule.
+The lint guard now enforces this: an ESLint `no-restricted-imports`
+rule scoped to `packages/ui/**` forbids `@azores/ui` from importing
+`@azores/ux` (or any subpath). See [`eslint.config.js`](../eslint.config.js).
 
 ## 2. Remaining phases
 
-| Phase | Scope | Done when |
-| --- | --- | --- |
-| 7 | Tests (Vitest + RTL) for behavior in `@azores/ux`; basic visual smoke for `@azores/ui`. ESLint `no-restricted-imports` guard so `@azores/ui` can't import `@azores/ux`. | `pnpm test` green; lint forbids `@azores/ui` → `@azores/ux`. |
-
-Each phase is a single PR. Don't bundle phases — review surface stays
-small.
+All planned phases (1–7) have shipped. New work goes through the
+deferred items below or new phases added on top.
 
 ## 3. Deferred items from earlier phases
 

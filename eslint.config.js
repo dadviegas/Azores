@@ -19,4 +19,21 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
     },
   },
+  {
+    files: ["packages/ui/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@azores/ux", "@azores/ux/*"],
+              message:
+                "@azores/ui must not import @azores/ux. UI is presentation-only; flow/behavior lives in UX.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

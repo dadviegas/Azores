@@ -10,10 +10,10 @@ export type CalendarEvent = { time: string; title: string; tone: "ocean" | "lava
 export type ClockZone = { name: string; time: string };
 
 export const KpiWidget = ({ data }: { data: KpiData }): JSX.Element => (
-  <div>
+  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
     <div
       style={{
-        fontSize: 11,
+        fontSize: 10,
         textTransform: "uppercase",
         letterSpacing: "0.08em",
         color: "var(--az-text-3)",
@@ -24,27 +24,25 @@ export const KpiWidget = ({ data }: { data: KpiData }): JSX.Element => (
     </div>
     <div
       style={{
-        marginTop: 6,
         fontFamily: "var(--az-font-display)",
-        fontSize: 32,
+        fontSize: 24,
         fontWeight: 500,
         letterSpacing: "-0.02em",
-        lineHeight: 1.05,
+        lineHeight: 1,
       }}
     >
       {data.value}
     </div>
     <div
       style={{
-        marginTop: 4,
         display: "inline-flex",
         alignItems: "center",
         gap: 4,
-        fontSize: 12,
+        fontSize: 11,
         color: data.dir === "up" ? "var(--az-moss-500)" : "var(--az-coral-500)",
       }}
     >
-      <Icon name={data.dir === "up" ? "arrowup" : "arrowdown"} size={11} />
+      <Icon name={data.dir === "up" ? "arrowup" : "arrowdown"} size={10} />
       {data.delta}
     </div>
   </div>

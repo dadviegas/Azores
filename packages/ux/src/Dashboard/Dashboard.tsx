@@ -199,6 +199,7 @@ export const Dashboard = <T,>({
     };
 
   const backdropRows = Math.max(totalRows + 2, 6);
+  const backdropCellCount = cols * backdropRows;
   const isDragging = dragState !== null;
   const ghostPos = dragState?.ghost ?? null;
   const draggedId = dragState?.id ?? null;
@@ -216,10 +217,9 @@ export const Dashboard = <T,>({
         $cols={cols}
         $rowH={rowHeight}
         $gap={gap}
-        $rows={backdropRows}
         data-active={isDragging}
       >
-        {Array.from({ length: cols }).map((_, i) => (
+        {Array.from({ length: backdropCellCount }).map((_, i) => (
           <div key={i} />
         ))}
       </GridBackdrop>
@@ -259,6 +259,8 @@ export const Dashboard = <T,>({
                       type="button"
                       title={a.label}
                       aria-label={a.label}
+                      draggable={false}
+                      onMouseDown={(e) => e.stopPropagation()}
                       onClick={a.onClick}
                     >
                       <Icon name={a.icon} size={12} />
@@ -268,7 +270,11 @@ export const Dashboard = <T,>({
               ) : null}
             </Header>
             <Body>{renderBody({ widget: w, isResizing: resizing })}</Body>
-            <ResizeHandle onMouseDown={startResize(w.id)} aria-label="Resize widget" />
+            <ResizeHandle
+              onMouseDown={startResize(w.id)}
+              aria-label="Resize widget"
+              draggable={false}
+            />
             {resizing ? (
               <SizeReadout>
                 {w.w}×{w.h}

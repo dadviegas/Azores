@@ -12,8 +12,8 @@ export const Grid = styled.div<{ $cols: number; $rowH: number; $gap: number }>(
   }),
 );
 
-export const GridBackdrop = styled.div<{ $cols: number; $rowH: number; $gap: number; $rows: number }>(
-  ({ $cols, $rowH, $gap, $rows }) => ({
+export const GridBackdrop = styled.div<{ $cols: number; $rowH: number; $gap: number }>(
+  ({ $cols, $rowH, $gap }) => ({
     position: "absolute",
     inset: 0,
     display: "grid",
@@ -26,11 +26,9 @@ export const GridBackdrop = styled.div<{ $cols: number; $rowH: number; $gap: num
     zIndex: 0,
     "&[data-active='true']": { opacity: 1 },
     "& > *": {
-      gridColumn: "span 1",
-      gridRow: `span ${$rows}`,
-      borderRadius: tokens.r.md,
-      background: tokens.bg2,
-      border: `1px dashed ${tokens.line2}`,
+      borderRadius: tokens.r.sm,
+      border: `1px dashed color-mix(in srgb, ${tokens.primary} 28%, transparent)`,
+      background: `color-mix(in srgb, ${tokens.primary} 3%, transparent)`,
     },
   }),
 );
@@ -78,7 +76,7 @@ export const Header = styled.div({
   display: "flex",
   alignItems: "center",
   gap: tokens.s[2],
-  padding: `${tokens.s[2]} ${tokens.s[3]}`,
+  padding: `${tokens.s[1]} ${tokens.s[3]}`,
   borderBottom: `1px solid ${tokens.line}`,
   background: tokens.bg2,
   fontSize: tokens.fs.xs,
@@ -134,7 +132,7 @@ export const HeaderAction = styled.button({
 export const Body = styled.div({
   flex: 1,
   minHeight: 0,
-  padding: tokens.s[4],
+  padding: tokens.s[3],
   overflow: "hidden",
 });
 

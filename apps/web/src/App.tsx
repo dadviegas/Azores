@@ -11,13 +11,15 @@ import {
 import { Foundations } from "./pages/Foundations";
 import { Components } from "./pages/Components";
 import { DashboardPage } from "./pages/Dashboard";
+import { Markdown } from "./pages/Markdown";
 
-type Route = "foundations" | "components" | "ux";
+type Route = "foundations" | "components" | "ux" | "markdown";
 
 const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
   { id: "foundations", label: "Foundations", icon: "layers" },
   { id: "components", label: "Components", icon: "grid" },
   { id: "ux", label: "UX dashboard", icon: "dashboard" },
+  { id: "markdown", label: "Markdown", icon: "bookopen" },
 ];
 
 const readRoute = (): Route => {
@@ -78,6 +80,14 @@ const Shell = (): JSX.Element => {
         icon: "dashboard",
         keywords: "widgets drag resize",
         run: () => navigateTo("ux"),
+      },
+      {
+        id: "nav-md",
+        label: "Go to Markdown",
+        group: "Navigate",
+        icon: "bookopen",
+        keywords: "docs editor blog",
+        run: () => navigateTo("markdown"),
       },
       {
         id: "th-toggle",
@@ -202,8 +212,10 @@ const Shell = (): JSX.Element => {
           <Foundations />
         ) : route === "components" ? (
           <Components />
-        ) : (
+        ) : route === "ux" ? (
           <DashboardPage />
+        ) : (
+          <Markdown />
         )}
       </main>
       <CommandPalette

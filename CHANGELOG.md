@@ -10,7 +10,69 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Changed
+- KaTeX wired into the markdown pipeline. Inline `$…$` and block `$$…$$`
+  / fenced ` ```math ` are now rendered as real math instead of plain
+  italic text.
+  - Added `katex` + `@types/katex` to the pnpm `catalog:`
+    ([pnpm-workspace.yaml](pnpm-workspace.yaml)).
+  - `@azores/ux` depends on `katex`
+    ([packages/ux/package.json](packages/ux/package.json)).
+  - [parse.ts](packages/ux/src/Markdown/parse.ts) renders math
+    expressions to HTML at parse time via `katex.renderToString`
+    (`throwOnError: false`); the `math-block` block now carries `html`
+    instead of raw `body`.
+  - [MarkdownView.tsx](packages/ux/src/Markdown/MarkdownView.tsx) imports
+    `katex/dist/katex.min.css` and renders math-block HTML via
+    `dangerouslySetInnerHTML`.
+  - **Cost**: web bundle JS grew from 351 KB → 581 KB. Lazy-loading
+    KaTeX (only when a markdown source contains `$`) is the planned
+    follow-up — it's the obvious code-splitting candidate now that we
+    have actual heavy content.
+- Mermaid node labels use a fixed dark fill (`#14161A`) instead of
+  `var(--az-text)` so they stay readable on the always-light pastel
+  node backgrounds in dark mode
+  ([packages/ux/src/Markdown/Mermaid.tsx](packages/ux/src/Markdown/Mermaid.tsx)).
+
 ### Added
+- Phase 5 of [docs/plan.md](docs/plan.md) — `@azores/ux` `MarkdownView` +
+  `MarkdownEditor`, ported from
+  [docs/design/Azores/page-markdown.jsx](docs/design/Azores/page-markdown.jsx)
+  with zero new dependencies.
+  - [parse.ts](packages/ux/src/Markdown/parse.ts) — tiny markdown parser
+    supporting headings, bold/italic/code, lists, blockquotes, tables,
+    code fences, callouts (`:::note|tip|warn|danger`), inline + block
+    math (`$…$`, `$$…$$`), mermaid blocks, JSON `chart` blocks, HR,
+    images, links, footnote refs.
+  - [highlight.ts](packages/ux/src/Markdown/highlight.ts) — manual
+    keyword/string/number/comment highlighter for js/ts, py, rust, go,
+    sql, bash, json, css, html/xml, diff. No CDN dependency.
+  - [Mermaid.tsx](packages/ux/src/Markdown/Mermaid.tsx) — basic
+    flowchart renderer (`graph LR/TD/TB/RL` with rect/round/rhombus
+    shapes and labelled arrows).
+  - [Chart.tsx](packages/ux/src/Markdown/Chart.tsx) — line + bar charts
+    from JSON.
+  - [CodeBlock.tsx](packages/ux/src/Markdown/CodeBlock.tsx) — fenced
+    block with traffic-light header, optional `lang:filename` tag,
+    line-number gutter, copy-to-clipboard button.
+  - [MarkdownView.tsx](packages/ux/src/Markdown/MarkdownView.tsx) —
+    public renderer; takes a `source` string, parses once via `useMemo`,
+    renders all block kinds. Imports
+    [markdown.css](packages/ux/src/Markdown/markdown.css) (lifted from
+    the mockup) for the rendered chrome.
+  - [MarkdownEditor.tsx](packages/ux/src/Markdown/MarkdownEditor.tsx) —
+    two-column split-pane: source textarea on the left (with toolbar +
+    char counter), live `MarkdownView` preview on the right.
+  - [packages/ux/src/globals.d.ts](packages/ux/src/globals.d.ts) —
+    `*.css` module declaration so TS accepts the side-effect CSS import
+    inside the package.
+  - New showcase route `#/markdown`
+    ([apps/web/src/App.tsx](apps/web/src/App.tsx)) plus palette command
+    "Go to Markdown".
+  - [pages/Markdown.tsx](apps/web/src/pages/Markdown.tsx) — pill-tab
+    switcher across Blog post / ngrok-style docs / Live editor; sample
+    markdown ported verbatim into
+    [pages/markdownSamples.ts](apps/web/src/pages/markdownSamples.ts).
 - Phase 4 of [docs/plan.md](docs/plan.md) — `@azores/ux` `Dashboard`
   primitive with drag/resize, plus a UX dashboard showcase page using
   `@azores/ui` `Background` variants.

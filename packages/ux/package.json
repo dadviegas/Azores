@@ -15,9 +15,11 @@
   "dependencies": {
     "@azores/ui": "workspace:*",
     "@emotion/react": "catalog:",
-    "@emotion/styled": "catalog:"
+    "@emotion/styled": "catalog:",
+    "katex": "catalog:"
   },
   "devDependencies": {
+    "@types/katex": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:"
   }

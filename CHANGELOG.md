@@ -11,6 +11,12 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Changed
+- [docs/plan.md](docs/plan.md) trimmed to what's still actionable.
+  Phases 1–5 (Emotion + tokens, `@azores/ui` primitives, flow
+  primitives, Dashboard, Markdown) are shipped per this changelog, so
+  their entries in the plan were removed. Remaining phases (6 login,
+  7 tests + lint guard), deferred items from earlier phases, and the
+  still-open routing/icons questions are kept.
 - Mobile responsiveness pass across the showcase + design system.
   - **App shell**
     ([apps/web/src/App.tsx](apps/web/src/App.tsx),

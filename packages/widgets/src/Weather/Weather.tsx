@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { Icon, LoadingShimmer } from "@azores/ui";
 import {
-  useSource,
+  IPMA_OBSERVATIONS_SOURCE_NAME,
+  IPMA_STATIONS_SOURCE_NAME,
   WEATHER_SOURCE_NAME,
+  useSource,
+  type IpmaObservations,
+  type IpmaStations,
   type WeatherData,
   type WeatherParams,
 } from "@azores/dataprovider";
@@ -17,6 +21,7 @@ import {
   Temp,
   Wrap,
 } from "./Weather.styles.js";
+import { isPortugal, latestForStation, nearestStation } from "./ipma.js";
 
 // Ponta Delgada — sensible default while we wait on geolocation, and a
 // graceful fallback when the user denies the prompt.
@@ -60,11 +65,33 @@ const fmtDay = (iso: string): string => {
 
 export const Weather = ({ ttlMs }: WidgetProps): JSX.Element => {
   const params = useGeolocation();
+  const usePT = isPortugal(params);
+
   const { data, error, loading } = useSource<WeatherData>(
     WEATHER_SOURCE_NAME,
     params,
     ttlMs != null ? { ttlMs } : undefined,
   );
+
+  // Conditional IPMA fetches. Fetcher rejects unknown sources — these still
+  // run when `enabled` is false because useSource doesn't accept an
+  // enabled-flag yet, but they hit the cache and are harmless when ignored.
+  // (Keep sources declared in manifest.yaml so the allowlist matches.)
+  const ipmaStations = useSource<IpmaStations>(
+    IPMA_STATIONS_SOURCE_NAME,
+    undefined,
+    ttlMs != null ? { ttlMs } : undefined,
+  );
+  const ipmaObs = useSource<IpmaObservations>(
+    IPMA_OBSERVATIONS_SOURCE_NAME,
+    undefined,
+    ttlMs != null ? { ttlMs } : undefined,
+  );
+
+  const station =
+    usePT && ipmaStations.data ? nearestStation(params, ipmaStations.data) : undefined;
+  const stationReading =
+    usePT && station && ipmaObs.data ? latestForStation(station, ipmaObs.data) : undefined;
 
   if (loading && !data) {
     return (
@@ -91,17 +118,27 @@ export const Weather = ({ ttlMs }: WidgetProps): JSX.Element => {
     );
   }
 
-  const { temperature, windspeed, weathercode } = data.current_weather;
-  const cur = codeToIcon(weathercode);
+  const cur = codeToIcon(data.current_weather.weathercode);
+  // "Now" prefers the IPMA station reading inside Portugal; falls back to
+  // the Open-Meteo modelled current_weather elsewhere (or if IPMA is empty).
+  const nowTemp = stationReading?.temperature ?? data.current_weather.temperature;
+  const nowWind = stationReading?.windKmh ?? data.current_weather.windspeed;
+  const nowSource = stationReading
+    ? `IPMA · ${stationReading.stationName}`
+    : cur.label;
+
   const days = data.daily?.time?.slice(0, 4) ?? [];
 
   return (
     <Wrap>
       <Now>
         <Icon name={cur.icon} size={32} />
-        <Temp>{Math.round(temperature)}°</Temp>
+        <Temp>{Math.round(nowTemp)}°</Temp>
         <Meta>
-          {cur.label} · {Math.round(windspeed)} km/h
+          {nowSource} · {Math.round(nowWind)} km/h
+          {stationReading?.humidity != null
+            ? ` · ${Math.round(stationReading.humidity)}% rh`
+            : ""}
         </Meta>
       </Now>
       <Forecast>

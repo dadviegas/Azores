@@ -11,6 +11,176 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **Curated news presets** — grouped free RSS feeds (World, Europe,
+  Americas, Tech) exposed by the News widget for a future picker UI. See
+  [packages/widgets/src/News/presets.ts](packages/widgets/src/News/presets.ts).
+  Each preset carries a `corsFriendly` flag so a future picker (or proxy
+  layer) can honor browser CORS reality — Reddit / Hacker News / Wikinews /
+  Lobsters fetch directly; major outlets (BBC, Reuters, NPR, Euronews, DW,
+  Politico EU, ProPublica, CBC, Al Jazeera) are listed but flagged as
+  needing a proxy.
+
+### Changed
+- **FX widget defaults to a 1-row tile** —
+  [packages/widgets/src/Fx/manifest.yaml](packages/widgets/src/Fx/manifest.yaml)
+  now ships `defaultSize.h: 1`. The 4-pair rate row is short and was
+  floating in a half-empty 2-row tile by default.
+- **Atlas allows 1-row-tall widgets** — pass `minHeight={1}` to the
+  shared `<Dashboard>` in
+  [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) so users
+  can resize tiles down to a thin strip. Default floor was 2 rows, which
+  made low-density widgets (e.g. World Bank's Latest block) sit in a
+  half-empty tile they couldn't shrink.
+- **Resize uses a ghost preview** — dragging the resize handle in
+  [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx)
+  no longer commits a new size on every snap step. While the pointer is
+  down, the grid backdrop is shown and a dashed outline tracks the
+  snap-target `w×h`; the layout only updates on mouseup. Each snap step
+  re-keys the ghost so a short scale-in pulse replays, giving the
+  discrete grid-track jumps a sense of motion. Removes the inline
+  `SizeReadout` (label is now on the ghost itself).
+
+### Added
+- **`@azores/core` storage proxy** — adapter-based key/value persistence so
+  app state (dashboard layouts, future user prefs) sits behind a swappable
+  backend. Default is IndexedDB; Supabase (or any remote KV) can land later
+  via `setStorageAdapter(createSupabaseAdapter(...))` without touching the
+  call sites.
+  - [packages/core/src/storage/adapter.ts](packages/core/src/storage/adapter.ts) —
+    `StorageAdapter { get, set, delete }` interface.
+  - [packages/core/src/storage/indexeddb.ts](packages/core/src/storage/indexeddb.ts) —
+    `createIndexedDBAdapter()`. Distinct DB (`azores-storage`, store `kv`)
+    from the fetch cache so "clear cache" can never wipe user layouts.
+  - [packages/core/src/storage/store.ts](packages/core/src/storage/store.ts) —
+    `getStorage()` / `setStorageAdapter()`. `globalThis`-pinned singleton
+    so federated remotes that bundle their own copy of `@azores/core` all
+    resolve to the same adapter instance.
+- **Atlas dashboard layout persistence** —
+  [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) hydrates
+  widgets from `getStorage()` on mount and writes back on every change
+  (250 ms debounce so a drag/resize gesture coalesces into one write).
+  Stored under `atlas:dashboard:layout` as `{ v: 1, widgets: [...] }`;
+  the `v` lets a future shape change discard incompatible records instead
+  of crashing. `Reset` clears the persisted entry.
+
+### Added
+- **Catalog-add fits existing gaps** — adding a widget from the library now
+  inspects the current packed layout and shrinks the new tile (clamped at
+  2×2) to land in the first empty pocket, rather than always seeding the
+  manifest's default size and pushing the new widget past the last row. The
+  external-drag ghost previews the same shrunk size so the drop is
+  predictable.
+  - [packages/ux/src/Dashboard/layout.ts](packages/ux/src/Dashboard/layout.ts) —
+    new `findFirstGap` helper.
+  - [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) — `sizeForCatalog`
+    + updated `makeFromCatalog` and external-drag wiring.
+
+### Changed
+- **Widget default heights tuned to content** — list/chart widgets seed taller
+  so they don't ship squashed. Atlas/Weather/Wikipedia/Fx unchanged at h:2;
+  News/Earthquakes/WorldBank now h:3. Fx bumped from h:1 to h:2 (h:1 cut off
+  the rate values).
+  - [packages/widgets/src/Fx/manifest.yaml](packages/widgets/src/Fx/manifest.yaml)
+  - [packages/widgets/src/News/manifest.yaml](packages/widgets/src/News/manifest.yaml)
+  - [packages/widgets/src/Earthquakes/manifest.yaml](packages/widgets/src/Earthquakes/manifest.yaml)
+  - [packages/widgets/src/WorldBank/manifest.yaml](packages/widgets/src/WorldBank/manifest.yaml)
+- **Dashboard min widget height = 2 rows** — resize floor and the default
+  size-preset ladder now start at h:2 instead of h:1, so a widget body is
+  always at least ~5× the header height. Fits the rule that h:1 leaves only
+  chrome visible.
+  - [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx) —
+    `minHeight` default 1 → 2; `S` preset h:1 → h:2.
+- **Smoother dashboard reordering** — non-dragged cells now run the FLIP
+  animation while a drag is in flight, so the user sees where tiles will
+  land before dropping. Previously animations were suppressed for the whole
+  grid during drag; now only the dragged cell (pointer-driven) and resize
+  (mid-frame size changes) skip FLIP.
+  - [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx).
+
+### Fixed
+- **Vertical reordering picks the wrong slot** — the drop-target lookup keyed
+  off each packed widget's top-left cell, so dragging onto rows *inside* a
+  tall widget skipped past it. Now picks the widget whose region contains
+  the target cell (or the nearest by center distance) and inserts above/below
+  based on whether the cursor is in its top or bottom half.
+  - [packages/ux/src/Dashboard/layout.ts](packages/ux/src/Dashboard/layout.ts) —
+    `reorderForInsertion`.
+- **Atlas page background gap during drag** —
+  [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) — switched
+  the `<Background>` from `position: absolute` (constrained to the
+  Shell's box) to `position: fixed` so the wallpaper always covers the
+  viewport, even when the Shell briefly grows past 100dvh during drag.
+
+### Added
+- **`azores-external-worldbank` source** —
+  [packages/dataprovider/src/sources/azores-external-worldbank/source.ts](packages/dataprovider/src/sources/azores-external-worldbank/source.ts)
+  wraps the World Bank Open Data Indicators API (`api.worldbank.org/v2`,
+  no key). Typed `WorldBankParams` covers `country`, `indicator`, `date`
+  range and page size; `parse` flattens the API's `[meta, rows]` envelope
+  into `WorldBankSeries { meta, rows }`. 24-hour TTL.
+- **`worldbank` widget** —
+  [packages/widgets/src/WorldBank/WorldBank.tsx](packages/widgets/src/WorldBank/WorldBank.tsx)
+  renders the latest reported value plus an 8-cell year strip for any
+  country/indicator pair. Per-instance `data: { country, indicator, title, date }`
+  selects the series; defaults to Portugal · GDP (current US$). SI-suffix
+  formatter handles values from fractions to trillions. Default size 4×2.
+- Widget registry in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts)
+  now includes `worldbank`.
+- **IPMA station sources** for live observations across Portugal (mainland, Azores, Madeira) —
+  - [packages/dataprovider/src/sources/azores-external-ipma-stations/source.ts](packages/dataprovider/src/sources/azores-external-ipma-stations/source.ts) — station metadata (GeoJSON, 24h TTL).
+  - [packages/dataprovider/src/sources/azores-external-ipma-observations/source.ts](packages/dataprovider/src/sources/azores-external-ipma-observations/source.ts) — hourly observations across all stations (10m TTL). Missing readings surface as `-99`; widgets must guard.
+
+### Changed
+- **Dashboard rows are fixed-height; widget bodies scroll internally.**
+  Switched `gridAutoRows` from `minmax(rowH, auto)` to a flat `rowH` so a
+  tall widget (e.g. `earthquakes` h=2) can no longer drag a neighbouring
+  short widget (e.g. `fx` h=1 sharing row 0) up to its own height. Each
+  widget now occupies exactly `h × rowHeight` and its `Body` uses
+  `overflow: auto` — the user can resize a big widget smaller and scroll
+  its content in place, and two h=1 widgets stacked next to one h=2
+  widget all keep their declared heights.
+  - [packages/ux/src/Dashboard/Dashboard.styles.ts](packages/ux/src/Dashboard/Dashboard.styles.ts) — `Grid` / `GridBackdrop` `gridAutoRows`, `Body` `overflow`.
+- **Weather widget augments with IPMA station data inside Portugal.**
+  Open-Meteo still owns the 7-day forecast; the "now" card is replaced by the nearest IPMA station's reading when `(lat, lng)` falls inside the mainland / Azores / Madeira bounding boxes. Outside those, behaviour is unchanged.
+  - [packages/widgets/src/Weather/Weather.tsx](packages/widgets/src/Weather/Weather.tsx) — composes both sources; falls back to Open-Meteo current_weather when station data is unavailable.
+  - [packages/widgets/src/Weather/ipma.ts](packages/widgets/src/Weather/ipma.ts) — `isPortugal`, `nearestStation`, `latestForStation` helpers (equirectangular distance, newest-first walk over the time-keyed observations map).
+  - [packages/widgets/src/Weather/manifest.yaml](packages/widgets/src/Weather/manifest.yaml) — declares the two new IPMA sources alongside `azores-external-weather`.
+
+### Added
+- **Text-body sources in `@azores/core`** — `Source.responseType` (`"json" | "text"`, defaults to `"json"`) tells the Fetcher whether to call `res.json()` or `res.text()`. The existing `parse?` hook receives the raw body and types the result.
+  - [packages/core/src/fetch/sources.ts](packages/core/src/fetch/sources.ts) — type addition.
+  - [packages/core/src/fetch/fetcher.ts](packages/core/src/fetch/fetcher.ts) — branches on `responseType` before parsing.
+- **RSS / Atom support in `@azores/dataprovider`** —
+  [packages/dataprovider/src/rss.ts](packages/dataprovider/src/rss.ts) parses RSS 2.0 and Atom into a uniform `RssFeed { title, items: [{ title, link, published, summary, id }] }`. Browser-only (uses `DOMParser`).
+  - **`azores-external-rss`** generic source —
+    [packages/dataprovider/src/sources/news/azores-external-rss/source.ts](packages/dataprovider/src/sources/news/azores-external-rss/source.ts) takes `{ url }` so any CORS-friendly feed can be plugged in. `responseType: "text"` + `parseRss` in the source's `parse` hook. 10-minute TTL.
+- **`earthquakes` widget** —
+  [packages/widgets/src/Earthquakes/Earthquakes.tsx](packages/widgets/src/Earthquakes/Earthquakes.tsx)
+  lists USGS events from the last 24h at magnitude 4.5+, severity-coloured magnitude pill, relative timestamps. Default size 4×2.
+- **`news` widget** —
+  [packages/widgets/src/News/News.tsx](packages/widgets/src/News/News.tsx)
+  generic RSS/Atom reader. Per-instance `data: { url, title? }` selects the feed; defaults to USGS' significant-week Atom (CORS-friendly). Default size 4×2.
+- **Widget registry** in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts) now includes `earthquakes` and `news`.
+
+- **News source category** under
+  [packages/dataprovider/src/sources/news/](packages/dataprovider/src/sources/news/) —
+  introduces a grouping folder so news-shaped feeds live separately from
+  generic external sources. Each provider keeps its own
+  `source.ts` + `manifest.yaml` folder and self-registers on import.
+  - **`azores-external-earthquakes`** —
+    [packages/dataprovider/src/sources/news/azores-external-earthquakes/source.ts](packages/dataprovider/src/sources/news/azores-external-earthquakes/source.ts)
+    wraps the USGS Earthquake Catalog (`fdsnws/event/1/query`,
+    GeoJSON, no key). Typed `EarthquakeParams` covers time window,
+    magnitude bounds, bounding box, and ordering; `EarthquakeData`
+    types the GeoJSON `FeatureCollection`. 5-minute TTL.
+  - The category barrel
+    [packages/dataprovider/src/sources/news/index.ts](packages/dataprovider/src/sources/news/index.ts)
+    is re-exported from
+    [packages/dataprovider/src/sources/index.ts](packages/dataprovider/src/sources/index.ts),
+    so `import "@azores/dataprovider"` continues to register everything.
+
 - **`@azores/dataprovider` package** — the data layer on top of
   `@azores/core` fetch. Owns the source folders, the React seam, and
   the widget-manifest schema.
@@ -106,6 +276,11 @@ with relative links so the entry stays clickable.
   package; `tools/*` added to [pnpm-workspace.yaml](pnpm-workspace.yaml).
 
 ### Fixed
+- **Frankfurter FX endpoint moved** —
+  [packages/dataprovider/src/sources/azores-external-fx/source.ts](packages/dataprovider/src/sources/azores-external-fx/source.ts)
+  switched from `api.frankfurter.app/latest` to
+  `api.frankfurter.dev/v1/latest`. The old host now returns a 301 the
+  browser can't follow due to CORS, so the FX widget was failing.
 - **`@azores/dataprovider` missing `@emotion/react` peer** — atlas's
   rspack runs the swc-loader on workspace packages with
   `importSource: "@emotion/react"`, which injects

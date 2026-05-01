@@ -1,0 +1,4 @@
+name: azores-external-ipma-observations
+url: https://api.ipma.pt/open-data/observation/meteorology/stations/observations.json
+description: IPMA hourly observations across all Portuguese weather stations.
+ttl: 10m

@@ -1,0 +1,11 @@
+name: news
+title: News feed
+description: Generic RSS / Atom reader. Configure the feed URL via the dashboard widget's data.url.
+sources:
+  - azores-external-rss
+ttl: 10m
+defaultSize:
+  w: 4
+  h: 3
+icon: rss
+configurable: true

@@ -85,7 +85,10 @@ export class Fetcher {
     if (!res.ok) {
       throw new Error(`Fetcher: ${sourceName} returned ${res.status} ${res.statusText}`);
     }
-    const raw = (await res.json()) as unknown;
+    const raw =
+      source.responseType === "text"
+        ? ((await res.text()) as unknown)
+        : ((await res.json()) as unknown);
     const data = (source.parse ? source.parse(raw) : raw) as T;
 
     const ttl = opts.ttlMs ?? source.ttlMs ?? this.ttlOverrideMs ?? DEFAULT_TTL_MS;

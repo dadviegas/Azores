@@ -1,0 +1,4 @@
+name: azores-external-earthquakes
+url: https://earthquake.usgs.gov/fdsnws/event/1/
+description: USGS Earthquake Catalog — global seismic events as GeoJSON, no key required.
+ttl: 5m

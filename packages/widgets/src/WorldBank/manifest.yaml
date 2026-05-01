@@ -1,0 +1,10 @@
+name: worldbank
+title: World Bank indicator
+description: Country indicator time series from the World Bank Open Data API. Defaults to Portugal · GDP (current US$).
+sources:
+  - azores-external-worldbank
+ttl: 24h
+defaultSize:
+  w: 4
+  h: 2
+icon: line-chart

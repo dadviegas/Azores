@@ -12,6 +12,11 @@ export type WidgetManifest = {
   ttl?: string | number;
   defaultSize: { w: number; h: number };
   icon?: string;
+  // True when the widget reads per-instance `data` so two instances can show
+  // different things (e.g. weather for Azores and weather for Lisbon). The
+  // dashboard library uses this to allow duplicates of configurable widgets
+  // and block duplicates of fixed ones.
+  configurable?: boolean;
 };
 
 const DURATION_RE = /^(\d+)\s*(ms|s|m|h|d)?$/i;
@@ -87,6 +92,7 @@ export const parseWidgetManifest = (raw: unknown): WidgetManifest => {
     ttl,
     defaultSize: { w: defaultSize.w, h: defaultSize.h },
     icon: typeof raw.icon === "string" ? raw.icon : undefined,
+    configurable: typeof raw.configurable === "boolean" ? raw.configurable : false,
   };
 };
 

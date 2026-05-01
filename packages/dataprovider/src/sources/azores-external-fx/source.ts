@@ -14,7 +14,7 @@ export const fxSource: Source<FxParams, FxRates> = {
   name: FX_SOURCE_NAME,
   ttlMs: 5 * 60 * 1000,
   build: ({ base = "EUR", symbols = ["USD", "GBP", "JPY", "BRL"] } = {}) =>
-    `https://api.frankfurter.app/latest?from=${base}&to=${symbols.join(",")}`,
+    `https://api.frankfurter.dev/v1/latest?from=${base}&to=${symbols.join(",")}`,
 };
 
 registerSource(fxSource);

@@ -1,0 +1,4 @@
+name: azores-external-worldbank
+url: https://api.worldbank.org/v2
+description: World Bank Open Data — country indicator time series. No API key.
+ttl: 24h

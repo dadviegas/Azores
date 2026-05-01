@@ -3,6 +3,8 @@ title: Weather
 description: Current conditions for your location, with a 4-day outlook.
 sources:
   - azores-external-weather
+  - azores-external-ipma-stations
+  - azores-external-ipma-observations
 ttl: 30m
 defaultSize:
   w: 4

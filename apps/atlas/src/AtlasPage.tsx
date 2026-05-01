@@ -5,7 +5,7 @@
 // `@azores/widgets` registry, and the data layer (DataProvider + Fetcher)
 // is what makes the widgets light up.
 
-import { Suspense, useEffect, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Background,
@@ -19,6 +19,8 @@ import {
   Dashboard,
   Drawer,
   TweaksPanel,
+  findFirstGap,
+  packWidgets,
   useTweaks,
   type DashboardWidget,
 } from "@azores/ux";
@@ -28,10 +30,29 @@ import {
   widgetRegistry,
   type WidgetEntry,
 } from "@azores/widgets";
+import { getStorage } from "@azores/core";
 
 type Widget = DashboardWidget<unknown>;
 
 const sources = collectAllowedSources();
+
+// Schema-versioned so a future shape change can be detected and discarded
+// instead of crashing the dashboard. Bump `v` on any breaking field change.
+const LAYOUT_KEY = "atlas:dashboard:layout";
+const LAYOUT_VERSION = 1;
+type StoredLayout = { v: number; widgets: Widget[] };
+
+// `GridItem` is just `{id, w, h}` — column/row come from packing in
+// declaration order. So the persisted shape mirrors `Widget` 1:1; the array
+// order is what encodes "where each tile goes".
+const serializeWidgets = (widgets: Widget[]): Widget[] =>
+  widgets.map(({ id, type, w, h, data }) => ({ id, type, w, h, data }));
+
+const isValidLayout = (raw: unknown): raw is StoredLayout =>
+  typeof raw === "object" &&
+  raw !== null &&
+  (raw as StoredLayout).v === LAYOUT_VERSION &&
+  Array.isArray((raw as StoredLayout).widgets);
 
 const initial = (): Widget[] =>
   Object.entries(widgetRegistry).map(([id, entry]) => ({
@@ -84,12 +105,39 @@ const renderBody = (widget: Widget): ReactNode => {
 
 const BG: BackgroundId = "atlantic";
 
-const makeFromCatalog = (id: string, entry: WidgetEntry): Widget => ({
-  id: `w${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-  type: id,
-  w: entry.manifest.defaultSize.w,
-  h: entry.manifest.defaultSize.h,
-});
+// Size the new tile to fit the first existing gap when one exists, falling
+// back to the manifest default. Floor of 2×2 matches the dashboard min so a
+// shrunk tile isn't unusable.
+const sizeForCatalog = (
+  existing: ReadonlyArray<Widget>,
+  cols: number,
+  defaultW: number,
+  defaultH: number,
+): { w: number; h: number } => {
+  const packed = packWidgets(existing, cols);
+  const gap = findFirstGap(packed, cols, defaultW, defaultH, 2, 2);
+  return gap ?? { w: defaultW, h: defaultH };
+};
+
+const makeFromCatalog = (
+  id: string,
+  entry: WidgetEntry,
+  existing: ReadonlyArray<Widget>,
+  cols: number,
+): Widget => {
+  const { w, h } = sizeForCatalog(
+    existing,
+    cols,
+    entry.manifest.defaultSize.w,
+    entry.manifest.defaultSize.h,
+  );
+  return {
+    id: `w${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    type: id,
+    w,
+    h,
+  };
+};
 
 export const AtlasPage = (): JSX.Element => {
   const [widgets, setWidgets] = useState<Widget[]>(initial);
@@ -100,23 +148,65 @@ export const AtlasPage = (): JSX.Element => {
   const { tweaks, setTheme, setAccent, toggleTheme } = useTweaks();
   const navigate = useNavigate();
 
+  // `hydrated` gates the save effect: don't persist the seed layout before
+  // we've checked storage, otherwise an in-flight load loses to an immediate
+  // save on first render.
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const raw = await getStorage().get<StoredLayout>(LAYOUT_KEY);
+      if (cancelled) return;
+      if (isValidLayout(raw) && raw.widgets.length > 0) setWidgets(raw.widgets);
+      hydrated.current = true;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    // Debounce: drag/resize fires `onChange` per pointermove. One write per
+    // gesture is plenty, and matters more once the adapter is Supabase.
+    const t = window.setTimeout(() => {
+      void getStorage().set<StoredLayout>(LAYOUT_KEY, {
+        v: LAYOUT_VERSION,
+        widgets: serializeWidgets(widgets),
+      });
+    }, 250);
+    return () => window.clearTimeout(t);
+  }, [widgets]);
+
   const remove = (id: string): void =>
     setWidgets((prev) => prev.filter((w) => w.id !== id));
 
   const addFromCatalog = (id: string): void => {
     const entry = widgetRegistry[id];
     if (!entry) return;
-    setWidgets((prev) => [...prev, makeFromCatalog(id, entry)]);
+    // Append so first-fit packing slots the new widget into the first
+    // existing gap that fits — `makeFromCatalog` already shrunk the size
+    // to match an open pocket when one was available.
+    setWidgets((prev) => [...prev, makeFromCatalog(id, entry, prev, cols)]);
   };
 
-  const reset = (): void => setWidgets(initial());
+  const addedTypes = new Set(widgets.map((w) => w.type));
+
+  const reset = (): void => {
+    setWidgets(initial());
+    void getStorage().delete(LAYOUT_KEY);
+  };
 
   const dragEntry = dragId ? widgetRegistry[dragId] : null;
 
   return (
     <DataProvider sources={sources}>
       <div style={{ position: "relative", minHeight: "100dvh", isolation: "isolate" }}>
-        <Background variant={BG} style={{ position: "absolute", inset: 0, zIndex: 0 }} />
+        {/* Fixed (not absolute) so the backdrop always covers the viewport — */}
+        {/* during drag the Shell can briefly grow past 100dvh and an absolute */}
+        {/* inset:0 then leaves a gap beneath the page bottom. */}
+        <Background variant={BG} style={{ position: "fixed", inset: 0, zIndex: 0 }} />
         <div
           className="az-content"
           style={{
@@ -205,11 +295,19 @@ export const AtlasPage = (): JSX.Element => {
             onChange={setWidgets}
             cols={cols}
             minWidth={Math.min(2, cols)}
+            minHeight={1}
             externalDrag={
               dragEntry
                 ? {
-                    w: dragEntry.manifest.defaultSize.w,
-                    h: dragEntry.manifest.defaultSize.h,
+                    // Preview the actual size the widget will land at — if a
+                    // smaller pocket is available, the ghost reflects it so
+                    // the user isn't surprised on drop.
+                    ...sizeForCatalog(
+                      widgets,
+                      cols,
+                      dragEntry.manifest.defaultSize.w,
+                      dragEntry.manifest.defaultSize.h,
+                    ),
                     onDrop: () => {
                       if (dragId) addFromCatalog(dragId);
                       setDragId(null);
@@ -239,58 +337,72 @@ export const AtlasPage = (): JSX.Element => {
           showBackdrop={false}
         >
           <p style={{ margin: "0 0 16px", color: "var(--az-text-3)", fontSize: 12 }}>
-            Drag onto the dashboard, or click to add.
+            Click to add to the top of the dashboard. Already-added widgets are marked.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {Object.entries(widgetRegistry).map(([id, entry]) => (
-              <div
-                key={id}
-                draggable
-                onDragStart={(e) => {
-                  e.dataTransfer.effectAllowed = "copy";
-                  e.dataTransfer.setData("application/x-az-widget", id);
-                  setDragId(id);
-                }}
-                onDragEnd={() => setDragId(null)}
-                onClick={() => {
-                  addFromCatalog(id);
-                  setLibOpen(false);
-                }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  padding: "10px 12px",
-                  background: "var(--az-bg-2)",
-                  border: "1px solid var(--az-line)",
-                  borderRadius: 10,
-                  cursor: "grab",
-                  userSelect: "none",
-                }}
-              >
+            {Object.entries(widgetRegistry).map(([id, entry]) => {
+              const added = addedTypes.has(id);
+              return (
                 <div
+                  key={id}
+                  draggable={!added}
+                  onDragStart={(e) => {
+                    if (added) {
+                      e.preventDefault();
+                      return;
+                    }
+                    e.dataTransfer.effectAllowed = "copy";
+                    e.dataTransfer.setData("application/x-az-widget", id);
+                    setDragId(id);
+                  }}
+                  onDragEnd={() => setDragId(null)}
+                  onClick={() => {
+                    if (added) return;
+                    addFromCatalog(id);
+                    setLibOpen(false);
+                  }}
+                  aria-disabled={added}
                   style={{
-                    width: 32,
-                    height: 32,
-                    display: "grid",
-                    placeItems: "center",
-                    background: "var(--az-surface)",
-                    border: "1px solid var(--az-line)",
-                    borderRadius: 8,
-                    color: "var(--az-text-2)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "10px 12px",
+                    background: added ? "var(--az-bg-1)" : "var(--az-bg-2)",
+                    border: `1px solid ${added ? "var(--az-line)" : "var(--az-line)"}`,
+                    borderRadius: 10,
+                    cursor: added ? "not-allowed" : "grab",
+                    userSelect: "none",
+                    opacity: added ? 0.55 : 1,
                   }}
                 >
-                  <Icon name={entry.manifest.icon ?? "box"} size={16} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 500 }}>{entry.manifest.title}</div>
-                  <div style={{ fontSize: 11, color: "var(--az-text-3)" }}>
-                    {entry.manifest.description ?? ""}
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      display: "grid",
+                      placeItems: "center",
+                      background: "var(--az-surface)",
+                      border: "1px solid var(--az-line)",
+                      borderRadius: 8,
+                      color: "var(--az-text-2)",
+                    }}
+                  >
+                    <Icon name={entry.manifest.icon ?? "box"} size={16} />
                   </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 500 }}>{entry.manifest.title}</div>
+                    <div style={{ fontSize: 11, color: "var(--az-text-3)" }}>
+                      {added ? "Already on dashboard" : entry.manifest.description ?? ""}
+                    </div>
+                  </div>
+                  <Icon
+                    name={added ? "check" : "plus"}
+                    size={14}
+                    style={{ color: added ? "var(--az-primary)" : "var(--az-text-3)" }}
+                  />
                 </div>
-                <Icon name="plus" size={14} style={{ color: "var(--az-text-3)" }} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Drawer>
 

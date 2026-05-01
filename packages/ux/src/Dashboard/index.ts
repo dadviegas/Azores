@@ -9,6 +9,7 @@ export {
 } from "./Dashboard.js";
 export { SizeGlyph, type SizeGlyphProps } from "./SizeGlyph.js";
 export {
+  findFirstGap,
   packWidgets,
   reorderForInsertion,
   type GridItem,

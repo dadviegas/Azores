@@ -11,11 +11,15 @@ import {
   type WidgetManifest,
 } from "@azores/dataprovider";
 import type { WidgetProps } from "./widget.js";
+import { NEWS_PRESETS } from "./News/presets.js";
 
 import atlasManifestRaw from "./Atlas/manifest.yaml";
+import earthquakesManifestRaw from "./Earthquakes/manifest.yaml";
 import fxManifestRaw from "./Fx/manifest.yaml";
+import newsManifestRaw from "./News/manifest.yaml";
 import weatherManifestRaw from "./Weather/manifest.yaml";
 import wikipediaManifestRaw from "./Wikipedia/manifest.yaml";
+import worldBankManifestRaw from "./WorldBank/manifest.yaml";
 
 export type WidgetEntry = {
   manifest: WidgetManifest;
@@ -42,6 +46,9 @@ export const widgetRegistry: Readonly<Record<string, WidgetEntry>> = {
   atlas: make(atlasManifestRaw, () => import("./Atlas/Atlas.js")),
   wikipedia: make(wikipediaManifestRaw, () => import("./Wikipedia/Wikipedia.js")),
   fx: make(fxManifestRaw, () => import("./Fx/Fx.js")),
+  earthquakes: make(earthquakesManifestRaw, () => import("./Earthquakes/Earthquakes.js")),
+  news: make(newsManifestRaw, () => import("./News/News.js")),
+  worldbank: make(worldBankManifestRaw, () => import("./WorldBank/WorldBank.js")),
 };
 
 // Union of every source any registered widget needs. Pass this straight to

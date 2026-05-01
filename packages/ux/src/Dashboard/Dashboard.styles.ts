@@ -6,8 +6,10 @@ export const Grid = styled.div<{ $cols: number; $rowH: number; $gap: number }>(
     position: "relative",
     display: "grid",
     gridTemplateColumns: `repeat(${$cols}, minmax(0, 1fr))`,
-    // Rows are at least $rowH (preserves visual rhythm) but grow to fit
-    // content when a widget needs more height than its row span allows.
+    // `h × rowHeight` is the minimum slot a widget reserves; rows grow when
+    // content needs more so a widget never has to scroll just because the
+    // manifest's default height undershot its content. The trade-off is that
+    // a tall content-driven cell can stretch siblings sharing its row span.
     gridAutoRows: `minmax(${$rowH}px, auto)`,
     gap: `${$gap}px`,
     minHeight: `${$rowH * 4}px`,
@@ -71,6 +73,14 @@ export const Ghost = styled.div<{ $col: number; $row: number; $w: number; $h: nu
     textTransform: "uppercase",
     pointerEvents: "none",
     zIndex: 0,
+    // Snap-step pulse: every time the grid placement changes (new w/h), the
+    // resize ghost is re-keyed so this short scale-in replays. Gives the jump
+    // a sense of motion even though grid tracks aren't transitionable.
+    animation: `az-ghost-pop 140ms ${tokens.ease}`,
+    "@keyframes az-ghost-pop": {
+      from: { transform: "scale(0.97)", opacity: 0.6 },
+      to: { transform: "scale(1)", opacity: 1 },
+    },
   }),
 );
 
@@ -135,7 +145,9 @@ export const Body = styled.div({
   flex: 1,
   minHeight: 0,
   padding: tokens.s[3],
-  overflow: "hidden",
+  // Scroll inside the cell when a widget is resized smaller than its
+  // content. Keeps every widget pinned to its declared `h` × rowHeight.
+  overflow: "auto",
 });
 
 export const ResizeHandle = styled.div({

@@ -1,0 +1,3 @@
+name: azores-external-rss
+description: Generic RSS 2.0 / Atom feed reader. Caller passes the feed URL as a param.
+ttl: 10m

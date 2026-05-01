@@ -1,0 +1,4 @@
+name: azores-external-ipma-stations
+url: https://api.ipma.pt/open-data/observation/meteorology/stations/stations.json
+description: IPMA station metadata for Portugal (mainland, Azores, Madeira). GeoJSON.
+ttl: 24h

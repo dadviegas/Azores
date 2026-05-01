@@ -1,0 +1,10 @@
+name: earthquakes
+title: Recent earthquakes
+description: USGS global seismic events from the last 24h, magnitude 4.5+.
+sources:
+  - azores-external-earthquakes
+ttl: 5m
+defaultSize:
+  w: 4
+  h: 3
+icon: activity

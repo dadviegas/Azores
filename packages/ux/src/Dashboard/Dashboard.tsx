@@ -25,7 +25,6 @@ import {
   HeaderAction,
   HeaderActions,
   ResizeHandle,
-  SizeReadout,
   Title,
 } from "./Dashboard.styles.js";
 
@@ -54,9 +53,11 @@ export type DashboardSizePreset = {
 };
 
 // Default ladder used when the consumer doesn't pass `sizePresets`. Tuned for
-// 12-col grids; the largest is auto-clamped to `cols` at render time.
+// 12-col grids; the largest is auto-clamped to `cols` at render time. h>=2
+// keeps the body at least ~5× the header height — h:1 squashes widgets so
+// only the chrome is readable.
 const DEFAULT_SIZE_PRESETS: DashboardSizePreset[] = [
-  { key: "S", w: 3, h: 1, label: "Small" },
+  { key: "S", w: 3, h: 2, label: "Small" },
   { key: "M", w: 4, h: 2, label: "Medium" },
   { key: "L", w: 6, h: 2, label: "Large" },
   { key: "XL", w: 8, h: 3, label: "Extra-large" },
@@ -131,7 +132,7 @@ export const Dashboard = <T,>({
   rowHeight = DEFAULT_ROW_HEIGHT,
   gap = DEFAULT_GAP,
   minWidth = 2,
-  minHeight = 1,
+  minHeight = 2,
   maxHeight = 6,
   sizePresets = DEFAULT_SIZE_PRESETS,
   enableSizeCycle = true,
@@ -141,6 +142,7 @@ export const Dashboard = <T,>({
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [externalGhost, setExternalGhost] = useState<ExternalDragState | null>(null);
   const [resizingId, setResizingId] = useState<string | null>(null);
+  const [resizeGhost, setResizeGhost] = useState<{ w: number; h: number } | null>(null);
 
   const layout = useMemo<PlacedItem<DashboardWidget<T>>[]>(() => {
     const list =
@@ -164,22 +166,23 @@ export const Dashboard = <T,>({
   );
 
   // FLIP — capture pre-layout positions, run translate→identity transition.
-  // Skipped while the user is mid-drag (their pointer-driven motion shouldn't
-  // be fought by an animation) and during resize (cell size changes mid-frame
-  // would cause shudder).
+  // Skip the dragged cell (the pointer drives it directly) and skip entirely
+  // during resize (cell size changes mid-frame cause shudder). Other cells
+  // still animate during drag so the user can preview the new layout.
   const positionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   useLayoutEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
     const cellsEls = grid.querySelectorAll<HTMLElement>("[data-wid]");
     const next = new Map<string, { x: number; y: number }>();
-    const animating = dragState !== null || resizingId !== null;
+    const skipAll = resizingId !== null;
+    const draggedId = dragState?.id ?? null;
     cellsEls.forEach((el) => {
       const id = el.dataset.wid;
       if (!id) return;
       const r = el.getBoundingClientRect();
       next.set(id, { x: r.left, y: r.top });
-      if (animating) return;
+      if (skipAll || id === draggedId) return;
       const prev = positionsRef.current.get(id);
       if (!prev) return;
       const dx = prev.x - r.left;
@@ -298,6 +301,8 @@ export const Dashboard = <T,>({
       const startW = widget.w;
       const startH = widget.h;
       const colW = (grid.getBoundingClientRect().width - gap * (cols - 1)) / cols;
+      let lastW = startW;
+      let lastH = startH;
 
       const onMove = (ev: MouseEvent): void => {
         const dx = ev.clientX - startX;
@@ -307,7 +312,9 @@ export const Dashboard = <T,>({
           minHeight,
           Math.min(maxHeight, Math.round(startH + dy / (rowHeight + gap))),
         );
-        if (newW === widget.w && newH === widget.h) return;
+        if (newW === lastW && newH === lastH) return;
+        lastW = newW;
+        lastH = newH;
         onChange(widgets.map((w) => (w.id === id ? { ...w, w: newW, h: newH } : w)));
       };
       const onUp = (): void => {
@@ -321,7 +328,8 @@ export const Dashboard = <T,>({
 
   const backdropRows = Math.max(totalRows + 2, 6);
   const backdropCellCount = cols * backdropRows;
-  const isDragging = dragState !== null || externalGhost !== null;
+  const isDragging =
+    dragState !== null || externalGhost !== null || resizingId !== null;
   const draggedId = dragState?.id ?? null;
   const internalGhost = dragState?.ghost ?? null;
   const externalGhostPos = externalGhost?.ghost ?? null;
@@ -363,6 +371,26 @@ export const Dashboard = <T,>({
           + Drop to add
         </Ghost>
       ) : null}
+
+      {resizingId && resizeGhost
+        ? (() => {
+            const placed = layout.find((p) => p.id === resizingId);
+            if (!placed) return null;
+            const w = Math.min(resizeGhost.w, cols);
+            const h = resizeGhost.h;
+            return (
+              <Ghost
+                key={`resize-${w}-${h}`}
+                $col={placed.col}
+                $row={placed.row}
+                $w={w}
+                $h={h}
+              >
+                {w}×{h}
+              </Ghost>
+            );
+          })()
+        : null}
 
       {layout.map((w) => {
         const dragging = draggedId === w.id;
@@ -421,11 +449,6 @@ export const Dashboard = <T,>({
               aria-label="Resize widget"
               draggable={false}
             />
-            {resizing ? (
-              <SizeReadout>
-                {w.w}×{w.h}
-              </SizeReadout>
-            ) : null}
           </Cell>
         );
       })}

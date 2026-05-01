@@ -26,3 +26,24 @@ export {
   type FxParams,
   type FxRates,
 } from "./azores-external-fx/source.js";
+export {
+  ipmaStationsSource,
+  IPMA_STATIONS_SOURCE_NAME,
+  type IpmaStations,
+  type IpmaStationFeature,
+} from "./azores-external-ipma-stations/source.js";
+export {
+  ipmaObservationsSource,
+  IPMA_OBSERVATIONS_SOURCE_NAME,
+  type IpmaObservations,
+  type IpmaObservation,
+} from "./azores-external-ipma-observations/source.js";
+export {
+  worldBankSource,
+  WORLDBANK_SOURCE_NAME,
+  type WorldBankParams,
+  type WorldBankRow,
+  type WorldBankMeta,
+  type WorldBankSeries,
+} from "./azores-external-worldbank/source.js";
+export * from "./news/index.js";

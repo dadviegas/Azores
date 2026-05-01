@@ -17,6 +17,9 @@ export type Source<TParams = unknown, TData = unknown> = {
   name: string;
   ttlMs?: number;
   build: (params: TParams) => string;
+  // How to read the response body. Defaults to "json". Use "text" for
+  // XML/RSS/Atom feeds and let `parse` turn the string into typed data.
+  responseType?: "json" | "text";
   parse?: (raw: unknown) => TData;
 };
 

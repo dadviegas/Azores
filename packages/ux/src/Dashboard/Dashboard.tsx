@@ -25,6 +25,7 @@ import {
   HeaderAction,
   HeaderActions,
   ResizeHandle,
+  SizeReadout,
   Title,
 } from "./Dashboard.styles.js";
 
@@ -142,7 +143,6 @@ export const Dashboard = <T,>({
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [externalGhost, setExternalGhost] = useState<ExternalDragState | null>(null);
   const [resizingId, setResizingId] = useState<string | null>(null);
-  const [resizeGhost, setResizeGhost] = useState<{ w: number; h: number } | null>(null);
 
   const layout = useMemo<PlacedItem<DashboardWidget<T>>[]>(() => {
     const list =
@@ -372,25 +372,6 @@ export const Dashboard = <T,>({
         </Ghost>
       ) : null}
 
-      {resizingId && resizeGhost
-        ? (() => {
-            const placed = layout.find((p) => p.id === resizingId);
-            if (!placed) return null;
-            const w = Math.min(resizeGhost.w, cols);
-            const h = resizeGhost.h;
-            return (
-              <Ghost
-                key={`resize-${w}-${h}`}
-                $col={placed.col}
-                $row={placed.row}
-                $w={w}
-                $h={h}
-              >
-                {w}×{h}
-              </Ghost>
-            );
-          })()
-        : null}
 
       {layout.map((w) => {
         const dragging = draggedId === w.id;

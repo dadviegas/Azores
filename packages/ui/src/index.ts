@@ -16,4 +16,5 @@ export * from "./Icon/index.js";
 export * from "./Inline/index.js";
 export * from "./Input/index.js";
 export * from "./Kbd/index.js";
+export * from "./LoadingShimmer/index.js";
 export * from "./Stack/index.js";

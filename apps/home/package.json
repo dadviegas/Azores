@@ -19,6 +19,7 @@
     "react-router-dom": "catalog:"
   },
   "devDependencies": {
+    "@azores/build": "workspace:*",
     "@module-federation/enhanced": "^2.4.0",
     "@rspack/cli": "^1.1.4",
     "@rspack/core": "^1.1.4",

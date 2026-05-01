@@ -1,0 +1,4 @@
+name: azores-external-wikipedia
+url: https://en.wikipedia.org/api/rest_v1
+description: Page summary (title, extract, thumbnail) for a given article.
+ttl: 1h

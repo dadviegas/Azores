@@ -32,8 +32,8 @@ export const APPS: ReadonlyArray<LauncherApp> = [
     name: "Atlas",
     tagline: "Live data widgets — weather, FX, countries, wiki.",
     icon: "globe",
-    path: "",
-    status: "planned",
+    path: "/apps/atlas",
+    status: "live",
     accent: "moss",
   },
   {

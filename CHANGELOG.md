@@ -11,6 +11,109 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **`@azores/dataprovider` package** — the data layer on top of
+  `@azores/core` fetch. Owns the source folders, the React seam, and
+  the widget-manifest schema.
+  - **Source folders** at
+    [packages/dataprovider/src/sources/](packages/dataprovider/src/sources/) —
+    one folder per source (`azores-external-weather`, `-countries`,
+    `-wikipedia`, `-fx`), each with a `source.ts` (URL builder, parser,
+    typed params/data) and a co-located `manifest.yaml`. The four
+    `weather/countries/wikipedia/fx` registrations have moved out of
+    `@azores/core` (which keeps only the registry primitives `Source<>`,
+    `registerSource`, `getSource`).
+  - **`<DataProvider>`** in
+    [packages/dataprovider/src/DataProvider.tsx](packages/dataprovider/src/DataProvider.tsx) —
+    React context exposing a single `Fetcher`. Allowlist is the union
+    of `sources:` arrays from the widget manifests it serves.
+  - **`useSource`** in
+    [packages/dataprovider/src/useSource.ts](packages/dataprovider/src/useSource.ts) —
+    the only fetch-related symbol widgets import. Owns the
+    `AbortController` lifecycle, reads cache synchronously when fresh,
+    `refresh()` bypasses cache, accepts a per-call `ttlMs` override
+    that flows through to `Fetcher.get` and pins the cache entry's
+    TTL — the seam by which a manifest's `ttl: 30m` actually takes
+    effect.
+  - **Widget-manifest schema** in
+    [packages/dataprovider/src/manifest.ts](packages/dataprovider/src/manifest.ts) —
+    `parseWidgetManifest` validates the YAML and `parseDurationMs`
+    handles humanised durations (`"30m"`, `"2h"`, `"45s"`, raw ms).
+    6 new vitest tests in
+    [packages/dataprovider/src/manifest.test.ts](packages/dataprovider/src/manifest.test.ts).
+- **`@azores/widgets` package** — every Azores widget, with its YAML
+  manifest and a lazy component thunk. Apps consume `widgetRegistry`
+  + `useSource`; they don't import widget components directly.
+  - **Four live widgets**, each a folder under
+    [packages/widgets/src/](packages/widgets/src/) with `manifest.yaml`,
+    `<Name>.tsx`, and `<Name>.styles.ts`: `Weather` (Open-Meteo,
+    geolocation + Ponta Delgada fallback), `Atlas` (REST Countries,
+    rotating random country every 60s), `Wikipedia` (page summary,
+    random pick from a curated list), `Fx` (Frankfurter ECB rates,
+    EUR base).
+  - **Registry** in
+    [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts) —
+    imports every `manifest.yaml` (rspack yaml-loader), validates each
+    via `parseWidgetManifest`, pairs with a `React.lazy` thunk.
+    `collectAllowedSources()` returns the union of source names so
+    `<DataProvider>`'s allowlist is one line away from "every widget
+    that might mount".
+- **`apps/atlas` — new federated remote app** at
+  [apps/atlas/](apps/atlas/) on port `5174`, exposes
+  `./AtlasRoutes`. A small launcher dashboard mounting all four live
+  widgets in a 2×2 tile grid with shimmer skeletons and per-tile
+  Suspense boundaries. Replaces the previous "PLANNED" placeholder
+  for Atlas in the home shell — see
+  [apps/home/src/apps.ts](apps/home/src/apps.ts) and
+  [apps/home/src/App.tsx](apps/home/src/App.tsx).
+- **`@azores/ui` `LoadingShimmer`** primitive at
+  [packages/ui/src/LoadingShimmer/](packages/ui/src/LoadingShimmer/) —
+  token-driven horizontal-sweep shimmer. Used by every live widget
+  for first-paint skeletons.
+- **Per-call `ttlMs` on `Fetcher.get`** — `FetchOptions` accepts a
+  `ttlMs` override. Precedence: `opts.ttlMs > source.ttlMs >
+  fetcher.ttlMs > DEFAULT_TTL_MS`. Required to plumb manifest TTLs
+  through to `FetchCache.set()`.
+
+### Changed
+- **`apps/home`** consumes a second federated remote (`atlas`) in
+  addition to `showcase`. New `AZORES_ATLAS_MANIFEST` env var locks
+  down the production manifest URL the same way
+  `AZORES_SHOWCASE_MANIFEST` does.
+- **`@azores/core` `sources.ts`** stripped of built-in source
+  registrations. Those moved into `@azores/dataprovider`.
+- **pnpm catalog** gains `yaml: ^2.8.3`; `@azores/config` references
+  `"yaml": "catalog:"` instead of a literal range.
+- **ESLint** config gets a node-environment override for
+  `**/rspack.config.mjs`, `tools/**`, `vitest.config.ts`, and
+  `vitest.setup.ts`.
+
+### Fixed
+- [packages/ui/src/Box/Box.tsx](packages/ui/src/Box/Box.tsx) —
+  `tokens` import was used only as a type; switched to
+  `import type` to satisfy `consistent-type-imports`.
+
+### Added
+- **`@azores/build` shared rspack config** — factory at
+  [tools/rspack-config.mjs](tools/rspack-config.mjs) collapses the three
+  near-identical app configs ([apps/web](apps/web/rspack.config.mjs),
+  [apps/atlas](apps/atlas/rspack.config.mjs),
+  [apps/home](apps/home/rspack.config.mjs)) into thin call sites that
+  declare only the app-specific bits (port, federation name/exposes/
+  remotes, copy assets, CORS, optional YAML loader). Common swc-loader
+  config, css/yaml rules, DefinePlugin/Html/CopyRspack/ReactRefresh
+  plugins, watchOptions, and the federation `shared` version-pinning
+  helper all live in one place. Registered as `@azores/build` workspace
+  package; `tools/*` added to [pnpm-workspace.yaml](pnpm-workspace.yaml).
+
+### Fixed
+- **`@azores/dataprovider` missing `@emotion/react` peer** — atlas's
+  rspack runs the swc-loader on workspace packages with
+  `importSource: "@emotion/react"`, which injects
+  `@emotion/react/jsx-dev-runtime` into
+  [packages/dataprovider/src/DataProvider.tsx](packages/dataprovider/src/DataProvider.tsx).
+  Declared as a peer so it resolves through the consuming app.
+
+### Added
 - **`@azores/core` fetch module** — public-API foundation for Phase 9
   live-data widgets. Three pieces that compose:
   - **`FetchCache`** + **`getCache()`** in

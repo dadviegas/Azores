@@ -1,0 +1,4 @@
+name: azores-external-countries
+url: https://restcountries.com
+description: Country metadata (flag, capital, population, currency, languages).
+ttl: 24h

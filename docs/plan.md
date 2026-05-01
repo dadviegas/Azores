@@ -6,13 +6,13 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–8 and 10 shipped (Emotion + tokens, `@azores/ui`
-primitives, flow primitives, dashboard, markdown, login, tests + lint
-guard, react-router migration, home shell + Module Federation). The
-Phase 9 foundation (`@azores/core` fetch module: `FetchCache`,
-source registry, `Fetcher` allowlist, IDB persistence) has landed —
-remaining work is wiring widgets to it. See
-[`CHANGELOG.md`](../CHANGELOG.md) for what landed.
+Status: phases 1–8, 9, and 10 shipped. Phase 9 landed end-to-end:
+`@azores/dataprovider` (sources + `<DataProvider>` + `useSource` +
+widget-manifest schema) on top of `@azores/core` fetch, `@azores/widgets`
+with four live widgets (Weather, Atlas, Wikipedia, FX), and a new
+`apps/atlas` federated remote that mounts them all in a shared
+`<Dashboard>`. The Atlas tile in the home shell is now `live`.
+See [`CHANGELOG.md`](../CHANGELOG.md) for what landed.
 
 ---
 

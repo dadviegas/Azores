@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "composite": true,
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/dataprovider" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/ux" },
+    { "path": "../../packages/widgets" }
+  ]
+}

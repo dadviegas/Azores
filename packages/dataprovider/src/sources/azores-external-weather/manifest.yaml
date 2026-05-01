@@ -1,0 +1,4 @@
+name: azores-external-weather
+url: https://open-meteo.com
+description: 7-day forecast and current conditions, no key required.
+ttl: 10m

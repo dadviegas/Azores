@@ -1,0 +1,17 @@
+{
+  "name": "@azores/build",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./rspack-config": "./rspack-config.mjs",
+    "./yaml-loader": "./rspack-yaml-loader.cjs"
+  },
+  "dependencies": {
+    "@module-federation/enhanced": "^2.4.0",
+    "@rspack/cli": "^1.1.4",
+    "@rspack/core": "^1.1.4",
+    "@rspack/plugin-react-refresh": "^1.0.0",
+    "yaml": "catalog:"
+  }
+}

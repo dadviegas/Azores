@@ -1,0 +1,11 @@
+/* Minimal page shell for the Atlas app. Tokens-only; no chrome borrowed
+   from the showcase since Atlas has its own simpler frame. */
+
+html, body, #app { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--az-font-sans);
+  font-size: var(--az-fs-base);
+  color: var(--az-text);
+  background: var(--az-bg);
+}

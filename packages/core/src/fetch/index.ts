@@ -5,14 +5,6 @@ export {
   listSources,
   DEFAULT_SOURCE_TTL_MS,
   type Source,
-  type WeatherParams,
-  type WeatherData,
-  type CountriesParams,
-  type Country,
-  type WikipediaParams,
-  type WikipediaSummary,
-  type FxParams,
-  type FxRates,
 } from "./sources.js";
 export {
   Fetcher,

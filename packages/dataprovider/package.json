@@ -1,0 +1,23 @@
+{
+  "name": "@azores/dataprovider",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@azores/core": "workspace:*",
+    "yaml": "catalog:"
+  },
+  "peerDependencies": {
+    "@emotion/react": "catalog:",
+    "react": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "vitest": "catalog:"
+  }
+}

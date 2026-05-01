@@ -1,6 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "tools"
 
 catalog:
   "@emotion/react": ^11.13.5
@@ -18,3 +19,4 @@ catalog:
   react-dom: ^18.3.1
   react-router-dom: ^6.30.3
   vitest: ^2.1.9
+  yaml: ^2.8.3

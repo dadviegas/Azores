@@ -1,0 +1,10 @@
+name: atlas
+title: Atlas
+description: A random country every minute — flag, capital, population.
+sources:
+  - azores-external-countries
+ttl: 24h
+defaultSize:
+  w: 4
+  h: 2
+icon: globe

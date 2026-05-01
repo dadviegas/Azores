@@ -1,0 +1,10 @@
+name: wikipedia
+title: From Wikipedia
+description: A short article summary, refreshed on demand.
+sources:
+  - azores-external-wikipedia
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 2
+icon: book

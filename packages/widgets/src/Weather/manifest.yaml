@@ -1,0 +1,10 @@
+name: weather
+title: Weather
+description: Current conditions for your location, with a 4-day outlook.
+sources:
+  - azores-external-weather
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 2
+icon: cloud

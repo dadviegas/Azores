@@ -1,0 +1,10 @@
+name: fx
+title: FX rates
+description: Live ECB foreign-exchange rates, EUR base.
+sources:
+  - azores-external-fx
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 1
+icon: coins

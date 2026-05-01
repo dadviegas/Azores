@@ -1,0 +1,4 @@
+name: azores-external-fx
+url: https://www.frankfurter.app
+description: ECB foreign-exchange rates, EUR base by default.
+ttl: 5m

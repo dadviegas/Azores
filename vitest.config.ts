@@ -15,6 +15,8 @@ export default defineConfig({
       "@azores/ux": new URL("./packages/ux/src/index.ts", import.meta.url).pathname,
       "@azores/core": new URL("./packages/core/src/index.ts", import.meta.url).pathname,
       "@azores/config": new URL("./packages/config/src/index.ts", import.meta.url).pathname,
+      "@azores/dataprovider": new URL("./packages/dataprovider/src/index.ts", import.meta.url).pathname,
+      "@azores/widgets": new URL("./packages/widgets/src/index.ts", import.meta.url).pathname,
     },
   },
 });

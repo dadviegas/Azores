@@ -3,13 +3,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Background } from "@azores/ui";
 import { Launcher } from "./Launcher";
 
-// Federated remote, loaded on demand the first time someone navigates to
-// /apps/showcase/*. The `showcase/*` specifier is resolved at runtime by the
-// Module Federation plugin against the manifest URL configured in
+// Federated remotes, loaded on demand the first time someone navigates to
+// the matching route. The `<remote>/*` specifiers are resolved at runtime
+// by the Module Federation plugin against the manifest URLs in
 // rspack.config.mjs.
 const Showcase = lazy(() => import("showcase/ShowcaseRoutes"));
+const Atlas = lazy(() => import("atlas/AtlasRoutes"));
 
-const ShowcaseFallback = (): JSX.Element => (
+const RemoteFallback = ({ label }: { label: string }): JSX.Element => (
   <div
     style={{
       position: "relative",
@@ -20,7 +21,7 @@ const ShowcaseFallback = (): JSX.Element => (
   >
     <Background variant="fog" style={{ position: "absolute", inset: 0, zIndex: 0 }} />
     <div style={{ position: "relative", zIndex: 1, color: "var(--az-text-2)" }}>
-      Loading showcase…
+      Loading {label}…
     </div>
   </div>
 );
@@ -32,8 +33,16 @@ export const App = (): JSX.Element => (
       <Route
         path="/apps/showcase/*"
         element={
-          <Suspense fallback={<ShowcaseFallback />}>
+          <Suspense fallback={<RemoteFallback label="showcase" />}>
             <Showcase />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/apps/atlas/*"
+        element={
+          <Suspense fallback={<RemoteFallback label="atlas" />}>
+            <Atlas />
           </Suspense>
         }
       />

@@ -1,7 +1,7 @@
 import { type HTMLAttributes } from "react";
 import { StyledBox } from "./Box.styles.js";
 import type { SpaceKey } from "../Stack/Stack.styles.js";
-import { tokens } from "../styles/tokens.js";
+import type { tokens } from "../styles/tokens.js";
 
 type RadiusKey = keyof typeof tokens.r;
 

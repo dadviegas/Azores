@@ -36,4 +36,27 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Build tooling runs in Node, not in the browser. CommonJS loaders are
+    // expected; rspack configs read process.env.
+    files: [
+      "**/rspack.config.mjs",
+      "tools/**/*.{mjs,cjs,js}",
+      "vitest.config.ts",
+      "vitest.setup.ts",
+    ],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        require: "readonly",
+        module: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-expressions": "off",
+    },
+  },
 );

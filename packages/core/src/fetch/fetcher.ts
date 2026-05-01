@@ -27,6 +27,9 @@ export type FetchOptions = {
   signal?: AbortSignal;
   // Force a network round-trip and replace the cache entry.
   forceRefresh?: boolean;
+  // Per-call TTL override. Wins over source.ttlMs and fetcher.ttlMs.
+  // Lets callers (e.g. a widget manifest) declare their own freshness.
+  ttlMs?: number;
 };
 
 const stableKey = (source: string, params: unknown): string => {
@@ -85,7 +88,7 @@ export class Fetcher {
     const raw = (await res.json()) as unknown;
     const data = (source.parse ? source.parse(raw) : raw) as T;
 
-    const ttl = source.ttlMs ?? this.ttlOverrideMs ?? DEFAULT_TTL_MS;
+    const ttl = opts.ttlMs ?? source.ttlMs ?? this.ttlOverrideMs ?? DEFAULT_TTL_MS;
     await cache.set(key, data, ttl);
     return data;
   }

@@ -1,11 +1,26 @@
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Icon } from "@azores/ui";
-import "katex/dist/katex.min.css";
 import "./markdown.css";
 import { Chart } from "./Chart.js";
 import { CodeBlock } from "./CodeBlock.js";
 import { Mermaid } from "./Mermaid.js";
-import { parseMarkdown, type Block, type CalloutKind } from "./parse.js";
+import { hasMath, parseMarkdown, setKatex, type Block, type CalloutKind } from "./parse.js";
+
+// Module-level guard so we only load KaTeX once per page session even if
+// multiple MarkdownView instances mount.
+let katexLoadPromise: Promise<void> | null = null;
+const loadKatex = (): Promise<void> => {
+  if (!katexLoadPromise) {
+    katexLoadPromise = Promise.all([
+      import("katex"),
+      import("katex/dist/katex.min.css"),
+    ]).then(([mod]) => {
+      const impl = (mod.default ?? mod) as Parameters<typeof setKatex>[0];
+      setKatex(impl);
+    });
+  }
+  return katexLoadPromise;
+};
 
 const CALLOUT_ICON: Record<CalloutKind, string> = {
   note: "info",
@@ -122,6 +137,20 @@ export type MarkdownViewProps = {
 };
 
 export const MarkdownView = ({ source, className }: MarkdownViewProps): JSX.Element => {
-  const blocks = useMemo(() => parseMarkdown(source), [source]);
+  const needsMath = useMemo(() => hasMath(source), [source]);
+  const [katexReady, setKatexReady] = useState(false);
+
+  useEffect(() => {
+    if (!needsMath || katexReady) return;
+    let cancelled = false;
+    loadKatex().then(() => {
+      if (!cancelled) setKatexReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [needsMath, katexReady]);
+
+  const blocks = useMemo(() => parseMarkdown(source), [source, katexReady]);
   return <div className={`az-md${className ? ` ${className}` : ""}`}>{renderBlocks(blocks)}</div>;
 };

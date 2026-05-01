@@ -10,6 +10,64 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Fixed
+- Dashboard rows now grow to fit content. `gridAutoRows` changed from
+  a fixed `${rowH}px` to `minmax(${rowH}px, auto)` in
+  [packages/ux/src/Dashboard/Dashboard.styles.ts](packages/ux/src/Dashboard/Dashboard.styles.ts).
+  Short widgets still respect the visual rhythm (minimum row height is
+  unchanged); widgets whose content overflows their row span (e.g. the
+  KPI delta line clipping at h=1) now expand the row instead of being
+  cropped. Drag math in `cellFromEvent` still assumes uniform `rowH`
+  rows, so pointer-to-cell mapping degrades slightly when a row has
+  grown — acceptable for current widgets.
+
+### Added
+- Dashboard polish — closes the three deferred items from Phase 4 of
+  [docs/plan.md](docs/plan.md):
+  - **Widget-library drawer** on the Dashboard page — click *Add
+    widget* to open a `Drawer` listing the catalog. Entries can be
+    clicked (appended to the grid) or dragged onto a target cell. The
+    Dashboard component grew an `externalDrag` prop that takes
+    `{ w, h, onDrop }`; while set, the grid renders a "+ Drop to add"
+    ghost following the cursor and calls `onDrop(cell)` on release.
+    The drawer renders without a backdrop so the grid stays
+    interactive during the drag.
+    [apps/web/src/pages/Dashboard.tsx](apps/web/src/pages/Dashboard.tsx),
+    [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx).
+  - **FLIP reflow animations** — when widgets reorder (drop, add,
+    remove, size cycle), each cell animates from its previous bounding
+    box to its new one via a 280ms transform transition. Implemented
+    inline in the `Dashboard` component using `useLayoutEffect` to
+    snapshot positions on every render, with the animation suppressed
+    during active drag/resize so the user's pointer-driven motion
+    isn't fought.
+  - **Size-cycling glyph** in every widget header — a 4×3 SVG mini-
+    grid that visualises the current footprint and cycles through
+    preset sizes (S 3×1 → M 4×2 → L 6×2 → XL 8×3) on click. Presets
+    are configurable via the new `sizePresets` prop; the feature can
+    be disabled with `enableSizeCycle={false}`. New file
+    [packages/ux/src/Dashboard/SizeGlyph.tsx](packages/ux/src/Dashboard/SizeGlyph.tsx).
+
+### Changed
+- Phase 5 of [docs/plan.md](docs/plan.md) — **KaTeX is now lazy-
+  loaded.** `MarkdownView` only imports `katex` and
+  `katex/dist/katex.min.css` after detecting math markers (`$…$`,
+  `$$`, or ```math) in its source. Until the dynamic import resolves,
+  math expressions render as escaped raw text wrapped in
+  `.az-md-math-pending` so layout doesn't jump.
+  - Production build: main JS bundle dropped from 581KB to 389KB (the
+    192KB / 33% win called out as the obvious code-splitting target
+    in [docs/plan.md](docs/plan.md)). KaTeX now ships as a 262KB JS
+    chunk + 23KB CSS chunk, fetched only on the markdown route when
+    the source contains math.
+  - [packages/ux/src/Markdown/parse.ts](packages/ux/src/Markdown/parse.ts)
+    no longer imports `katex` at module load. A new `setKatex()`
+    setter and `hasMath()` helper are exported; the renderer uses an
+    injected impl when present and falls back to a placeholder span
+    otherwise. [packages/ux/src/Markdown/MarkdownView.tsx](packages/ux/src/Markdown/MarkdownView.tsx)
+    triggers the import in a `useEffect` keyed on `hasMath(source)`,
+    once per page session.
+
 ### Changed
 - Phase 8 of [docs/plan.md](docs/plan.md) — showcase navigation moved
   off hash-based routing onto `react-router-dom`. URLs are real and

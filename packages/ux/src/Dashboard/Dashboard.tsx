@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,6 +13,7 @@ import {
   type GridItem,
   type PlacedItem,
 } from "./layout.js";
+import { SizeGlyph } from "./SizeGlyph.js";
 import {
   Body,
   Cell,
@@ -44,6 +46,30 @@ export type DashboardRenderContext<T> = {
   isResizing: boolean;
 };
 
+export type DashboardSizePreset = {
+  key: string;
+  label: string;
+  w: number;
+  h: number;
+};
+
+// Default ladder used when the consumer doesn't pass `sizePresets`. Tuned for
+// 12-col grids; the largest is auto-clamped to `cols` at render time.
+const DEFAULT_SIZE_PRESETS: DashboardSizePreset[] = [
+  { key: "S", w: 3, h: 1, label: "Small" },
+  { key: "M", w: 4, h: 2, label: "Medium" },
+  { key: "L", w: 6, h: 2, label: "Large" },
+  { key: "XL", w: 8, h: 3, label: "Extra-large" },
+];
+
+export type DashboardExternalDrag = {
+  w: number;
+  h: number;
+  // Optional callback when the external item is dropped on a cell. The
+  // consumer is responsible for appending the new widget to its state.
+  onDrop: (cell: { col: number; row: number }, e: React.DragEvent<HTMLDivElement>) => void;
+};
+
 export type DashboardProps<T = unknown> = {
   widgets: ReadonlyArray<DashboardWidget<T>>;
   onChange: (next: DashboardWidget<T>[]) => void;
@@ -56,6 +82,9 @@ export type DashboardProps<T = unknown> = {
   minWidth?: number;
   minHeight?: number;
   maxHeight?: number;
+  sizePresets?: ReadonlyArray<DashboardSizePreset>;
+  enableSizeCycle?: boolean;
+  externalDrag?: DashboardExternalDrag | null;
 };
 
 type DragState = {
@@ -65,9 +94,32 @@ type DragState = {
   ghost: { col: number; row: number } | null;
 };
 
+type ExternalDragState = {
+  w: number;
+  h: number;
+  ghost: { col: number; row: number } | null;
+};
+
 const DEFAULT_COLS = 12;
 const DEFAULT_ROW_HEIGHT = 92;
 const DEFAULT_GAP = 12;
+
+const sizeKey = (
+  w: number,
+  h: number,
+  presets: ReadonlyArray<DashboardSizePreset>,
+): string => presets.find((s) => s.w === w && s.h === h)?.key ?? `${w}×${h}`;
+
+const nextPreset = (
+  w: number,
+  h: number,
+  presets: ReadonlyArray<DashboardSizePreset>,
+  cols: number,
+): DashboardSizePreset => {
+  const usable = presets.map((p) => ({ ...p, w: Math.min(p.w, cols) }));
+  const idx = usable.findIndex((s) => s.w === w && s.h === h);
+  return usable[(idx + 1) % usable.length] ?? usable[0]!;
+};
 
 export const Dashboard = <T,>({
   widgets,
@@ -81,9 +133,13 @@ export const Dashboard = <T,>({
   minWidth = 2,
   minHeight = 1,
   maxHeight = 6,
+  sizePresets = DEFAULT_SIZE_PRESETS,
+  enableSizeCycle = true,
+  externalDrag = null,
 }: DashboardProps<T>): JSX.Element => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [dragState, setDragState] = useState<DragState | null>(null);
+  const [externalGhost, setExternalGhost] = useState<ExternalDragState | null>(null);
   const [resizingId, setResizingId] = useState<string | null>(null);
 
   const layout = useMemo<PlacedItem<DashboardWidget<T>>[]>(() => {
@@ -106,6 +162,40 @@ export const Dashboard = <T,>({
     () => layout.reduce((max, w) => Math.max(max, w.row + w.h), 0),
     [layout],
   );
+
+  // FLIP — capture pre-layout positions, run translate→identity transition.
+  // Skipped while the user is mid-drag (their pointer-driven motion shouldn't
+  // be fought by an animation) and during resize (cell size changes mid-frame
+  // would cause shudder).
+  const positionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const cellsEls = grid.querySelectorAll<HTMLElement>("[data-wid]");
+    const next = new Map<string, { x: number; y: number }>();
+    const animating = dragState !== null || resizingId !== null;
+    cellsEls.forEach((el) => {
+      const id = el.dataset.wid;
+      if (!id) return;
+      const r = el.getBoundingClientRect();
+      next.set(id, { x: r.left, y: r.top });
+      if (animating) return;
+      const prev = positionsRef.current.get(id);
+      if (!prev) return;
+      const dx = prev.x - r.left;
+      const dy = prev.y - r.top;
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      el.style.transition = "none";
+      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      // Force reflow, then animate to identity on next frame.
+      void el.offsetWidth;
+      requestAnimationFrame(() => {
+        el.style.transition = "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+        el.style.transform = "";
+      });
+    });
+    positionsRef.current = next;
+  });
 
   const cellFromEvent = useCallback(
     (e: { clientX: number; clientY: number }): { col: number; row: number } | null => {
@@ -136,31 +226,62 @@ export const Dashboard = <T,>({
     e.preventDefault();
     const cell = cellFromEvent(e);
     if (!cell) return;
-    setDragState((prev) => {
-      if (!prev) return prev;
-      if (prev.ghost && prev.ghost.col === cell.col && prev.ghost.row === cell.row) return prev;
-      return { ...prev, ghost: cell };
-    });
+    if (dragState) {
+      setDragState((prev) => {
+        if (!prev) return prev;
+        if (prev.ghost && prev.ghost.col === cell.col && prev.ghost.row === cell.row) return prev;
+        return { ...prev, ghost: cell };
+      });
+      return;
+    }
+    if (externalDrag) {
+      setExternalGhost((prev) => {
+        if (prev && prev.ghost && prev.ghost.col === cell.col && prev.ghost.row === cell.row) {
+          return prev;
+        }
+        return { w: externalDrag.w, h: externalDrag.h, ghost: cell };
+      });
+    }
+  };
+
+  const onDragLeaveGrid = (e: React.DragEvent<HTMLDivElement>): void => {
+    // Only clear when leaving the grid root, not crossing into a child cell.
+    if (e.currentTarget === e.target) setExternalGhost(null);
   };
 
   const onDropGrid = (e: React.DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
     const cell = cellFromEvent(e);
-    if (!cell || !dragState) {
+    if (!cell) {
+      setDragState(null);
+      setExternalGhost(null);
+      return;
+    }
+    if (dragState) {
+      const next = reorderForInsertion(
+        widgets,
+        dragState.id,
+        cell.col,
+        cell.row,
+        cols,
+        dragState.w,
+        dragState.h,
+      );
+      onChange(next);
       setDragState(null);
       return;
     }
-    const next = reorderForInsertion(
-      widgets,
-      dragState.id,
-      cell.col,
-      cell.row,
-      cols,
-      dragState.w,
-      dragState.h,
-    );
-    onChange(next);
-    setDragState(null);
+    if (externalDrag) {
+      externalDrag.onDrop(cell, e);
+      setExternalGhost(null);
+    }
+  };
+
+  const cycleSize = (id: string): void => {
+    const w = widgets.find((x) => x.id === id);
+    if (!w) return;
+    const next = nextPreset(w.w, w.h, sizePresets, cols);
+    onChange(widgets.map((x) => (x.id === id ? { ...x, w: next.w, h: next.h } : x)));
   };
 
   const startResize =
@@ -200,9 +321,10 @@ export const Dashboard = <T,>({
 
   const backdropRows = Math.max(totalRows + 2, 6);
   const backdropCellCount = cols * backdropRows;
-  const isDragging = dragState !== null;
-  const ghostPos = dragState?.ghost ?? null;
+  const isDragging = dragState !== null || externalGhost !== null;
   const draggedId = dragState?.id ?? null;
+  const internalGhost = dragState?.ghost ?? null;
+  const externalGhostPos = externalGhost?.ghost ?? null;
 
   return (
     <Grid
@@ -211,6 +333,7 @@ export const Dashboard = <T,>({
       $rowH={rowHeight}
       $gap={gap}
       onDragOver={onDragOverGrid}
+      onDragLeave={onDragLeaveGrid}
       onDrop={onDropGrid}
     >
       <GridBackdrop
@@ -224,19 +347,32 @@ export const Dashboard = <T,>({
         ))}
       </GridBackdrop>
 
-      {ghostPos && dragState ? (
-        <Ghost $col={ghostPos.col} $row={ghostPos.row} $w={dragState.w} $h={dragState.h}>
+      {internalGhost && dragState ? (
+        <Ghost $col={internalGhost.col} $row={internalGhost.row} $w={dragState.w} $h={dragState.h}>
           Drop here
+        </Ghost>
+      ) : null}
+
+      {externalGhostPos && externalGhost ? (
+        <Ghost
+          $col={externalGhostPos.col}
+          $row={externalGhostPos.row}
+          $w={Math.min(externalGhost.w, cols)}
+          $h={externalGhost.h}
+        >
+          + Drop to add
         </Ghost>
       ) : null}
 
       {layout.map((w) => {
         const dragging = draggedId === w.id;
-        const actions = widgetActions ? widgetActions(w) : [];
+        const consumerActions = widgetActions ? widgetActions(w) : [];
         const resizing = resizingId === w.id;
+        const sk = sizeKey(w.w, w.h, sizePresets);
         return (
           <Cell
             key={w.id}
+            data-wid={w.id}
             $col={w.col}
             $row={w.row}
             $w={w.w}
@@ -251,23 +387,33 @@ export const Dashboard = <T,>({
                 <Icon name="drag" size={12} />
               </DragHandle>
               <Title>{renderTitle(w)}</Title>
-              {actions.length > 0 ? (
-                <HeaderActions>
-                  {actions.map((a) => (
-                    <HeaderAction
-                      key={a.id}
-                      type="button"
-                      title={a.label}
-                      aria-label={a.label}
-                      draggable={false}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={a.onClick}
-                    >
-                      <Icon name={a.icon} size={12} />
-                    </HeaderAction>
-                  ))}
-                </HeaderActions>
-              ) : null}
+              <HeaderActions>
+                {enableSizeCycle ? (
+                  <HeaderAction
+                    type="button"
+                    title={`Size: ${sk} — click to cycle`}
+                    aria-label={`Cycle size, current ${sk}`}
+                    draggable={false}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={() => cycleSize(w.id)}
+                  >
+                    <SizeGlyph w={w.w} h={w.h} cols={cols} />
+                  </HeaderAction>
+                ) : null}
+                {consumerActions.map((a) => (
+                  <HeaderAction
+                    key={a.id}
+                    type="button"
+                    title={a.label}
+                    aria-label={a.label}
+                    draggable={false}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={a.onClick}
+                  >
+                    <Icon name={a.icon} size={12} />
+                  </HeaderAction>
+                ))}
+              </HeaderActions>
             </Header>
             <Body>{renderBody({ widget: w, isResizing: resizing })}</Body>
             <ResizeHandle

@@ -8,8 +8,10 @@ between **UI** (chrome) and **UX** (behavior).
 
 Status: phases 1–8 shipped (Emotion + tokens, `@azores/ui` primitives,
 flow primitives, dashboard, markdown, login, tests + lint guard,
-react-router migration). See [`CHANGELOG.md`](../CHANGELOG.md) for what
-landed. Remaining work is the deferred items in §3.
+react-router migration). The Phase 4 dashboard polish (drawer, FLIP,
+size-cycle glyph) and the Phase 5 KaTeX lazy-load also shipped.
+See [`CHANGELOG.md`](../CHANGELOG.md) for what landed. Remaining work
+is the still-deferred items in §3.
 
 ---
 
@@ -42,18 +44,26 @@ deferred items below or new phases added on top.
 
 Called out so future PRs pick them up:
 
-- **Phase 4 (Dashboard):** widget-library drawer (clickable +
-  drag-to-add), FLIP reflow animations, size-cycling glyph in the
-  widget header.
-- **Phase 5 (Markdown):** lazy-load KaTeX (only when source contains
-  `$`). The web bundle grew 351 KB → 581 KB when KaTeX landed; this is
-  the obvious code-splitting win. Medium-term, swap the hand-rolled
-  parser for `markdown-it` + plugins (`markdown-it-attrs`,
-  `markdown-it-anchor`, `markdown-it-container`) keeping `MarkdownView`
-  unchanged so callers don't break. Syntax highlighting today uses a
-  hand-rolled highlighter; if coverage gets thin, lazy-load
-  `highlight.js/lib/core` plus only the languages we use, behind
-  `React.lazy`.
+- **Phase 4 (Dashboard):** ~~widget-library drawer, FLIP reflow
+  animations, size-cycling glyph~~ — all shipped. See
+  [`CHANGELOG.md`](../CHANGELOG.md).
+- **Phase 5 (Markdown):** ~~lazy-load KaTeX~~ — shipped (581 KB →
+  389 KB main bundle, KaTeX now in an on-demand chunk). Still
+  deferred:
+  - **Swap the hand-rolled parser for `markdown-it`** + plugins
+    (`markdown-it-attrs`, `markdown-it-anchor`,
+    `markdown-it-container`) keeping `MarkdownView` unchanged so
+    callers don't break. Medium-term: the current parser handles
+    every fixture in the showcase and the public surface
+    (`parseMarkdown`, `Block` type) is small, so the swap is real
+    work without an immediate user-facing payoff. Pick it up when
+    coverage gaps appear (footnote definitions, nested lists, task
+    lists, etc.) or when we need plugin-style extensibility.
+  - **Lazy-load `highlight.js`** — the hand-rolled highlighter in
+    [`highlight.ts`](../packages/ux/src/Markdown/highlight.ts)
+    covers js/ts, py, rust, go, sql, bash, json, css, html, diff and
+    is ~100 lines. Only swap to `highlight.js/lib/core` (behind
+    `React.lazy`) when a real coverage gap shows up.
 
 ## 4. Decisions
 

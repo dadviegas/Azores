@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Background, Button, Icon, type BackgroundId } from "@azores/ui";
-import { Dashboard, type DashboardWidget } from "@azores/ux";
+import { Dashboard, Drawer, type DashboardWidget } from "@azores/ux";
 import {
   CalendarWidget,
   ChartWidget,
@@ -73,6 +73,35 @@ const INITIAL: Widget[] = [
   { id: "w10", type: "team", w: 4, h: 1 },
 ];
 
+type CatalogEntry = {
+  id: WidgetType;
+  title: string;
+  icon: string;
+  desc: string;
+  w: number;
+  h: number;
+};
+
+const CATALOG: ReadonlyArray<CatalogEntry> = [
+  { id: "kpi", title: "KPI", icon: "target", desc: "Single big number", w: 3, h: 1 },
+  { id: "chart", title: "Chart", icon: "bar", desc: "Bar chart", w: 6, h: 2 },
+  { id: "tasks", title: "Tasks", icon: "check", desc: "Drag-reorder list", w: 3, h: 2 },
+  { id: "calendar", title: "Calendar", icon: "calendar", desc: "Today's agenda", w: 3, h: 2 },
+  { id: "notes", title: "Notes", icon: "edit", desc: "Quick scratchpad", w: 4, h: 2 },
+  { id: "clock", title: "World clock", icon: "clock", desc: "Timezones", w: 4, h: 1 },
+  { id: "team", title: "Team", icon: "user", desc: "Who's online", w: 4, h: 1 },
+];
+
+const DEFAULT_KPI: KpiData = { label: "New KPI", value: "—", delta: "—", dir: "up" };
+
+const makeWidgetFromCatalog = (entry: CatalogEntry): Widget => {
+  const id = `w${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  if (entry.id === "kpi") {
+    return { id, type: "kpi", w: entry.w, h: entry.h, data: DEFAULT_KPI };
+  }
+  return { id, type: entry.id, w: entry.w, h: entry.h } as Widget;
+};
+
 const BG_OPTIONS: ReadonlyArray<{ id: BackgroundId | "paper"; name: string }> = [
   { id: "paper", name: "Paper" },
   { id: "atlantic", name: "Atlantic" },
@@ -128,10 +157,15 @@ const useResponsiveCols = (): number => {
 export const DashboardPage = (): JSX.Element => {
   const [widgets, setWidgets] = useState<Widget[]>(INITIAL);
   const [bg, setBg] = useState<BackgroundId | "paper">("paper");
+  const [libOpen, setLibOpen] = useState(false);
+  const [dragEntry, setDragEntry] = useState<CatalogEntry | null>(null);
   const cols = useResponsiveCols();
 
   const removeWidget = (id: string): void =>
     setWidgets((prev) => prev.filter((w) => w.id !== id));
+
+  const addFromCatalog = (entry: CatalogEntry): void =>
+    setWidgets((prev) => [...prev, makeWidgetFromCatalog(entry)]);
 
   const reset = (): void => setWidgets(INITIAL);
 
@@ -201,6 +235,10 @@ export const DashboardPage = (): JSX.Element => {
               </button>
             ))}
           </div>
+          <Button variant="primary" size="sm" onClick={() => setLibOpen(true)}>
+            <Icon name="plus" size={14} />
+            Add widget
+          </Button>
           <Button variant="ghost" size="sm" onClick={reset}>
             <Icon name="refresh" size={14} />
             Reset layout
@@ -213,6 +251,18 @@ export const DashboardPage = (): JSX.Element => {
         onChange={setWidgets}
         cols={cols}
         minWidth={Math.min(2, cols)}
+        externalDrag={
+          dragEntry
+            ? {
+                w: dragEntry.w,
+                h: dragEntry.h,
+                onDrop: () => {
+                  if (dragEntry) addFromCatalog(dragEntry);
+                  setDragEntry(null);
+                },
+              }
+            : null
+        }
         renderTitle={(w) => TITLES[w.type as WidgetType] ?? w.type}
         renderBody={({ widget }) => renderBody(widget)}
         widgetActions={(w) => [
@@ -224,6 +274,68 @@ export const DashboardPage = (): JSX.Element => {
           },
         ]}
       />
+
+      <Drawer
+        open={libOpen}
+        onClose={() => setLibOpen(false)}
+        side="right"
+        width="340px"
+        title="Widget library"
+        showBackdrop={false}
+      >
+        <p style={{ margin: "0 0 16px", color: "var(--az-text-3)", fontSize: 12 }}>
+          Drag onto the dashboard, or click to add.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {CATALOG.map((c) => (
+            <div
+              key={c.id}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = "copy";
+                e.dataTransfer.setData("application/x-az-widget", c.id);
+                setDragEntry(c);
+              }}
+              onDragEnd={() => setDragEntry(null)}
+              onClick={() => {
+                addFromCatalog(c);
+                setLibOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "10px 12px",
+                background: "var(--az-bg-2)",
+                border: "1px solid var(--az-line)",
+                borderRadius: 10,
+                cursor: "grab",
+                userSelect: "none",
+              }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  display: "grid",
+                  placeItems: "center",
+                  background: "var(--az-surface)",
+                  border: "1px solid var(--az-line)",
+                  borderRadius: 8,
+                  color: "var(--az-text-2)",
+                }}
+              >
+                <Icon name={c.icon} size={16} />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>{c.title}</div>
+                <div style={{ fontSize: 11, color: "var(--az-text-3)" }}>{c.desc}</div>
+              </div>
+              <Icon name="plus" size={14} style={{ color: "var(--az-text-3)" }} />
+            </div>
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 

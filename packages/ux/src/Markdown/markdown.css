@@ -264,6 +264,14 @@
   font-style: italic;
   padding: 0 2px;
 }
+/* Shown briefly while KaTeX is being lazy-loaded; matches KaTeX italic look so
+   the swap is barely perceptible. */
+.az-md-math-pending {
+  font-family: "Computer Modern", "Latin Modern Math", "Cambria Math", Georgia, serif;
+  font-style: italic;
+  opacity: 0.7;
+}
+div.az-md-math-pending { display: block; text-align: center; margin: 1.2em 0; }
 .az-md-math-block {
   display: block;
   text-align: center;

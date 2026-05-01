@@ -6,7 +6,9 @@ export const Grid = styled.div<{ $cols: number; $rowH: number; $gap: number }>(
     position: "relative",
     display: "grid",
     gridTemplateColumns: `repeat(${$cols}, minmax(0, 1fr))`,
-    gridAutoRows: `${$rowH}px`,
+    // Rows are at least $rowH (preserves visual rhythm) but grow to fit
+    // content when a widget needs more height than its row span allows.
+    gridAutoRows: `minmax(${$rowH}px, auto)`,
     gap: `${$gap}px`,
     minHeight: `${$rowH * 4}px`,
   }),
@@ -18,7 +20,7 @@ export const GridBackdrop = styled.div<{ $cols: number; $rowH: number; $gap: num
     inset: 0,
     display: "grid",
     gridTemplateColumns: `repeat(${$cols}, minmax(0, 1fr))`,
-    gridAutoRows: `${$rowH}px`,
+    gridAutoRows: `minmax(${$rowH}px, auto)`,
     gap: `${$gap}px`,
     pointerEvents: "none",
     opacity: 0,

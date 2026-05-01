@@ -3,19 +3,44 @@
 // callouts (`:::`), inline + block math (rendered via KaTeX), mermaid blocks,
 // JSON chart blocks, HR, images, links, footnote refs.
 
-import katex from "katex";
+type KatexLike = {
+  renderToString: (
+    expr: string,
+    opts: { displayMode: boolean; throwOnError: boolean; output: "html" },
+  ) => string;
+};
+
+let katexImpl: KatexLike | null = null;
+
+// Set the KaTeX implementation after a lazy import. MarkdownView calls this
+// once it dynamically loads KaTeX; until then math expressions are rendered as
+// escaped raw source so the parser stays sync.
+export const setKatex = (impl: KatexLike): void => {
+  katexImpl = impl;
+};
+
+// Cheap detector so callers can decide whether to bother loading KaTeX.
+export const hasMath = (src: string): boolean =>
+  /\$[^$\n]+\$|^\$\$|^```math/m.test(src);
 
 export type CalloutKind = "note" | "tip" | "warn" | "danger";
 
+const escapeText = (s: string): string =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
 const renderMath = (expr: string, displayMode: boolean): string => {
+  if (!katexImpl) {
+    const tag = displayMode ? "div" : "span";
+    return `<${tag} class="az-md-math-pending">${escapeText(expr)}</${tag}>`;
+  }
   try {
-    return katex.renderToString(expr, {
+    return katexImpl.renderToString(expr, {
       displayMode,
       throwOnError: false,
       output: "html",
     });
   } catch {
-    return expr;
+    return escapeText(expr);
   }
 };
 

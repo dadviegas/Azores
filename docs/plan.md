@@ -6,14 +6,13 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–8 shipped (Emotion + tokens, `@azores/ui` primitives,
-flow primitives, dashboard, markdown, login, tests + lint guard,
-react-router migration). The Phase 4 dashboard polish (drawer, FLIP,
-size-cycle glyph) and the Phase 5 KaTeX lazy-load also shipped.
-**Phase 10 — `@azores/home` launcher + Module Federation — shipped**
-(see §6). See [`CHANGELOG.md`](../CHANGELOG.md) for what landed.
-Remaining work: the still-deferred items in §3 plus the live-data-
-widgets phase in §7.
+Status: phases 1–8 and 10 shipped (Emotion + tokens, `@azores/ui`
+primitives, flow primitives, dashboard, markdown, login, tests + lint
+guard, react-router migration, home shell + Module Federation). The
+Phase 9 foundation (`@azores/core` fetch module: `FetchCache`,
+source registry, `Fetcher` allowlist, IDB persistence) has landed —
+remaining work is wiring widgets to it. See
+[`CHANGELOG.md`](../CHANGELOG.md) for what landed.
 
 ---
 
@@ -37,21 +36,11 @@ The lint guard now enforces this: an ESLint `no-restricted-imports`
 rule scoped to `packages/ui/**` forbids `@azores/ui` from importing
 `@azores/ux` (or any subpath). See [`eslint.config.js`](../eslint.config.js).
 
-## 2. Remaining phases
-
-All planned phases (1–7) have shipped. New work goes through the
-deferred items below or new phases added on top.
-
-## 3. Deferred items from earlier phases
+## 2. Deferred items from earlier phases
 
 Called out so future PRs pick them up:
 
-- **Phase 4 (Dashboard):** ~~widget-library drawer, FLIP reflow
-  animations, size-cycling glyph~~ — all shipped. See
-  [`CHANGELOG.md`](../CHANGELOG.md).
-- **Phase 5 (Markdown):** ~~lazy-load KaTeX~~ — shipped (581 KB →
-  389 KB main bundle, KaTeX now in an on-demand chunk). Still
-  deferred:
+- **Phase 5 (Markdown):**
   - **Swap the hand-rolled parser for `markdown-it`** + plugins
     (`markdown-it-attrs`, `markdown-it-anchor`,
     `markdown-it-container`) keeping `MarkdownView` unchanged so
@@ -67,117 +56,84 @@ Called out so future PRs pick them up:
     is ~100 lines. Only swap to `highlight.js/lib/core` (behind
     `React.lazy`) when a real coverage gap shows up.
 
-## 4. Decisions
+- **Phase 10 (Module Federation):**
+  - **Type safety across the federation boundary.** Today the host
+    has a hand-rolled stub in
+    [`apps/home/src/federated.d.ts`](../apps/home/src/federated.d.ts)
+    declaring `showcase/ShowcaseRoutes` as an opaque
+    `ComponentType`. `@module-federation/enhanced` ships a DTS plugin
+    that publishes `.d.ts` alongside `remoteEntry.js`; wire it up so
+    the host gets real types when it imports federated modules. The
+    build already attempts to generate `@mf-types.zip` on the remote
+    side — flaky on the first run, worth fixing.
+  - **Pre-fetch on hover.** First click into the showcase tile is a
+    cold network hop for the manifest + entry + chunks. Pre-fetch
+    the manifest on hover/focus of the tile so the click feels free.
+  - **Production manifest URL** — `AZORES_SHOWCASE_MANIFEST` env var
+    is read at build time. Lock down the production value in CI per
+    environment when we have one.
 
-- **Routing — `react-router`.** Move the showcase off hash-based nav
-  onto `react-router` so we get real URLs, deep linking, and a routing
-  primitive the rest of the app can grow into. New phase to schedule
-  (see §5).
+## 3. Decisions
+
+- **Routing — `react-router`.** The showcase moved off hash-based nav;
+  URLs are real and deep-linkable.
 - **Icons — inline SVG sprite.** Keep the sprite from
   [`icons.jsx`](./design/Azores/icons.jsx); don't take on `lucide-react`.
   Bundle size wins while the icon set stays small; we'll revisit if
   coverage gets thin.
+- **Fetch layer — typed `Fetcher` with source allowlist.** Widgets do
+  not call `fetch` directly; they receive a `Fetcher` whose `sources`
+  list constrains what they can request. Cache lives in `@azores/core`
+  and is shared across MF remotes via a `globalThis` singleton.
 
-## 5. Phase 8 — routing migration (shipped)
+## 4. Phase 9 — live data widgets (in progress)
 
-Done. `react-router-dom` powers the showcase; URLs are real
-(`/foundations`, `/components`, `/icons`, `/dashboard`, `/markdown`,
-`/login`) and deep-linkable. See [`CHANGELOG.md`](../CHANGELOG.md).
+Foundation shipped: `@azores/core` exposes `FetchCache`,
+`registerSource`, `createFetcher`, and built-in sources for `weather`,
+`countries`, `wikipedia`, `fx`. Remaining work is on the widget side.
 
-## 6. Phase 10 — home shell + Module Federation (shipped)
+### Widgets to wire
 
-A new `@azores/home` app under [`apps/home/`](../apps/home/) is the
-launcher users land on. Sibling apps are loaded as Module Federation
-remotes via manifest (`mf-manifest.json`), with React, react-dom,
-react-router-dom, and @emotion/react declared `singleton: true` on
-both sides. Versions are pulled from each package.json at config
-time, so the pnpm catalog is the single source of truth — drift is a
-config bug, not a runtime hazard.
+One per quadrant of the existing catalog (weather / atlas / knowledge /
+markets), each consuming a `Fetcher` with a single-source allowlist:
 
-- **Host:** [`apps/home`](../apps/home/) on port 5170. Owns the
-  outer `BrowserRouter`. Routes: `/` (launcher tiles),
-  `/apps/showcase/*` (lazy-loaded federated showcase).
-- **Remote:** [`apps/web`](../apps/web/) on port 5173. Exposes
-  `./ShowcaseRoutes` — a router-agnostic component that mounts
-  `<Routes>` with relative paths so it works under either parent.
-  Standalone deploys still get a thin `App` wrapper that adds
-  `<BrowserRouter>`.
-- **Adding a new federated app:** drop a new app under `apps/`,
-  configure its `rspack.config.mjs` with `ModuleFederationPlugin`
-  matching the singleton list, then add an entry to
-  [`apps/home/src/apps.ts`](../apps/home/src/apps.ts) and a
-  matching `<Route>` in [`apps/home/src/App.tsx`](../apps/home/src/App.tsx).
-
-### Open follow-ups
-
-- **Type safety across the federation boundary.** Today the host
-  has a hand-rolled stub in
-  [`apps/home/src/federated.d.ts`](../apps/home/src/federated.d.ts)
-  declaring `showcase/ShowcaseRoutes` as an opaque
-  `ComponentType`. `@module-federation/enhanced` ships a DTS plugin
-  that publishes `.d.ts` alongside `remoteEntry.js`; wire it up so
-  the host gets real types when it imports federated modules. The
-  build already attempts to generate `@mf-types.zip` on the remote
-  side — flaky on the first run, worth fixing.
-- **Pre-fetch on hover.** First click into the showcase tile is a
-  cold network hop for the manifest + entry + chunks. Pre-fetch
-  the manifest on hover/focus of the tile so the click feels free.
-- **Production manifest URL** — `AZORES_SHOWCASE_MANIFEST` env var
-  is read at build time. Lock down the production value in CI per
-  environment when we have one.
-
-## 7. Phase 9 — live data widgets (planned)
-
-Today every Dashboard widget renders hard-coded fixture data. Phase 9
-turns at least four of them into live widgets backed by **public,
-no-key, CORS-open** JSON APIs. Constraint: no API keys, no secrets in
-the bundle, no auth flow — drop the URL into `fetch` and it works.
-
-### Picks
-
-The four below cover one widget per quadrant of the existing catalog
-(weather / atlas / knowledge / markets) and have stable schemas:
-
-- **Weather** — [Open-Meteo](https://open-meteo.com)
-  `https://api.open-meteo.com/v1/forecast?latitude=…&longitude=…&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`.
-  Replaces the placeholder Weather widget from the design mock. Pair
-  with `navigator.geolocation` (with a Ponta Delgada fallback) so the
-  widget reflects the user's location.
-- **Country / atlas** — [REST Countries](https://restcountries.com)
-  `https://restcountries.com/v3.1/all?fields=name,cca2,capital,population,flag,currencies,languages`.
-  New `AtlasWidget` — picks a random country on each tick, shows
-  flag + capital + population + currency. Cheap, visually striking.
-- **Wikipedia summary** — `https://en.wikipedia.org/api/rest_v1/page/summary/<title>`.
-  New `OnThisDayWidget` (or a "random article" variant via
-  `…/page/random/summary`). Good for typography density and
+- **Weather** — replace placeholder Weather widget with an Open-Meteo
+  reader (`source: "weather"`). Pair with `navigator.geolocation` and
+  a Ponta Delgada fallback. TTL 10 min already set on the source.
+- **Atlas** — new `AtlasWidget` consuming `source: "countries"`.
+  Picks a random country on each tick; shows flag + capital +
+  population + currency. TTL 24h on the source; rotation handled
+  client-side, not via re-fetch.
+- **Wikipedia** — new `OnThisDayWidget` (or random-article variant)
+  consuming `source: "wikipedia"`. Good for typography density and
   thumbnail rendering.
-- **FX ticker** — [Frankfurter](https://www.frankfurter.app) /
-  ECB rates `https://api.frankfurter.app/latest?from=EUR&to=USD,GBP,JPY,BRL`.
-  Replaces the fake Stocks widget with real EUR-base rates. Mono-
-  font numbers, sparkline-friendly via the `…/2024-01-01..` range
-  endpoint.
+- **FX ticker** — replace the fake Stocks widget with Frankfurter
+  rates (`source: "fx"`, EUR base → USD/GBP/JPY/BRL). Mono-font
+  numbers; sparkline-friendly via the date-range endpoint when we
+  add history.
 
 ### Cross-cutting work
 
-- **`useFetchJson` hook in `@azores/core`** — the framework-agnostic
-  layer. Owns `AbortController`, error/loading state, swr-style
-  refresh-on-focus, and a tiny in-memory cache keyed by URL. Widgets
-  consume it; no widget should call `fetch` directly.
+- **`useFetchSource` hook in `@azores/core`** — thin React wrapper
+  over `Fetcher.get` returning `{ data, error, loading, refresh }`.
+  Owns the `AbortController` lifecycle (cancel on unmount / param
+  change), reads from cache synchronously when fresh, swr-style
+  revalidate-on-focus opt-in. Widgets consume the hook; no widget
+  touches `Fetcher` directly.
 - **Skeleton/loading state in widget bodies** — the Dashboard
   already has the chrome; widgets need a `LoadingShimmer` primitive
-  (probably in `@azores/ui`) that respects token spacing/radius.
+  in `@azores/ui` that respects token spacing/radius.
 - **Failure UX** — every widget needs an offline/error state. Show
   a muted "—" with a retry chip, not a full error card; the
   Dashboard chrome stays.
-- **CORS / network-failure smoke test** — hit each picked endpoint
-  from `apps/web` dev once and confirm headers + payload shape match
-  the types. Pin a `zod` schema (or a hand-rolled type guard) per
-  widget so a silent API change shows up as a typed runtime error,
-  not a crash deep in the renderer.
+- **Runtime validation** — the `Source.parse` hook is the seam for
+  this. Add a `zod` schema (or hand-rolled type guard) per source so
+  a silent API change shows up as a typed runtime error, not a crash
+  deep in the renderer.
 - **Refresh cadence** — every widget declares its own interval
   (weather 10 min, FX 5 min, atlas 60 s for the rotation, wiki on
-  click). The size-cycle action stays; add a refresh action via the
-  existing `widgetActions` prop.
+  click). Add a refresh action via the existing `widgetActions` prop;
+  it calls `Fetcher.get(name, params, { forceRefresh: true })`.
 
 ### Out of scope for Phase 9
 
@@ -197,6 +153,24 @@ unauthenticated), CoinGecko (`api.coingecko.com`), ISS live position
 (`api.open-notify.org/iss-now.json`), SpaceX (`api.spacexdata.com`),
 TheMealDB, PokeAPI, world-time-api. Each could become a fifth or
 sixth live widget if the four above land cleanly.
+
+## 5. Phase 11 — widget grid persistence (planned)
+
+Once live data lands, the grid layout itself becomes worth keeping
+between sessions. Pieces that need to compose:
+
+- **Storage seam** — same `globalThis` singleton trick as
+  `FetchCache`, backed by IDB store `layout`. Key by user id once we
+  have one; for now key by `"default"`.
+- **Layout schema** — versioned (`{ v: 1, widgets: [...] }`) so we
+  can migrate without nuking saved grids. Reject unknown versions
+  forward.
+- **Reset action** — surface a "reset layout" item in the existing
+  Dashboard menu. Cheap to add, expensive to omit when a user wedges
+  their grid.
+
+Not started; called out so the data-widget phase doesn't accidentally
+couple itself to ad-hoc `localStorage` writes.
 
 Decisions land in this file as we make them. Anything that ships goes
 into [`CHANGELOG.md`](../CHANGELOG.md).

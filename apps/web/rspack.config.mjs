@@ -65,6 +65,7 @@ export default defineConfig({
     ],
   },
   experiments: { css: true },
+  lazyCompilation: false,
   plugins: [
     new rspack.DefinePlugin({
       __AZORES_BASE_PATH__: JSON.stringify(basePath),
@@ -99,8 +100,12 @@ export default defineConfig({
     port: 5173,
     historyApiFallback: true,
     hot: true,
+    devMiddleware: { writeToDisk: false },
     // Allow the home host (cross-origin in dev) to fetch our remoteEntry +
     // manifest. Without this CORS the host's loader sees a network error.
     headers: { "Access-Control-Allow-Origin": "*" },
+  },
+  watchOptions: {
+    ignored: ["**/node_modules/**", "**/dist/**", "**/@mf-types/**", "**/.mf/**"],
   },
 });

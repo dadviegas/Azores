@@ -27,7 +27,7 @@ export default defineConfig({
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[contenthash].js",
-    publicPath: "auto",
+    publicPath: "/",
     clean: true,
   },
   resolve: {
@@ -65,6 +65,7 @@ export default defineConfig({
     ],
   },
   experiments: { css: true },
+  lazyCompilation: false,
   plugins: [
     new rspack.DefinePlugin({
       __AZORES_BASE_PATH__: JSON.stringify(basePath),
@@ -73,6 +74,7 @@ export default defineConfig({
     isDev && new ReactRefreshPlugin(),
     new ModuleFederationPlugin({
       name: "home",
+      dev: false,
       // Manifest-based remote loading. The string format is
       // `<remoteName>@<manifestUrl>`. The runtime fetches the manifest first
       // (cheap JSON), then loads the entry + chunks listed inside it.
@@ -92,4 +94,7 @@ export default defineConfig({
     }),
   ].filter(Boolean),
   devServer: { port: 5170, historyApiFallback: true, hot: true },
+  watchOptions: {
+    ignored: ["**/node_modules/**", "**/dist/**", "**/@mf-types/**"],
+  },
 });

@@ -1,13 +1,14 @@
 // Standalone entry — wraps the router-agnostic ShowcaseRoutes in a
-// BrowserRouter so `apps/web` can be deployed on its own. When consumed via
-// Module Federation by `apps/home`, the host owns the BrowserRouter and
-// imports ShowcaseRoutes directly instead.
+// HashRouter so `apps/web` can be deployed on its own (incl. on GitHub
+// Pages, where deep-link reloads would otherwise 404 with a
+// BrowserRouter). When consumed via Module Federation by `apps/home`,
+// the host owns the router and imports ShowcaseRoutes directly instead.
 
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import { ShowcaseRoutes } from "./ShowcaseRoutes";
 
 export const App = (): JSX.Element => (
-  <BrowserRouter basename={__AZORES_BASE_PATH__}>
+  <HashRouter>
     <ShowcaseRoutes />
-  </BrowserRouter>
+  </HashRouter>
 );

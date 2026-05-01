@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import { Background } from "@azores/ui";
 import { Launcher } from "./Launcher";
 
@@ -27,7 +27,7 @@ const RemoteFallback = ({ label }: { label: string }): JSX.Element => (
 );
 
 export const App = (): JSX.Element => (
-  <BrowserRouter basename={__AZORES_BASE_PATH__}>
+  <HashRouter>
     <Routes>
       <Route path="/" element={<Launcher />} />
       <Route
@@ -48,5 +48,5 @@ export const App = (): JSX.Element => (
       />
       <Route path="*" element={<Launcher />} />
     </Routes>
-  </BrowserRouter>
+  </HashRouter>
 );

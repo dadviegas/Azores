@@ -11,10 +11,15 @@ const showcaseManifest =
 const atlasManifest =
   process.env.AZORES_ATLAS_MANIFEST ?? "http://localhost:5174/mf-manifest.json";
 
+// Host's own `publicPath` — chunks/assets for `home` are served from here.
+// Defaults to root for local dev; CI sets `PAGES_BASE=/Azores/` so Pages
+// resolves chunks under the repo subpath.
+const homePublicPath = process.env.PAGES_BASE ?? "/";
+
 export default createRspackConfig({
   rootDir: __dirname,
   port: 5170,
-  publicPath: "/",
+  publicPath: homePublicPath,
   federation: {
     name: "home",
     // Manifest-based remote loading. Format is `<remoteName>@<manifestUrl>`;

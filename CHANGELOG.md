@@ -10,6 +10,30 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Changed
+- **Routing switched to `HashRouter` across all three apps** — `home`,
+  `web` (showcase), and `atlas` standalone entries now wrap their
+  routes in `HashRouter` instead of `BrowserRouter`. GitHub Pages
+  doesn't fall back to `index.html` for unknown paths, so reloading on
+  a deep link (e.g. `/Azores/foundations`) was 404'ing; the path now
+  lives in the URL hash and the server only sees `/Azores/`. Drops the
+  router `basename={__AZORES_BASE_PATH__}` since the hash is
+  client-only. The `__AZORES_BASE_PATH__` define is retained for asset
+  URLs.
+  - [apps/home/src/App.tsx](apps/home/src/App.tsx)
+  - [apps/web/src/App.tsx](apps/web/src/App.tsx)
+  - [apps/atlas/src/App.tsx](apps/atlas/src/App.tsx)
+- **Pages deploy now publishes the federated home shell** —
+  [.github/workflows/pages.yml](.github/workflows/pages.yml) builds all
+  three apps and assembles a single artifact tree:
+  `dist/` (home), `dist/showcase/` (web), `dist/atlas/` (atlas). Sets
+  `AZORES_SHOWCASE_MANIFEST=/<repo>/showcase/mf-manifest.json` and
+  `AZORES_ATLAS_MANIFEST=/<repo>/atlas/mf-manifest.json` at build time
+  so the host fetches remotes from sibling subpaths under the same
+  Pages site (no separate origin needed). Home's `publicPath` is now
+  driven by `PAGES_BASE` instead of being hardcoded to `/`.
+  - [apps/home/rspack.config.mjs](apps/home/rspack.config.mjs)
+
 ### Added
 - **Widget catalog + news preset tiles** — the dashboard library now
   iterates a `widgetCatalog` rather than the bare `widgetRegistry`. Each

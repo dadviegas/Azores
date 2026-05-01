@@ -17,6 +17,14 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Pages serves the site under `/<repo>/`. All three apps need this so
+      # their chunks resolve correctly: `home` uses it as its `publicPath`,
+      # and the federation manifests for `showcase`/`atlas` need to be
+      # absolute URLs under the same prefix so the host can fetch them.
+      PAGES_BASE: /${{ github.event.repository.name }}/
+      AZORES_SHOWCASE_MANIFEST: /${{ github.event.repository.name }}/showcase/mf-manifest.json
+      AZORES_ATLAS_MANIFEST: /${{ github.event.repository.name }}/atlas/mf-manifest.json
     steps:
       - uses: actions/checkout@v4
 
@@ -29,16 +37,39 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Build
-        env:
-          PAGES_BASE: /${{ github.event.repository.name }}/
+      # Build the federated remotes first so their `mf-manifest.json` files
+      # exist before the host references them. `publicPath: "auto"` in each
+      # remote means chunk URLs are resolved at runtime from the actual
+      # script location — they don't need PAGES_BASE baked in.
+      - name: Build showcase (web)
         run: pnpm --filter @azores/web build
+
+      - name: Build atlas
+        run: pnpm --filter @azores/atlas build
+
+      - name: Build home (host)
+        run: pnpm --filter @azores/home build
+
+      # Assemble a single static tree:
+      #   dist/                 ← home
+      #   dist/showcase/        ← apps/web
+      #   dist/atlas/           ← apps/atlas
+      # The home host's federation config points at /<repo>/showcase/mf-manifest.json
+      # and /<repo>/atlas/mf-manifest.json (set above via env), so this layout
+      # is what those URLs resolve against.
+      - name: Assemble Pages artifact
+        run: |
+          mkdir -p dist
+          cp -R apps/home/dist/. dist/
+          mkdir -p dist/showcase dist/atlas
+          cp -R apps/web/dist/. dist/showcase/
+          cp -R apps/atlas/dist/. dist/atlas/
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/web/dist
+          path: dist
 
   deploy:
     needs: build

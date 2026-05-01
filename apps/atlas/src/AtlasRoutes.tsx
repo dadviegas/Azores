@@ -2,6 +2,11 @@
 // at the root of a BrowserRouter (standalone) or nested under a host route
 // (Module Federation consumer).
 
+// Atlas-specific CSS travels with the federated module so the host doesn't
+// have to know about it. Standalone `apps/atlas` re-imports it via the
+// route tree the same way.
+import "./atlas.css";
+
 import { Route, Routes, Navigate } from "react-router-dom";
 import { ToastProvider } from "@azores/ux";
 import { AtlasPage } from "./AtlasPage";

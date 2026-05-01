@@ -3,6 +3,12 @@
 // `apps/web` deploy) or nested under a parent route in a host shell (Module
 // Federation consumer like `apps/home`). The host owns the BrowserRouter.
 
+// Showcase chrome CSS is imported here (rather than only from the standalone
+// bootstrap) so the federated remote ships its own styles. Without this, the
+// host's bootstrap doesn't run, the mobile breakpoints disappear, and the
+// sidebar renders inline above the content on small viewports.
+import "./showcase.css";
+
 import { useEffect, useMemo, useState } from "react";
 import {
   Link,

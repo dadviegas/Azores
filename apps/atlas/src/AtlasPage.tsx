@@ -223,7 +223,7 @@ export const AtlasPage = (): JSX.Element => {
             zIndex: 1,
             maxWidth: 1180,
             margin: "0 auto",
-            padding: "32px 24px",
+            padding: "32px clamp(16px, 4vw, 24px)",
           }}
         >
           <header
@@ -232,6 +232,9 @@ export const AtlasPage = (): JSX.Element => {
               alignItems: "center",
               justifyContent: "space-between",
               marginBottom: 32,
+              flexWrap: "wrap",
+              rowGap: 12,
+              columnGap: 16,
             }}
           >
             <Link
@@ -248,7 +251,7 @@ export const AtlasPage = (): JSX.Element => {
               <BrandMark size="md" />
               <span style={{ fontWeight: 600, letterSpacing: "0.02em" }}>Atlas</span>
             </Link>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <Button
                 variant="ghost"
                 size="sm"

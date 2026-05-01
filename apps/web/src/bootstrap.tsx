@@ -4,7 +4,8 @@
 // here too so the remote's own initial chunk doesn't sync-resolve react.
 
 import "@azores/ui/src/styles/tokens.css";
-import "./showcase.css";
+// `showcase.css` is imported from `ShowcaseRoutes.tsx` so the federated
+// remote ships its own styles when consumed by `apps/home`.
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

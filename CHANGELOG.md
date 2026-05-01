@@ -10,6 +10,30 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Fixed
+- **Mobile layout broken on the Pages deploy** — the showcase chrome
+  (`showcase.css`) and Atlas's body styles (`atlas.css`) were imported
+  only from each app's standalone `bootstrap.tsx`. When the host
+  ([apps/home](apps/home/)) loaded those apps as Module Federation
+  remotes, `bootstrap.tsx` never ran, so neither stylesheet shipped —
+  the showcase sidebar drawer and mobile breakpoints disappeared (nav
+  rendered inline above the content) and Atlas's page body fell back
+  to UA defaults. Moved the imports into the federated entry modules
+  so the CSS travels with the remote in both standalone and federated
+  loads. Verified `mf-manifest.json` now lists the chrome CSS under
+  the exposed module's assets.
+  - [apps/web/src/ShowcaseRoutes.tsx](apps/web/src/ShowcaseRoutes.tsx)
+  - [apps/web/src/bootstrap.tsx](apps/web/src/bootstrap.tsx)
+  - [apps/atlas/src/AtlasRoutes.tsx](apps/atlas/src/AtlasRoutes.tsx)
+  - [apps/atlas/src/bootstrap.tsx](apps/atlas/src/bootstrap.tsx)
+- **Atlas header overflowed the viewport on mobile** — the page header
+  in [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) put a
+  brand link plus 5 buttons in a non-wrapping flex row, forcing the
+  page wider than the viewport on narrow screens (which clipped widget
+  cards on the right). Header now wraps with `flexWrap: "wrap"` +
+  `rowGap`, and content padding scales with viewport width via
+  `clamp(16px, 4vw, 24px)`.
+
 ### Changed
 - **Routing switched to `HashRouter` across all three apps** — `home`,
   `web` (showcase), and `atlas` standalone entries now wrap their

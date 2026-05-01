@@ -1,5 +1,6 @@
 import "@azores/ui/src/styles/tokens.css";
-import "./atlas.css";
+// `atlas.css` is imported from `AtlasRoutes.tsx` so the federated remote
+// ships its own styles when consumed by `apps/home`.
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";

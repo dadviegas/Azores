@@ -1,4 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  BrowserRouter,
+  NavLink,
+  Outlet,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { BrandMark, Button, Icon, Kbd } from "@azores/ui";
 import {
   CommandPalette,
@@ -15,28 +25,20 @@ import { Markdown } from "./pages/Markdown";
 import { Icons } from "./pages/Icons";
 import { LoginPage } from "./pages/Login";
 
-type Route = "foundations" | "components" | "ux" | "markdown" | "icons" | "login";
+type RouteEntry = { path: string; label: string; icon: string };
 
-const ROUTES: ReadonlyArray<{ id: Route; label: string; icon: string }> = [
-  { id: "foundations", label: "Foundations", icon: "layers" },
-  { id: "components", label: "Components", icon: "grid" },
-  { id: "icons", label: "Icons", icon: "sparkles" },
-  { id: "ux", label: "UX dashboard", icon: "dashboard" },
-  { id: "markdown", label: "Markdown", icon: "bookopen" },
-  { id: "login", label: "Login", icon: "user" },
+const ROUTES: ReadonlyArray<RouteEntry> = [
+  { path: "/foundations", label: "Foundations", icon: "layers" },
+  { path: "/components", label: "Components", icon: "grid" },
+  { path: "/icons", label: "Icons", icon: "sparkles" },
+  { path: "/dashboard", label: "UX dashboard", icon: "dashboard" },
+  { path: "/markdown", label: "Markdown", icon: "bookopen" },
+  { path: "/login", label: "Login", icon: "user" },
 ];
 
-const readRoute = (): Route => {
-  const hash = window.location.hash.replace(/^#\/?/, "");
-  return ROUTES.some((r) => r.id === hash) ? (hash as Route) : "foundations";
-};
-
-const navigateTo = (id: Route): void => {
-  window.location.hash = `/${id}`;
-};
-
-const Shell = (): JSX.Element => {
-  const [route, setRoute] = useState<Route>(readRoute);
+const ShowcaseLayout = (): JSX.Element => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [tweaksOpen, setTweaksOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
@@ -44,19 +46,12 @@ const Shell = (): JSX.Element => {
   const toast = useToast();
 
   useEffect(() => {
-    const onHash = (): void => setRoute(readRoute());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
-  }, []);
-
-  useEffect(() => {
     document.body.dataset.navOpen = navOpen ? "true" : "false";
   }, [navOpen]);
 
-  // Close mobile nav whenever route changes
   useEffect(() => {
     setNavOpen(false);
-  }, [route]);
+  }, [location.pathname]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent): void => {
@@ -77,7 +72,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "layers",
         keywords: "color type tokens spacing radii",
-        run: () => navigateTo("foundations"),
+        run: () => navigate("/foundations"),
       },
       {
         id: "nav-comp",
@@ -85,7 +80,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "grid",
         keywords: "buttons inputs badges",
-        run: () => navigateTo("components"),
+        run: () => navigate("/components"),
       },
       {
         id: "nav-icons",
@@ -93,7 +88,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "sparkles",
         keywords: "icon library glyphs",
-        run: () => navigateTo("icons"),
+        run: () => navigate("/icons"),
       },
       {
         id: "nav-ux",
@@ -101,7 +96,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "dashboard",
         keywords: "widgets drag resize",
-        run: () => navigateTo("ux"),
+        run: () => navigate("/dashboard"),
       },
       {
         id: "nav-md",
@@ -109,7 +104,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "bookopen",
         keywords: "docs editor blog",
-        run: () => navigateTo("markdown"),
+        run: () => navigate("/markdown"),
       },
       {
         id: "nav-login",
@@ -117,7 +112,7 @@ const Shell = (): JSX.Element => {
         group: "Navigate",
         icon: "user",
         keywords: "sign in auth",
-        run: () => navigateTo("login"),
+        run: () => navigate("/login"),
       },
       {
         id: "th-toggle",
@@ -190,31 +185,11 @@ const Shell = (): JSX.Element => {
           }),
       },
     ],
-    [setAccent, setTheme, toggleTheme, toast],
+    [navigate, setAccent, setTheme, toggleTheme, toast],
   );
 
-  const currentTitle = ROUTES.find((r) => r.id === route)?.label ?? "";
-
-  if (route === "login") {
-    return (
-      <>
-        <LoginPage />
-        <CommandPalette
-          open={paletteOpen}
-          onClose={() => setPaletteOpen(false)}
-          commands={commands}
-        />
-        <TweaksPanel
-          open={tweaksOpen}
-          onClose={() => setTweaksOpen(false)}
-          theme={tweaks.theme}
-          accent={tweaks.accent}
-          onThemeChange={setTheme}
-          onAccentChange={setAccent}
-        />
-      </>
-    );
-  }
+  const currentTitle =
+    ROUTES.find((r) => r.path === location.pathname)?.label ?? "";
 
   return (
     <div className="az-app">
@@ -234,15 +209,16 @@ const Shell = (): JSX.Element => {
         <nav className="az-nav" aria-label="Showcase navigation">
           <div className="az-nav-section">Showcase</div>
           {ROUTES.map((r) => (
-            <button
-              key={r.id}
-              className={`az-nav-item${route === r.id ? " is-active" : ""}`}
-              onClick={() => navigateTo(r.id)}
-              aria-current={route === r.id ? "page" : undefined}
+            <NavLink
+              key={r.path}
+              to={r.path}
+              className={({ isActive }: { isActive: boolean }) =>
+                `az-nav-item${isActive ? " is-active" : ""}`
+              }
             >
               <Icon name={r.icon} size={16} />
               {r.label}
-            </button>
+            </NavLink>
           ))}
         </nav>
       </aside>
@@ -278,17 +254,7 @@ const Shell = (): JSX.Element => {
             <span className="az-topbar-btn-label">Tweaks</span>
           </Button>
         </div>
-        {route === "foundations" ? (
-          <Foundations />
-        ) : route === "components" ? (
-          <Components />
-        ) : route === "icons" ? (
-          <Icons />
-        ) : route === "ux" ? (
-          <DashboardPage />
-        ) : (
-          <Markdown />
-        )}
+        <Outlet />
       </main>
       <CommandPalette
         open={paletteOpen}
@@ -307,8 +273,126 @@ const Shell = (): JSX.Element => {
   );
 };
 
+const LoginRoute = (): JSX.Element => {
+  const navigate = useNavigate();
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const { tweaks, setTheme, setAccent, toggleTheme } = useTweaks();
+  const toast = useToast();
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent): void => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((o) => !o);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const commands = useMemo<ReadonlyArray<Command>>(
+    () => [
+      {
+        id: "nav-found",
+        label: "Go to Foundations",
+        group: "Navigate",
+        icon: "layers",
+        run: () => navigate("/foundations"),
+      },
+      {
+        id: "nav-comp",
+        label: "Go to Components",
+        group: "Navigate",
+        icon: "grid",
+        run: () => navigate("/components"),
+      },
+      {
+        id: "nav-icons",
+        label: "Go to Icons",
+        group: "Navigate",
+        icon: "sparkles",
+        run: () => navigate("/icons"),
+      },
+      {
+        id: "nav-ux",
+        label: "Go to UX dashboard",
+        group: "Navigate",
+        icon: "dashboard",
+        run: () => navigate("/dashboard"),
+      },
+      {
+        id: "nav-md",
+        label: "Go to Markdown",
+        group: "Navigate",
+        icon: "bookopen",
+        run: () => navigate("/markdown"),
+      },
+      {
+        id: "th-toggle",
+        label: "Toggle theme",
+        group: "Theme",
+        icon: "settings",
+        run: () => toggleTheme(),
+      },
+      {
+        id: "open-tweaks",
+        label: "Open Tweaks panel",
+        group: "Showcase",
+        icon: "settings",
+        run: () => setTweaksOpen(true),
+      },
+      {
+        id: "demo-toast",
+        label: "Fire a sample toast",
+        group: "Showcase",
+        icon: "bell",
+        run: () =>
+          toast.push({
+            kind: "success",
+            title: "Saved",
+            message: "Tweaks persisted to localStorage.",
+          }),
+      },
+    ],
+    [navigate, setTheme, toggleTheme, toast],
+  );
+
+  return (
+    <>
+      <LoginPage />
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        commands={commands}
+      />
+      <TweaksPanel
+        open={tweaksOpen}
+        onClose={() => setTweaksOpen(false)}
+        theme={tweaks.theme}
+        accent={tweaks.accent}
+        onThemeChange={setTheme}
+        onAccentChange={setAccent}
+      />
+    </>
+  );
+};
+
 export const App = (): JSX.Element => (
   <ToastProvider>
-    <Shell />
+    <BrowserRouter basename={__AZORES_BASE_PATH__}>
+      <Routes>
+        <Route path="/login" element={<LoginRoute />} />
+        <Route element={<ShowcaseLayout />}>
+          <Route index element={<Navigate to="/foundations" replace />} />
+          <Route path="/foundations" element={<Foundations />} />
+          <Route path="/components" element={<Components />} />
+          <Route path="/icons" element={<Icons />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/markdown" element={<Markdown />} />
+          <Route path="*" element={<Navigate to="/foundations" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   </ToastProvider>
 );

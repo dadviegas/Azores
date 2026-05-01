@@ -10,6 +10,31 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Changed
+- Phase 8 of [docs/plan.md](docs/plan.md) — showcase navigation moved
+  off hash-based routing onto `react-router-dom`. URLs are real and
+  deep-linkable: `/foundations` (default), `/components`, `/icons`,
+  `/dashboard`, `/markdown`, `/login`.
+  - [apps/web/src/App.tsx](apps/web/src/App.tsx) now wraps the app in
+    `<BrowserRouter>` with a layout route (`ShowcaseLayout`) that
+    renders the sidebar + topbar + `<Outlet>`. The login route is a
+    sibling so it renders edge-to-edge without the shell. Sidebar
+    items use `<NavLink>` for active state; command-palette "Go to …"
+    commands call `useNavigate()` instead of mutating
+    `window.location.hash`. Unknown paths redirect to `/foundations`.
+  - `<BrowserRouter basename={__AZORES_BASE_PATH__}>` reads a build-
+    time global injected by
+    [`rspack.config.mjs`](apps/web/rspack.config.mjs) via
+    `DefinePlugin` from `PAGES_BASE`, so GitHub Pages deploys under a
+    sub-path keep working. Dev server already had
+    `historyApiFallback: true`.
+  - `react-router-dom: ^6.28.0` added to the catalog in
+    [`pnpm-workspace.yaml`](pnpm-workspace.yaml) and consumed by
+    `@azores/web` only.
+  - Resolves the routing open question in
+    [docs/plan.md](docs/plan.md). The icons question was also
+    decided: stay on the inline SVG sprite — no code change.
+
 ### Fixed
 - Code-block gutter line numbers misaligned with the code rows. Two
   bugs in

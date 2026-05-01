@@ -6,10 +6,10 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–7 shipped (Emotion + tokens, `@azores/ui` primitives,
-flow primitives, dashboard, markdown, login, tests + lint guard). See
-[`CHANGELOG.md`](../CHANGELOG.md) for what landed. Remaining work is
-the deferred items in §3 and the open questions in §4.
+Status: phases 1–8 shipped (Emotion + tokens, `@azores/ui` primitives,
+flow primitives, dashboard, markdown, login, tests + lint guard,
+react-router migration). See [`CHANGELOG.md`](../CHANGELOG.md) for what
+landed. Remaining work is the deferred items in §3.
 
 ---
 
@@ -55,15 +55,22 @@ Called out so future PRs pick them up:
   `highlight.js/lib/core` plus only the languages we use, behind
   `React.lazy`.
 
-## 4. Open questions
+## 4. Decisions
 
-- **Routing** — for the showcase, do we want `react-router` or stay on
-  the hash-based nav from the mockup? Hash-only has held up so far; no
-  reason to add a dep until the real app needs deep linking.
-- **Icons** — keep the inline SVG sprite from
-  [`icons.jsx`](./design/Azores/icons.jsx), or move to `lucide-react`?
-  Inline sprite wins on bundle size if our icon set stays under ~30;
-  `lucide` wins on coverage if we cross that threshold.
+- **Routing — `react-router`.** Move the showcase off hash-based nav
+  onto `react-router` so we get real URLs, deep linking, and a routing
+  primitive the rest of the app can grow into. New phase to schedule
+  (see §5).
+- **Icons — inline SVG sprite.** Keep the sprite from
+  [`icons.jsx`](./design/Azores/icons.jsx); don't take on `lucide-react`.
+  Bundle size wins while the icon set stays small; we'll revisit if
+  coverage gets thin.
+
+## 5. Phase 8 — routing migration (shipped)
+
+Done. `react-router-dom` powers the showcase; URLs are real
+(`/foundations`, `/components`, `/icons`, `/dashboard`, `/markdown`,
+`/login`) and deep-linkable. See [`CHANGELOG.md`](../CHANGELOG.md).
 
 Decisions land in this file as we make them. Anything that ships goes
 into [`CHANGELOG.md`](../CHANGELOG.md).

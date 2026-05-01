@@ -6,13 +6,14 @@ import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV !== "production";
+const basePath = (process.env.PAGES_BASE ?? "/").replace(/\/$/, "") || "/";
 
 export default defineConfig({
   entry: { main: "./src/main.tsx" },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[contenthash].js",
-    publicPath: process.env.PAGES_BASE ?? "/",
+    publicPath: `${basePath === "/" ? "" : basePath}/`,
     clean: true,
   },
   resolve: {
@@ -51,6 +52,9 @@ export default defineConfig({
   },
   experiments: { css: true },
   plugins: [
+    new rspack.DefinePlugin({
+      __AZORES_BASE_PATH__: JSON.stringify(basePath),
+    }),
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
     new rspack.CopyRspackPlugin({ patterns: [{ from: "icon.svg", to: "icon.svg" }] }),
     isDev && new ReactRefreshPlugin(),

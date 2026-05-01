@@ -14,7 +14,8 @@
     "@azores/ux": "workspace:*",
     "@emotion/react": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-router-dom": "catalog:"
   },
   "devDependencies": {
     "@rspack/cli": "^1.1.4",

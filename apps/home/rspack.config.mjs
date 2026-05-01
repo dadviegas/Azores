@@ -11,9 +11,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isDev = process.env.NODE_ENV !== "production";
 const basePath = (process.env.PAGES_BASE ?? "/").replace(/\/$/, "") || "/";
 
-// Federation deps. Singletons so the host and remote share one instance —
-// version pinned via the pnpm catalog, so a runtime drift means a bug in
-// pnpm-workspace.yaml, not here.
+// Where to fetch the showcase manifest from. Defaults to the dev server, but
+// production deploys override via env so the host points at the real CDN.
+const showcaseManifest =
+  process.env.AZORES_SHOWCASE_MANIFEST ?? "http://localhost:5173/mf-manifest.json";
+
 const reactVersion = require("react/package.json").version;
 const reactDomVersion = require("react-dom/package.json").version;
 const routerVersion = require("react-router-dom/package.json").version;
@@ -25,8 +27,6 @@ export default defineConfig({
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].[contenthash].js",
-    // `auto` lets MF chunks load from wherever the remoteEntry was served
-    // from, which is what we want when the home host fetches us cross-origin.
     publicPath: "auto",
     clean: true,
   },
@@ -70,22 +70,18 @@ export default defineConfig({
       __AZORES_BASE_PATH__: JSON.stringify(basePath),
     }),
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
-    new rspack.CopyRspackPlugin({ patterns: [{ from: "icon.svg", to: "icon.svg" }] }),
     isDev && new ReactRefreshPlugin(),
     new ModuleFederationPlugin({
-      // Federation identity. Host consumes us as `showcase@…/mf-manifest.json`.
-      name: "showcase",
-      filename: "remoteEntry.js",
-      // `manifest: true` is the default in @module-federation/enhanced ≥0.6,
-      // but spell it out so a future major doesn't silently change behavior.
-      manifest: true,
-      // DTS plugin is off until we set up a proper federation tsconfig and
-      // type-archive pipeline. Host gets types from a hand-rolled stub at
-      // `apps/home/src/federated.d.ts`. Tracked in docs/plan.md §6.
-      dts: false,
-      exposes: {
-        "./ShowcaseRoutes": "./src/ShowcaseRoutes.tsx",
+      name: "home",
+      // Manifest-based remote loading. The string format is
+      // `<remoteName>@<manifestUrl>`. The runtime fetches the manifest first
+      // (cheap JSON), then loads the entry + chunks listed inside it.
+      remotes: {
+        showcase: `showcase@${showcaseManifest}`,
       },
+      // Off until we publish remote types properly — see web's
+      // rspack.config.mjs and docs/plan.md §6.
+      dts: false,
       shared: {
         react: { singleton: true, requiredVersion: reactVersion },
         "react-dom": { singleton: true, requiredVersion: reactDomVersion },
@@ -95,12 +91,5 @@ export default defineConfig({
       },
     }),
   ].filter(Boolean),
-  devServer: {
-    port: 5173,
-    historyApiFallback: true,
-    hot: true,
-    // Allow the home host (cross-origin in dev) to fetch our remoteEntry +
-    // manifest. Without this CORS the host's loader sees a network error.
-    headers: { "Access-Control-Allow-Origin": "*" },
-  },
+  devServer: { port: 5170, historyApiFallback: true, hot: true },
 });

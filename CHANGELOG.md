@@ -10,6 +10,87 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Added
+- **`@azores/core` fetch module** — public-API foundation for Phase 9
+  live-data widgets. Three pieces that compose:
+  - **`FetchCache`** + **`getCache()`** in
+    [packages/core/src/fetch/cache.ts](packages/core/src/fetch/cache.ts).
+    IndexedDB-backed (DB `azores-fetch`, store `entries`) with an
+    in-memory fast path. Default TTL 10 min, per-entry override on
+    `set()`. Singleton pinned to `globalThis.__azores_fetch_cache__`
+    so multiple module copies (one per MF remote) all share the same
+    instance. Degrades silently to in-memory when IDB is unavailable
+    (jsdom, private browsing, quota errors).
+  - **Source registry** in
+    [packages/core/src/fetch/sources.ts](packages/core/src/fetch/sources.ts).
+    A `Source<TParams, TData>` is a typed contract: name, URL builder,
+    optional TTL override, optional response transformer. Built-ins
+    cover the four Phase 9 picks — `weather` (Open-Meteo, 10min),
+    `countries` (REST Countries, 24h), `wikipedia` (page summary, 1h),
+    `fx` (Frankfurter, 5min). Add a new source with
+    `registerSource({ name, build, ttlMs?, parse? })`.
+  - **`Fetcher`** + **`createFetcher({ sources })`** in
+    [packages/core/src/fetch/fetcher.ts](packages/core/src/fetch/fetcher.ts).
+    Per-app/widget gateway with a `sources` allowlist — calling
+    `.get("weather", …)` from a Fetcher that wasn't given `weather`
+    throws at request time, so unauthorized sources surface immediately
+    instead of silently working. Cache key is
+    `<source>:<sorted-JSON-params>` so `{ a, b }` and `{ b, a }`
+    collapse to one entry. Supports `signal` (AbortController) and
+    `forceRefresh` (bypass cache + replace entry).
+  - 5 new vitest tests in
+    [packages/core/src/fetch/Fetcher.test.ts](packages/core/src/fetch/Fetcher.test.ts)
+    cover: allowlist enforcement, cache hit dedupes calls, stable key
+    is order-insensitive, `forceRefresh` bypasses, non-2xx throws.
+    All 13 tests in the suite passing.
+
+### Added
+- **Phase 10 — `@azores/home` launcher app + Module Federation.** A
+  new app under [apps/home/](apps/home/) is the shell users land on:
+  a tile grid that lazy-loads sibling apps as MF remotes. First tile
+  is the showcase; Atlas + Markdown studio are placeholder tiles.
+  - **Host** ([apps/home/rspack.config.mjs](apps/home/rspack.config.mjs))
+    runs on port `5170` and configures
+    `@module-federation/enhanced/rspack`'s `ModuleFederationPlugin`
+    with a `showcase@<manifestUrl>` remote. The manifest URL defaults
+    to `http://localhost:5173/mf-manifest.json` and is overridable
+    via `AZORES_SHOWCASE_MANIFEST` for production deploys.
+  - **Remote** ([apps/web/rspack.config.mjs](apps/web/rspack.config.mjs))
+    exposes `./ShowcaseRoutes` from
+    [apps/web/src/ShowcaseRoutes.tsx](apps/web/src/ShowcaseRoutes.tsx),
+    a new router-agnostic component extracted from the old
+    `App.tsx`. The standalone
+    [apps/web/src/App.tsx](apps/web/src/App.tsx) is now a thin
+    wrapper that adds `<BrowserRouter>`; the host adds its own when
+    consuming the remote, so the same component works in both modes.
+    Output uses `publicPath: "auto"` so federated chunks load from
+    the remote's origin, and dev server sets
+    `Access-Control-Allow-Origin: *` so the host can fetch the
+    manifest cross-origin.
+  - **Singletons** — `react`, `react-dom`, `react-router-dom`,
+    `@emotion/react` are declared `singleton: true` on both sides
+    with `requiredVersion` read from each package.json at config
+    time. The pnpm catalog already pins these to one version, so
+    runtime version drift can only be a `pnpm-workspace.yaml` bug,
+    never a per-app bug.
+  - **Manifest mode** (`mf-manifest.json`) is used instead of raw
+    `remoteEntry.js` lookup so the host can introspect what the
+    remote exposes/shares without parsing the entry chunk.
+  - **Routing** — host's `<BrowserRouter>` owns `/` (launcher) and
+    `/apps/showcase/*` (lazy-loaded showcase). `ShowcaseRoutes` uses
+    relative `<Route path="…">` and relative `<NavLink to="…">` so
+    it resolves correctly under either basename. `useResolvedPath(".")`
+    feeds the topbar title lookup.
+  - **Tile UI** in [apps/home/src/Launcher.tsx](apps/home/src/Launcher.tsx)
+    composes `@azores/ui` primitives (Background, BrandMark, Icon)
+    with an Emotion-styled tile grid. Tile manifest lives in
+    [apps/home/src/apps.ts](apps/home/src/apps.ts) — adding a new
+    federated app is one entry.
+  - **Tooling note** — `@module-federation/enhanced@^2.4.0` requires
+    Node ≥22 (uses `util.styleText`). Repo's
+    [package.json](package.json) `engines.node` is already `>=24`,
+    so this only bites devs on stale Node versions.
+
 ### Fixed
 - Dashboard rows now grow to fit content. `gridAutoRows` changed from
   a fixed `${rowH}px` to `minmax(${rowH}px, auto)` in

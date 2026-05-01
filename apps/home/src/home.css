@@ -1,0 +1,7 @@
+html, body, #app { height: 100%; margin: 0; }
+body {
+  background: var(--az-bg);
+  color: var(--az-text);
+  font-family: var(--az-font-sans);
+  -webkit-font-smoothing: antialiased;
+}

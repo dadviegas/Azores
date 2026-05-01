@@ -144,6 +144,27 @@ export const Dashboard = <T,>({
   const [externalGhost, setExternalGhost] = useState<ExternalDragState | null>(null);
   const [resizingId, setResizingId] = useState<string | null>(null);
 
+  // Square cells — measure the live column width and use it as the row height
+  // so each grid track is a perfect square. A widget at `w:4, h:2` is then
+  // visually 4×2 squares, and the backdrop dashed cells render as squares.
+  // Falls back to the `rowHeight` prop until the first measurement lands.
+  const [measuredRowH, setMeasuredRowH] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const measure = (): void => {
+      const w = grid.getBoundingClientRect().width;
+      if (w <= 0) return;
+      const colW = (w - gap * (cols - 1)) / cols;
+      setMeasuredRowH(Math.max(40, Math.round(colW)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(grid);
+    return () => ro.disconnect();
+  }, [cols, gap]);
+  const effectiveRowH = measuredRowH ?? rowHeight;
+
   const layout = useMemo<PlacedItem<DashboardWidget<T>>[]>(() => {
     const list =
       dragState && dragState.ghost
@@ -165,35 +186,46 @@ export const Dashboard = <T,>({
     [layout],
   );
 
-  // FLIP — capture pre-layout positions, run translate→identity transition.
-  // Skip the dragged cell (the pointer drives it directly) and skip entirely
-  // during resize (cell size changes mid-frame cause shudder). Other cells
-  // still animate during drag so the user can preview the new layout.
-  const positionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  // FLIP — capture pre-layout box, run (translate, scale)→identity transition.
+  // The dragged cell skips entirely (pointer drives it). For the resizing cell
+  // we also apply scale-FLIP so each grid-snap step animates as a smooth
+  // grow/shrink from the previous size, instead of jumping instantly to the
+  // new track count. Neighbors translate-FLIP into their displaced positions.
+  const positionsRef = useRef<
+    Map<string, { x: number; y: number; w: number; h: number }>
+  >(new Map());
   useLayoutEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
     const cellsEls = grid.querySelectorAll<HTMLElement>("[data-wid]");
-    const next = new Map<string, { x: number; y: number }>();
-    const skipAll = resizingId !== null;
+    const next = new Map<string, { x: number; y: number; w: number; h: number }>();
     const draggedId = dragState?.id ?? null;
     cellsEls.forEach((el) => {
       const id = el.dataset.wid;
       if (!id) return;
       const r = el.getBoundingClientRect();
-      next.set(id, { x: r.left, y: r.top });
-      if (skipAll || id === draggedId) return;
+      next.set(id, { x: r.left, y: r.top, w: r.width, h: r.height });
+      if (id === draggedId) return;
       const prev = positionsRef.current.get(id);
       if (!prev) return;
       const dx = prev.x - r.left;
       const dy = prev.y - r.top;
-      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      // Only the resizing cell uses scale-FLIP; neighbors keep crisp content
+      // (scaling them would blur text during a drag-displacement).
+      const isResizingCell = id === resizingId;
+      const sx = isResizingCell && r.width > 0 ? prev.w / r.width : 1;
+      const sy = isResizingCell && r.height > 0 ? prev.h / r.height : 1;
+      const noMove = Math.abs(dx) < 1 && Math.abs(dy) < 1;
+      const noScale = Math.abs(sx - 1) < 0.005 && Math.abs(sy - 1) < 0.005;
+      if (noMove && noScale) return;
       el.style.transition = "none";
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
+      el.style.transformOrigin = "top left";
+      el.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
       // Force reflow, then animate to identity on next frame.
       void el.offsetWidth;
       requestAnimationFrame(() => {
-        el.style.transition = "transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1)";
+        el.style.transition =
+          "transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1)";
         el.style.transform = "";
       });
     });
@@ -209,10 +241,10 @@ export const Dashboard = <T,>({
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const col = Math.max(0, Math.min(cols - 1, Math.round(x / (colW + gap))));
-      const row = Math.max(0, Math.floor(y / (rowHeight + gap)));
+      const row = Math.max(0, Math.floor(y / (effectiveRowH + gap)));
       return { col, row };
     },
-    [cols, gap, rowHeight],
+    [cols, gap, effectiveRowH],
   );
 
   const onDragStartCell =
@@ -310,7 +342,7 @@ export const Dashboard = <T,>({
         const newW = Math.max(minWidth, Math.min(cols, Math.round(startW + dx / (colW + gap))));
         const newH = Math.max(
           minHeight,
-          Math.min(maxHeight, Math.round(startH + dy / (rowHeight + gap))),
+          Math.min(maxHeight, Math.round(startH + dy / (effectiveRowH + gap))),
         );
         if (newW === lastW && newH === lastH) return;
         lastW = newW;
@@ -338,7 +370,7 @@ export const Dashboard = <T,>({
     <Grid
       ref={gridRef}
       $cols={cols}
-      $rowH={rowHeight}
+      $rowH={effectiveRowH}
       $gap={gap}
       onDragOver={onDragOverGrid}
       onDragLeave={onDragLeaveGrid}
@@ -346,7 +378,7 @@ export const Dashboard = <T,>({
     >
       <GridBackdrop
         $cols={cols}
-        $rowH={rowHeight}
+        $rowH={effectiveRowH}
         $gap={gap}
         data-active={isDragging}
       >
@@ -430,6 +462,11 @@ export const Dashboard = <T,>({
               aria-label="Resize widget"
               draggable={false}
             />
+            {resizing ? (
+              <SizeReadout>
+                {w.w}×{w.h}
+              </SizeReadout>
+            ) : null}
           </Cell>
         );
       })}

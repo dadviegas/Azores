@@ -11,16 +11,48 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
-- **Curated news presets** — grouped free RSS feeds (World, Europe,
-  Americas, Tech) exposed by the News widget for a future picker UI. See
-  [packages/widgets/src/News/presets.ts](packages/widgets/src/News/presets.ts).
-  Each preset carries a `corsFriendly` flag so a future picker (or proxy
-  layer) can honor browser CORS reality — Reddit / Hacker News / Wikinews /
-  Lobsters fetch directly; major outlets (BBC, Reuters, NPR, Euronews, DW,
-  Politico EU, ProPublica, CBC, Al Jazeera) are listed but flagged as
-  needing a proxy.
+- **Widget catalog + news preset tiles** — the dashboard library now
+  iterates a `widgetCatalog` rather than the bare `widgetRegistry`. Each
+  catalog row is one library entry; configurable widgets (manifest
+  `configurable: true`) expose multiple rows that share a Component but
+  ship distinct default `data` payloads. Atlas seeds one tile per CORS-
+  friendly news preset (Reddit r/worldnews, r/europe, r/news, r/canada,
+  Wikinews EN, Hacker News Front page, Hacker News Best, Lobste.rs) so
+  the world / Europe / Americas / tech feeds all land on the dashboard
+  out of the box.
+  - [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts) —
+    `widgetCatalog` and `CatalogEntry` type.
+  - [packages/widgets/src/News/presets.ts](packages/widgets/src/News/presets.ts) —
+    grouped free RSS feeds with a `corsFriendly` flag. Major outlets that
+    don't set CORS (BBC, Reuters, NPR, Euronews, DW, Politico EU,
+    ProPublica, CBC, Al Jazeera) are listed but excluded from the seeded
+    catalog until a proxy layer exists.
+  - [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) — library
+    + initial seed switch to the catalog; configurable widgets allow
+    duplicates; tile chrome reads `data.title` so each news instance
+    shows its source ("Reddit · r/worldnews") instead of the generic
+    "News feed".
+  - [packages/widgets/src/News/manifest.yaml](packages/widgets/src/News/manifest.yaml) —
+    `configurable: true`, default tile bumped to 4×3 (h was 2, too short
+    for a useful headline list).
 
 ### Changed
+- **Square grid cells** — `<Dashboard>` in
+  [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx)
+  now measures the live column width via `ResizeObserver` and uses it as
+  the row height, so every grid track is a perfect square. A widget at
+  `w:4, h:2` is literally 4×2 squares and the dashed backdrop cells
+  render as squares regardless of viewport width. Row tracks are also
+  fixed (was `minmax($rowH, auto)`) so content overflow scrolls inside
+  the cell instead of stretching the row and breaking squareness.
+  [packages/ux/src/Dashboard/Dashboard.styles.ts](packages/ux/src/Dashboard/Dashboard.styles.ts).
+- **Resize animates per snap step** — the FLIP block in
+  [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx)
+  now captures pre-layout `w/h` in addition to `x/y`. The resizing cell
+  applies a scale-FLIP (`scale(prev/new)` → identity over 220ms) on each
+  grid-snap commit, so growing/shrinking by one grid track plays as a
+  smooth tween instead of an instant jump. Neighbors continue to use
+  translate-only FLIP to keep their text crisp.
 - **FX widget defaults to a 1-row tile** —
   [packages/widgets/src/Fx/manifest.yaml](packages/widgets/src/Fx/manifest.yaml)
   now ships `defaultSize.h: 1`. The 4-pair rate row is short and was
@@ -31,14 +63,17 @@ with relative links so the entry stays clickable.
   can resize tiles down to a thin strip. Default floor was 2 rows, which
   made low-density widgets (e.g. World Bank's Latest block) sit in a
   half-empty tile they couldn't shrink.
-- **Resize uses a ghost preview** — dragging the resize handle in
+- **Resize feedback** — dragging the resize handle in
   [packages/ux/src/Dashboard/Dashboard.tsx](packages/ux/src/Dashboard/Dashboard.tsx)
-  no longer commits a new size on every snap step. While the pointer is
-  down, the grid backdrop is shown and a dashed outline tracks the
-  snap-target `w×h`; the layout only updates on mouseup. Each snap step
-  re-keys the ghost so a short scale-in pulse replays, giving the
-  discrete grid-track jumps a sense of motion. Removes the inline
-  `SizeReadout` (label is now on the ghost itself).
+  now reveals the grid backdrop (previously only shown during reorder /
+  external-drop) so snap targets are visible. Live snap-resize is
+  preserved — the cell shrinks/grows in real time as the cursor crosses
+  cell boundaries. A previous attempt at a ghost-preview-only flow was
+  reverted because the preview sat *inside* the cell footprint while
+  shrinking and felt unresponsive. FLIP now also runs on non-resizing
+  neighbors so they glide as they're displaced; only the resizing cell
+  itself skips FLIP (translate-back would shudder against the live
+  size change).
 
 ### Added
 - **`@azores/core` storage proxy** — adapter-based key/value persistence so

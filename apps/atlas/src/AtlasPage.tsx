@@ -27,7 +27,9 @@ import {
 import { DataProvider } from "@azores/dataprovider";
 import {
   collectAllowedSources,
+  widgetCatalog,
   widgetRegistry,
+  type CatalogEntry,
   type WidgetEntry,
 } from "@azores/widgets";
 import { getStorage } from "@azores/core";
@@ -55,12 +57,12 @@ const isValidLayout = (raw: unknown): raw is StoredLayout =>
   Array.isArray((raw as StoredLayout).widgets);
 
 const initial = (): Widget[] =>
-  Object.entries(widgetRegistry).map(([id, entry]) => ({
-    id: `w-${id}`,
-    type: id,
-    w: entry.manifest.defaultSize.w,
-    h: entry.manifest.defaultSize.h,
-    // No data payload for live widgets — they fetch via useSource.
+  widgetCatalog.map((entry) => ({
+    id: `w-${entry.id}`,
+    type: entry.type,
+    w: entry.defaultSize.w,
+    h: entry.defaultSize.h,
+    data: entry.data,
   }));
 
 const useResponsiveCols = (): number => {
@@ -98,7 +100,7 @@ const renderBody = (widget: Widget): ReactNode => {
   const { Component, ttlMs } = entry;
   return (
     <Suspense fallback={<WidgetSkeleton />}>
-      <Component ttlMs={ttlMs} />
+      <Component ttlMs={ttlMs} data={widget.data} />
     </Suspense>
   );
 };
@@ -120,22 +122,22 @@ const sizeForCatalog = (
 };
 
 const makeFromCatalog = (
-  id: string,
-  entry: WidgetEntry,
+  entry: CatalogEntry,
   existing: ReadonlyArray<Widget>,
   cols: number,
 ): Widget => {
   const { w, h } = sizeForCatalog(
     existing,
     cols,
-    entry.manifest.defaultSize.w,
-    entry.manifest.defaultSize.h,
+    entry.defaultSize.w,
+    entry.defaultSize.h,
   );
   return {
     id: `w${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    type: id,
+    type: entry.type,
     w,
     h,
+    data: entry.data,
   };
 };
 
@@ -182,23 +184,30 @@ export const AtlasPage = (): JSX.Element => {
   const remove = (id: string): void =>
     setWidgets((prev) => prev.filter((w) => w.id !== id));
 
-  const addFromCatalog = (id: string): void => {
-    const entry = widgetRegistry[id];
+  const addFromCatalog = (catalogId: string): void => {
+    const entry = widgetCatalog.find((c) => c.id === catalogId);
     if (!entry) return;
     // Append so first-fit packing slots the new widget into the first
     // existing gap that fits — `makeFromCatalog` already shrunk the size
     // to match an open pocket when one was available.
-    setWidgets((prev) => [...prev, makeFromCatalog(id, entry, prev, cols)]);
+    setWidgets((prev) => [...prev, makeFromCatalog(entry, prev, cols)]);
   };
 
+  // Configurable widgets (presets carry a `data` payload) can have multiple
+  // instances on the dashboard, so we never mark them "added". Fixed widgets
+  // are blocked once their type is on the dashboard.
   const addedTypes = new Set(widgets.map((w) => w.type));
+  const isAdded = (entry: CatalogEntry): boolean =>
+    entry.data === undefined && addedTypes.has(entry.type);
 
   const reset = (): void => {
     setWidgets(initial());
     void getStorage().delete(LAYOUT_KEY);
   };
 
-  const dragEntry = dragId ? widgetRegistry[dragId] : null;
+  const dragEntry = dragId
+    ? widgetCatalog.find((c) => c.id === dragId) ?? null
+    : null;
 
   return (
     <DataProvider sources={sources}>
@@ -305,8 +314,8 @@ export const AtlasPage = (): JSX.Element => {
                     ...sizeForCatalog(
                       widgets,
                       cols,
-                      dragEntry.manifest.defaultSize.w,
-                      dragEntry.manifest.defaultSize.h,
+                      dragEntry.defaultSize.w,
+                      dragEntry.defaultSize.h,
                     ),
                     onDrop: () => {
                       if (dragId) addFromCatalog(dragId);
@@ -315,7 +324,19 @@ export const AtlasPage = (): JSX.Element => {
                   }
                 : null
             }
-            renderTitle={(w) => widgetRegistry[w.type]?.manifest.title ?? w.type}
+            renderTitle={(w) => {
+              // Configurable widgets (news presets) ship a `data.title` so
+              // each instance reads as its source — "Reddit · r/worldnews"
+              // rather than the generic manifest title "News feed".
+              const dataTitle =
+                w.data && typeof w.data === "object"
+                  ? (w.data as { title?: unknown }).title
+                  : undefined;
+              if (typeof dataTitle === "string" && dataTitle.length > 0) {
+                return dataTitle;
+              }
+              return widgetRegistry[w.type]?.manifest.title ?? w.type;
+            }}
             renderBody={({ widget }) => renderBody(widget)}
             widgetActions={(w) => [
               {
@@ -340,11 +361,11 @@ export const AtlasPage = (): JSX.Element => {
             Click to add to the top of the dashboard. Already-added widgets are marked.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {Object.entries(widgetRegistry).map(([id, entry]) => {
-              const added = addedTypes.has(id);
+            {widgetCatalog.map((entry) => {
+              const added = isAdded(entry);
               return (
                 <div
-                  key={id}
+                  key={entry.id}
                   draggable={!added}
                   onDragStart={(e) => {
                     if (added) {
@@ -352,13 +373,13 @@ export const AtlasPage = (): JSX.Element => {
                       return;
                     }
                     e.dataTransfer.effectAllowed = "copy";
-                    e.dataTransfer.setData("application/x-az-widget", id);
-                    setDragId(id);
+                    e.dataTransfer.setData("application/x-az-widget", entry.id);
+                    setDragId(entry.id);
                   }}
                   onDragEnd={() => setDragId(null)}
                   onClick={() => {
                     if (added) return;
-                    addFromCatalog(id);
+                    addFromCatalog(entry.id);
                     setLibOpen(false);
                   }}
                   aria-disabled={added}
@@ -387,12 +408,12 @@ export const AtlasPage = (): JSX.Element => {
                       color: "var(--az-text-2)",
                     }}
                   >
-                    <Icon name={entry.manifest.icon ?? "box"} size={16} />
+                    <Icon name={entry.icon ?? "box"} size={16} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 500 }}>{entry.manifest.title}</div>
+                    <div style={{ fontSize: 13, fontWeight: 500 }}>{entry.title}</div>
                     <div style={{ fontSize: 11, color: "var(--az-text-3)" }}>
-                      {added ? "Already on dashboard" : entry.manifest.description ?? ""}
+                      {added ? "Already on dashboard" : entry.description ?? ""}
                     </div>
                   </div>
                   <Icon

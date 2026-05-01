@@ -6,11 +6,11 @@ export const Grid = styled.div<{ $cols: number; $rowH: number; $gap: number }>(
     position: "relative",
     display: "grid",
     gridTemplateColumns: `repeat(${$cols}, minmax(0, 1fr))`,
-    // `h × rowHeight` is the minimum slot a widget reserves; rows grow when
-    // content needs more so a widget never has to scroll just because the
-    // manifest's default height undershot its content. The trade-off is that
-    // a tall content-driven cell can stretch siblings sharing its row span.
-    gridAutoRows: `minmax(${$rowH}px, auto)`,
+    // Fixed rows (no `auto` upper bound). `$rowH` is set by the dashboard to
+    // match the live column width, so each grid track is a perfect square and
+    // a widget at `w:N, h:M` renders as N×M squares. Body has `overflow: auto`
+    // so content that exceeds the declared `h` scrolls inside the cell.
+    gridAutoRows: `${$rowH}px`,
     gap: `${$gap}px`,
     minHeight: `${$rowH * 4}px`,
   }),
@@ -22,7 +22,7 @@ export const GridBackdrop = styled.div<{ $cols: number; $rowH: number; $gap: num
     inset: 0,
     display: "grid",
     gridTemplateColumns: `repeat(${$cols}, minmax(0, 1fr))`,
-    gridAutoRows: `minmax(${$rowH}px, auto)`,
+    gridAutoRows: `${$rowH}px`,
     gap: `${$gap}px`,
     pointerEvents: "none",
     opacity: 0,
@@ -73,14 +73,6 @@ export const Ghost = styled.div<{ $col: number; $row: number; $w: number; $h: nu
     textTransform: "uppercase",
     pointerEvents: "none",
     zIndex: 0,
-    // Snap-step pulse: every time the grid placement changes (new w/h), the
-    // resize ghost is re-keyed so this short scale-in replays. Gives the jump
-    // a sense of motion even though grid tracks aren't transitionable.
-    animation: `az-ghost-pop 140ms ${tokens.ease}`,
-    "@keyframes az-ghost-pop": {
-      from: { transform: "scale(0.97)", opacity: 0.6 },
-      to: { transform: "scale(1)", opacity: 1 },
-    },
   }),
 );
 

@@ -8,5 +8,5 @@ sources:
 ttl: 30m
 defaultSize:
   w: 4
-  h: 2
+  h: 3
 icon: cloud

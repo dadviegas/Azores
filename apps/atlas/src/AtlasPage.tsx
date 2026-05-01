@@ -40,8 +40,11 @@ const sources = collectAllowedSources();
 
 // Schema-versioned so a future shape change can be detected and discarded
 // instead of crashing the dashboard. Bump `v` on any breaking field change.
+// v2: Reddit and Wikinews presets removed from the seed (browsers can no
+// longer fetch them cross-origin); existing v1 layouts are discarded so
+// the saved widget URLs don't keep surfacing "Load failed" tiles.
 const LAYOUT_KEY = "atlas:dashboard:layout";
-const LAYOUT_VERSION = 1;
+const LAYOUT_VERSION = 2;
 type StoredLayout = { v: number; widgets: Widget[] };
 
 // `GridItem` is just `{id, w, h}` — column/row come from packing in

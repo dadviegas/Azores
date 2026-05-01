@@ -25,23 +25,12 @@ export type NewsPreset = {
 
 export const NEWS_PRESETS: ReadonlyArray<NewsPreset> = [
   // ── World ──────────────────────────────────────────────────────────────
-  {
-    id: "reddit-worldnews",
-    label: "Reddit · r/worldnews",
-    url: "https://www.reddit.com/r/worldnews/.rss",
-    region: "world",
-    kind: "rss",
-    corsFriendly: true,
-  },
-  {
-    id: "wikinews-en",
-    label: "Wikinews (English)",
-    url: "https://en.wikinews.org/w/index.php?title=Special:NewsFeed&feed=atom&categories=Published&notcategories=No%20publish%7CArchived%7CAutoArchived%7Cdisputed&namespace=0&count=30&hourcount=124&ordermethod=categoryadd&stablepages=only",
-    region: "world",
-    kind: "rss",
-    corsFriendly: true,
-    note: "Wikimedia · CC BY 2.5",
-  },
+  // Reddit's `*.rss` and Wikinews' Special:NewsFeed used to be flagged
+  // `corsFriendly: true` here, but Reddit started blocking unauthenticated
+  // cross-origin browser requests (403 / no `Access-Control-Allow-Origin`)
+  // and Wikinews' filtered feed rate-limits hard. Both surfaced as
+  // "Feed unavailable. Load failed" tiles on the seeded Atlas dashboard
+  // and have been removed from the catalog. Reintroduce behind a proxy.
   {
     id: "aljazeera-world",
     label: "Al Jazeera · World",
@@ -71,14 +60,7 @@ export const NEWS_PRESETS: ReadonlyArray<NewsPreset> = [
   },
 
   // ── Europe ─────────────────────────────────────────────────────────────
-  {
-    id: "reddit-europe",
-    label: "Reddit · r/europe",
-    url: "https://www.reddit.com/r/europe/.rss",
-    region: "europe",
-    kind: "rss",
-    corsFriendly: true,
-  },
+  // Reddit r/europe removed for the same reason as r/worldnews above.
   {
     id: "euronews-en",
     label: "Euronews (English)",
@@ -108,22 +90,7 @@ export const NEWS_PRESETS: ReadonlyArray<NewsPreset> = [
   },
 
   // ── Americas ───────────────────────────────────────────────────────────
-  {
-    id: "reddit-news",
-    label: "Reddit · r/news",
-    url: "https://www.reddit.com/r/news/.rss",
-    region: "americas",
-    kind: "rss",
-    corsFriendly: true,
-  },
-  {
-    id: "reddit-canada",
-    label: "Reddit · r/canada",
-    url: "https://www.reddit.com/r/canada/.rss",
-    region: "americas",
-    kind: "rss",
-    corsFriendly: true,
-  },
+  // Reddit r/news and r/canada removed; see r/worldnews note above.
   {
     id: "npr-news",
     label: "NPR · News",

@@ -10,6 +10,23 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Removed
+- **Reddit and Wikinews news presets** — `*.rss` on Reddit started
+  blocking unauthenticated cross-origin browser fetches (403 with no
+  `Access-Control-Allow-Origin`) and Wikinews' `Special:NewsFeed` Atom
+  feed rate-limits the same way. Both were flagged `corsFriendly: true`
+  in [packages/widgets/src/News/presets.ts](packages/widgets/src/News/presets.ts)
+  but failed at runtime, surfacing as "Feed unavailable. Load failed"
+  tiles on every fresh Atlas dashboard. Dropped: `reddit-worldnews`,
+  `reddit-europe`, `reddit-news`, `reddit-canada`, `wikinews-en`. The
+  CORS-blocked outlets (BBC, Reuters, Al Jazeera, Euronews, Politico EU,
+  DW, NPR, ProPublica, CBC) remain in the list flagged `corsFriendly:
+  false` so a future proxy hop can reintroduce them. Bumped
+  `LAYOUT_VERSION` 1 → 2 in
+  [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx) so
+  persisted dashboards from before this change get re-seeded instead
+  of holding onto the dead URLs.
+
 ### Fixed
 - **Mobile layout broken on the Pages deploy** — the showcase chrome
   (`showcase.css`) and Atlas's body styles (`atlas.css`) were imported

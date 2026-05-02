@@ -10,6 +10,14 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Added
+- **Character preview page** at
+  [docs/character-preview.html](docs/character-preview.html) — standalone
+  HTML mock of three CSS-only animated SVG mascots (whale, volcano,
+  seagull) themed to the Azores brand. Not wired into any app; lives in
+  `docs/` so a future "Mascot" widget can pull the markup/keyframes
+  verbatim.
+
 ### Removed
 - **Reddit and Wikinews news presets** — `*.rss` on Reddit started
   blocking unauthenticated cross-origin browser fetches (403 with no

@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Azores · Character preview</title>
+    <style>
+      :root {
+        --bg: #0b0e12;
+        --bg-2: #14181f;
+        --line: #2a313c;
+        --text: #e7eaf0;
+        --text-2: #a6adba;
+        --ocean-300: #5e91b0;
+        --ocean-500: #1d6fa5;
+        --ocean-700: #0f4c75;
+        --lava-300: #f3a86a;
+        --lava-500: #e26a2c;
+        --lava-700: #b04a17;
+        --moss-500: #4f7a3a;
+        --sky: #8db8d8;
+      }
+      html, body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.5 -apple-system, system-ui, "Segoe UI", sans-serif;
+        min-height: 100vh;
+      }
+      .page {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+      }
+      h1 {
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        font-size: clamp(24px, 4vw, 36px);
+        margin: 0 0 8px;
+      }
+      .lead {
+        color: var(--text-2);
+        margin: 0 0 32px;
+        font-size: 15px;
+      }
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+      .card {
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .card header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-2);
+      }
+      .card .stage {
+        position: relative;
+        aspect-ratio: 16 / 11;
+        background: linear-gradient(180deg, #0e1a2b 0%, #0b1320 60%, #0a0e16 100%);
+        overflow: hidden;
+      }
+      .card .meta {
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--text-2);
+        border-top: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .stage svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      /* ------------------------------------------------------------------
+         #1  Whale — slow horizontal swim, gentle vertical bob, blow puff
+         ------------------------------------------------------------------ */
+      .whale-stage {
+        background:
+          radial-gradient(120% 60% at 50% 100%, rgba(15, 76, 117, 0.55), transparent 70%),
+          linear-gradient(180deg, #0e1a2b 0%, #07101c 100%);
+      }
+      .whale-bubble {
+        animation: bubble-rise 4.2s linear infinite;
+        opacity: 0;
+      }
+      .whale-bubble.b2 { animation-delay: 1.4s; }
+      .whale-bubble.b3 { animation-delay: 2.8s; }
+      @keyframes bubble-rise {
+        0%   { transform: translateY(0);    opacity: 0; }
+        15%  { opacity: 0.6; }
+        100% { transform: translateY(-90px); opacity: 0; }
+      }
+      .whale-group {
+        animation: whale-swim 14s ease-in-out infinite;
+      }
+      @keyframes whale-swim {
+        0%, 100% { transform: translate(-10%, 4%); }
+        50%      { transform: translate(70%, -2%); }
+      }
+      .whale-body {
+        animation: whale-bob 3.2s ease-in-out infinite;
+        transform-origin: 50% 50%;
+      }
+      @keyframes whale-bob {
+        0%, 100% { transform: translateY(0) rotate(-2deg); }
+        50%      { transform: translateY(-3px) rotate(2deg); }
+      }
+      .whale-tail {
+        animation: whale-tail 1.6s ease-in-out infinite;
+        transform-origin: 78% 60%;
+      }
+      @keyframes whale-tail {
+        0%, 100% { transform: rotate(-12deg); }
+        50%      { transform: rotate(10deg); }
+      }
+      .whale-blow {
+        animation: blow 6s ease-out infinite;
+        opacity: 0;
+        transform-origin: 50% 100%;
+      }
+      @keyframes blow {
+        0%, 75%   { opacity: 0; transform: translateY(0)   scale(0.6); }
+        80%       { opacity: 0.9; transform: translateY(-4px) scale(0.8); }
+        100%      { opacity: 0;   transform: translateY(-26px) scale(1.2); }
+      }
+
+      /* ------------------------------------------------------------------
+         #2  Volcano — basalt cone, slow smoke plume, embers, lava glow
+         ------------------------------------------------------------------ */
+      .volcano-stage {
+        background:
+          radial-gradient(60% 40% at 50% 100%, rgba(226, 106, 44, 0.18), transparent 70%),
+          linear-gradient(180deg, #0a0a10 0%, #1a0f0c 100%);
+      }
+      .volcano-glow {
+        animation: glow-pulse 2.8s ease-in-out infinite;
+        transform-origin: 50% 100%;
+      }
+      @keyframes glow-pulse {
+        0%, 100% { opacity: 0.55; transform: scale(1); }
+        50%      { opacity: 0.95; transform: scale(1.08); }
+      }
+      .smoke {
+        animation: smoke-rise 5.5s ease-out infinite;
+        opacity: 0;
+        transform-origin: 50% 100%;
+      }
+      .smoke.s2 { animation-delay: 1.2s; }
+      .smoke.s3 { animation-delay: 2.8s; }
+      .smoke.s4 { animation-delay: 4.0s; }
+      @keyframes smoke-rise {
+        0%   { opacity: 0;   transform: translate(0, 0)    scale(0.5); }
+        20%  { opacity: 0.5; }
+        100% { opacity: 0;   transform: translate(-12px, -120px) scale(2.4); }
+      }
+      .ember {
+        animation: ember-fly 2.6s ease-out infinite;
+        opacity: 0;
+      }
+      .ember.e2 { animation-delay: 0.6s; }
+      .ember.e3 { animation-delay: 1.4s; }
+      .ember.e4 { animation-delay: 2.0s; }
+      @keyframes ember-fly {
+        0%   { opacity: 0;   transform: translate(0, 0); }
+        15%  { opacity: 1; }
+        100% { opacity: 0;   transform: translate(var(--dx, 14px), -80px); }
+      }
+
+      /* ------------------------------------------------------------------
+         #3  Seagull — figure-8 flight path, wing flap, scaling for depth
+         ------------------------------------------------------------------ */
+      .gull-stage {
+        background:
+          linear-gradient(180deg, #1c2f47 0%, #0e1a2b 70%, #0a0e16 100%);
+      }
+      .cloud {
+        opacity: 0.18;
+        animation: cloud-drift 30s linear infinite;
+      }
+      .cloud.c2 { animation-duration: 42s; animation-delay: -10s; opacity: 0.12; }
+      @keyframes cloud-drift {
+        from { transform: translateX(-20%); }
+        to   { transform: translateX(120%); }
+      }
+      .gull-path {
+        animation: gull-fly 9s ease-in-out infinite;
+        transform-origin: center;
+      }
+      @keyframes gull-fly {
+        0%   { transform: translate(-15%, 30%) scale(0.7); }
+        25%  { transform: translate(25%,  10%) scale(0.9); }
+        50%  { transform: translate(60%,  35%) scale(1.0); }
+        75%  { transform: translate(25%,  60%) scale(0.85); }
+        100% { transform: translate(-15%, 30%) scale(0.7); }
+      }
+      .wing-l, .wing-r {
+        animation: flap 0.45s ease-in-out infinite;
+        transform-origin: 50% 50%;
+      }
+      .wing-r { animation-delay: 0s; }
+      .wing-l { animation-delay: 0.02s; }
+      @keyframes flap {
+        0%, 100% { transform: rotate(0deg)   scaleY(1); }
+        50%      { transform: rotate(0deg)   scaleY(0.25); }
+      }
+
+      .controls {
+        margin: 24px 0 8px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .controls button {
+        appearance: none;
+        background: var(--bg-2);
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 12px;
+        font: inherit;
+        cursor: pointer;
+      }
+      .controls button:hover { border-color: var(--ocean-500); }
+      .paused * { animation-play-state: paused !important; }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Azores · Character preview</h1>
+      <p class="lead">
+        3 personagens SVG animados, CSS-only (zero JS, zero deps, ~5 KB cada).
+        Inspirados no tema dos Açores: oceano Atlântico, basalto vulcânico, lava.
+      </p>
+
+      <div class="controls">
+        <button id="toggle">Pausar animações</button>
+        <button id="reload">Recarregar</button>
+      </div>
+
+      <div class="grid" id="grid">
+
+        <!-- #1 WHALE ------------------------------------------------------ -->
+        <article class="card">
+          <header><span>Mascot · Baleia</span><span>swim · bob · blow</span></header>
+          <div class="stage whale-stage">
+            <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" aria-label="Whale">
+              <!-- bubbles -->
+              <g class="whale-bubble"  fill="#5e91b0" opacity="0.6">
+                <circle cx="80"  cy="170" r="3" />
+                <circle cx="92"  cy="178" r="2" />
+              </g>
+              <g class="whale-bubble b2" fill="#5e91b0" opacity="0.6">
+                <circle cx="180" cy="180" r="2.5" />
+              </g>
+              <g class="whale-bubble b3" fill="#5e91b0" opacity="0.6">
+                <circle cx="240" cy="172" r="3" />
+                <circle cx="232" cy="184" r="2" />
+              </g>
+
+              <!-- whale moving group -->
+              <g class="whale-group">
+                <g class="whale-body">
+                  <!-- blow puff -->
+                  <g class="whale-blow" transform="translate(108 92)">
+                    <ellipse cx="0" cy="0" rx="6" ry="9" fill="#cdd9e6" opacity="0.85" />
+                    <ellipse cx="-6" cy="2" rx="4" ry="6" fill="#cdd9e6" opacity="0.6" />
+                    <ellipse cx="6"  cy="2" rx="4" ry="6" fill="#cdd9e6" opacity="0.6" />
+                  </g>
+
+                  <!-- body -->
+                  <path d="M 30 130
+                           C 30 95, 80 90, 120 100
+                           C 170 102, 220 110, 245 130
+                           C 230 152, 170 160, 120 158
+                           C 80 158, 30 155, 30 130 Z"
+                        fill="#1d6fa5" />
+                  <!-- belly -->
+                  <path d="M 50 138
+                           C 80 152, 180 158, 230 138
+                           C 200 156, 80 160, 50 138 Z"
+                        fill="#5e91b0" opacity="0.55" />
+                  <!-- eye -->
+                  <circle cx="58" cy="120" r="3" fill="#0b0e12" />
+                  <circle cx="59" cy="119" r="1" fill="#fff" />
+                  <!-- mouth -->
+                  <path d="M 32 130 Q 42 134 56 132" stroke="#0f4c75" stroke-width="1.5"
+                        fill="none" stroke-linecap="round" />
+                  <!-- fin -->
+                  <path d="M 130 145 Q 138 165 122 162 Q 118 156 130 145 Z" fill="#0f4c75" />
+                  <!-- tail -->
+                  <g class="whale-tail">
+                    <path d="M 240 130
+                             Q 270 110, 285 118
+                             Q 275 132, 260 132
+                             Q 280 144, 282 152
+                             Q 268 152, 248 142 Z"
+                          fill="#0f4c75" />
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="meta">Trajeto horizontal lento (14s), corpo embala (3.2s), cauda abana (1.6s), respira a cada 6s.</div>
+        </article>
+
+        <!-- #2 VOLCANO ---------------------------------------------------- -->
+        <article class="card">
+          <header><span>Mascot · Vulcão</span><span>smoke · ember · glow</span></header>
+          <div class="stage volcano-stage">
+            <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" aria-label="Volcano">
+              <!-- smoke plumes (back layer) -->
+              <g transform="translate(160 80)">
+                <circle class="smoke"    cx="0"  cy="0" r="14" fill="#5a5a66" opacity="0.5" />
+                <circle class="smoke s2" cx="-6" cy="2" r="11" fill="#6e6e7a" opacity="0.45" />
+                <circle class="smoke s3" cx="6"  cy="-2" r="13" fill="#56565f" opacity="0.5" />
+                <circle class="smoke s4" cx="-2" cy="4"  r="10" fill="#7a7a86" opacity="0.4" />
+              </g>
+
+              <!-- mountain -->
+              <path d="M 40 200
+                       L 130 90
+                       L 150 110
+                       L 170 80
+                       L 190 110
+                       L 280 200 Z"
+                    fill="#1a1d24" stroke="#2a313c" stroke-width="1" />
+              <!-- snow / lighter ridges -->
+              <path d="M 130 90  L 142 105 L 150 110 L 170 80 L 178 95 L 188 108 L 190 110"
+                    stroke="#3a414c" stroke-width="1" fill="none" />
+
+              <!-- crater glow -->
+              <ellipse class="volcano-glow" cx="160" cy="86" rx="24" ry="6" fill="#e26a2c" opacity="0.7" />
+              <ellipse class="volcano-glow" cx="160" cy="86" rx="14" ry="3" fill="#f3a86a" />
+
+              <!-- lava trickles -->
+              <path d="M 158 88 Q 156 110 150 130 Q 148 150 144 165"
+                    stroke="#e26a2c" stroke-width="2.5" fill="none" stroke-linecap="round" />
+              <path d="M 168 88 Q 174 100 180 118"
+                    stroke="#f3a86a" stroke-width="1.8" fill="none" stroke-linecap="round" />
+
+              <!-- embers -->
+              <circle class="ember"    cx="160" cy="80" r="2" fill="#f3a86a" style="--dx: -22px;" />
+              <circle class="ember e2" cx="162" cy="78" r="1.5" fill="#e26a2c" style="--dx: 18px;" />
+              <circle class="ember e3" cx="158" cy="82" r="2" fill="#f3a86a" style="--dx: 8px;" />
+              <circle class="ember e4" cx="164" cy="80" r="1.5" fill="#e26a2c" style="--dx: -10px;" />
+
+              <!-- ground silhouette -->
+              <rect x="0" y="200" width="320" height="20" fill="#08090d" />
+            </svg>
+          </div>
+          <div class="meta">Cratera pulsa (2.8s), 4 sopros de fumo desfasados, brasas voam em arco aleatório.</div>
+        </article>
+
+        <!-- #3 SEAGULL ---------------------------------------------------- -->
+        <article class="card">
+          <header><span>Mascot · Gaivota</span><span>flap · figure-8 · clouds</span></header>
+          <div class="stage gull-stage">
+            <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg" aria-label="Seagull">
+              <!-- clouds -->
+              <g class="cloud" fill="#cdd9e6">
+                <ellipse cx="40" cy="50" rx="30" ry="8" />
+                <ellipse cx="60" cy="45" rx="22" ry="7" />
+              </g>
+              <g class="cloud c2" fill="#cdd9e6" transform="translate(0 30)">
+                <ellipse cx="120" cy="40" rx="26" ry="7" />
+                <ellipse cx="140" cy="36" rx="18" ry="6" />
+              </g>
+
+              <!-- gull -->
+              <g class="gull-path">
+                <g transform="translate(120 90)">
+                  <!-- body -->
+                  <ellipse cx="0" cy="0" rx="9" ry="5" fill="#e7eaf0" />
+                  <!-- head -->
+                  <circle cx="9" cy="-2" r="4" fill="#e7eaf0" />
+                  <!-- beak -->
+                  <path d="M 13 -2 L 18 -1 L 13 0 Z" fill="#e26a2c" />
+                  <!-- eye -->
+                  <circle cx="10.5" cy="-3" r="0.8" fill="#0b0e12" />
+                  <!-- left wing -->
+                  <path class="wing-l" d="M -4 -1 Q -22 -10 -28 -2 Q -14 0 -4 1 Z" fill="#e7eaf0" />
+                  <!-- right wing -->
+                  <path class="wing-r" d="M 2 -1 Q 14 -10 22 -4 Q 10 0 2 1 Z" fill="#e7eaf0" />
+                  <!-- wing tips (darker) -->
+                  <path d="M -22 -7 Q -28 -2 -24 -1 Z" fill="#5a5a66" opacity="0.4" />
+                  <path d="M 18 -6 Q 22 -4 18 -2 Z"   fill="#5a5a66" opacity="0.4" />
+                </g>
+              </g>
+
+              <!-- second gull, smaller, offset path -->
+              <g class="gull-path" style="animation-duration: 12s; animation-delay: -3s;">
+                <g transform="translate(80 60) scale(0.6)">
+                  <ellipse cx="0" cy="0" rx="9" ry="5" fill="#cdd9e6" />
+                  <circle cx="9" cy="-2" r="4" fill="#cdd9e6" />
+                  <path d="M 13 -2 L 18 -1 L 13 0 Z" fill="#e26a2c" />
+                  <path class="wing-l" d="M -4 -1 Q -22 -10 -28 -2 Q -14 0 -4 1 Z" fill="#cdd9e6" />
+                  <path class="wing-r" d="M 2 -1 Q 14 -10 22 -4 Q 10 0 2 1 Z" fill="#cdd9e6" />
+                </g>
+              </g>
+            </svg>
+          </div>
+          <div class="meta">Gaivota em figura-8 (9s), asas batem (0.45s), escala muda para sugerir profundidade.</div>
+        </article>
+
+      </div>
+
+      <p class="lead" style="margin-top: 32px; font-size: 13px;">
+        Tudo CSS keyframes — animações pausáveis via <code>animation-play-state</code>.
+        Para o widget posso ainda: reagir à hora do dia (tema claro/dark), ligar o vulcão a
+        eventos sísmicos do widget Earthquakes, ou sincronizar a baleia/gaivota com o weather.
+      </p>
+    </main>
+
+    <script>
+      const grid = document.getElementById("grid");
+      document.getElementById("toggle").addEventListener("click", (e) => {
+        const paused = grid.classList.toggle("paused");
+        e.target.textContent = paused ? "Retomar animações" : "Pausar animações";
+      });
+      document.getElementById("reload").addEventListener("click", () => location.reload());
+    </script>
+  </body>
+</html>

@@ -64,6 +64,9 @@ jobs:
           mkdir -p dist/showcase dist/atlas
           cp -R apps/web/dist/. dist/showcase/
           cp -R apps/atlas/dist/. dist/atlas/
+          # Standalone HTML previews (no app shell, no MF) so they can be
+          # opened directly on a phone without booting the full host.
+          cp docs/character-preview.html dist/character-preview.html
 
       - uses: actions/configure-pages@v6
 

@@ -14,9 +14,11 @@ with relative links so the entry stays clickable.
 - **Character preview page** at
   [docs/character-preview.html](docs/character-preview.html) — standalone
   HTML mock of three CSS-only animated SVG mascots (whale, volcano,
-  seagull) themed to the Azores brand. Not wired into any app; lives in
-  `docs/` so a future "Mascot" widget can pull the markup/keyframes
-  verbatim.
+  seagull) themed to the Azores brand. Copied into the Pages artifact
+  via [.github/workflows/pages.yml](.github/workflows/pages.yml) so it's
+  reachable at `/<repo>/character-preview.html` for mobile previews.
+  Static frame strips (PNG) for offline review live alongside in
+  [docs/character-previews/](docs/character-previews/).
 
 ### Removed
 - **Reddit and Wikinews news presets** — `*.rss` on Reddit started

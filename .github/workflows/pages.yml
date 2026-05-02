@@ -67,6 +67,7 @@ jobs:
           # Standalone HTML previews (no app shell, no MF) so they can be
           # opened directly on a phone without booting the full host.
           cp docs/character-preview.html dist/character-preview.html
+          cp docs/people-preview.html dist/people-preview.html
 
       - uses: actions/configure-pages@v6
 

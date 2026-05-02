@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Azores · People preview</title>
+    <style>
+      :root {
+        --bg: #0b0e12;
+        --bg-2: #14181f;
+        --line: #2a313c;
+        --text: #e7eaf0;
+        --text-2: #a6adba;
+        --ocean-300: #5e91b0;
+        --ocean-500: #1d6fa5;
+        --ocean-700: #0f4c75;
+        --lava-300: #f3a86a;
+        --lava-500: #e26a2c;
+        --lava-700: #b04a17;
+        --moss-500: #4f7a3a;
+        --moss-300: #87ad6d;
+        --skin-1: #f3c9a4;
+        --skin-2: #d99c6f;
+        --skin-3: #a86b3a;
+      }
+      html, body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.5 -apple-system, system-ui, "Segoe UI", sans-serif;
+        min-height: 100vh;
+      }
+      .page { max-width: 1100px; margin: 0 auto; padding: 28px 20px 64px; }
+      h1 {
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        font-size: clamp(22px, 4vw, 32px);
+        margin: 0 0 6px;
+      }
+      .lead { color: var(--text-2); margin: 0 0 28px; font-size: 14px; }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .card {
+        background: var(--bg-2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .card header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-2);
+      }
+      .stage {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        background: linear-gradient(180deg, #1a2433 0%, #0e1622 100%);
+        cursor: pointer;
+        overflow: hidden;
+      }
+      .stage svg {
+        position: absolute; inset: 0; width: 100%; height: 100%;
+      }
+      .meta { padding: 10px 14px; font-size: 12px; color: var(--text-2); border-top: 1px solid var(--line); }
+
+      .hint {
+        position: absolute;
+        bottom: 10px; left: 50%; transform: translateX(-50%);
+        font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+        color: var(--text-2);
+        background: rgba(0,0,0,0.45);
+        padding: 4px 10px; border-radius: 999px;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      /* ==== Generic rig animations ============================================ */
+      .person { transform-origin: 50% 95%; }
+      .person .body {
+        animation: breathe 4s ease-in-out infinite;
+        transform-origin: 50% 70%;
+      }
+      @keyframes breathe {
+        0%, 100% { transform: scaleY(1); }
+        50%      { transform: scaleY(1.012); }
+      }
+
+      .head { animation: head-bob 6s ease-in-out infinite; transform-origin: 50% 100%; }
+      @keyframes head-bob {
+        0%, 100% { transform: rotate(-1.2deg); }
+        50%      { transform: rotate(1.2deg); }
+      }
+
+      .eye-lid {
+        animation: blink 5.2s infinite;
+        transform-origin: 50% 50%;
+      }
+      .eye-lid.delay { animation-delay: 2.6s; }
+      @keyframes blink {
+        0%, 92%, 100% { transform: scaleY(0); }
+        94%, 98%      { transform: scaleY(1); }
+      }
+
+      /* Talking — cycle through 3 mouth shapes by toggling visibility */
+      .mouth-frame { display: none; }
+      .mouth-frame.m-0 { display: block; }
+      .stage.talking .mouth-frame { animation: mouth-cycle 0.42s steps(1, end) infinite; }
+      .stage.talking .mouth-frame.m-0 { animation-delay: 0s; }
+      .stage.talking .mouth-frame.m-1 { animation-delay: -0.14s; }
+      .stage.talking .mouth-frame.m-2 { animation-delay: -0.28s; }
+      @keyframes mouth-cycle {
+        0%, 33%   { display: block; }
+        34%, 100% { display: none; }
+      }
+
+      /* Wave gesture on click — only the right-arm group rotates */
+      .arm-r { transform-origin: var(--shoulder, 50% 50%); }
+      .stage.waving .arm-r {
+        animation: wave 1.4s ease-in-out;
+      }
+      @keyframes wave {
+        0%   { transform: rotate(0deg); }
+        25%  { transform: rotate(-65deg); }
+        45%  { transform: rotate(-50deg); }
+        65%  { transform: rotate(-65deg); }
+        100% { transform: rotate(0deg); }
+      }
+
+      /* Speech bubble */
+      .bubble {
+        position: absolute;
+        top: 8%;
+        right: 6%;
+        max-width: 60%;
+        background: #fff;
+        color: #0b0e12;
+        font-size: 12px;
+        line-height: 1.35;
+        padding: 8px 12px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        opacity: 0;
+        transform: translateY(6px) scale(0.9);
+        transform-origin: bottom right;
+        transition: opacity .18s ease, transform .22s cubic-bezier(.25,1.4,.5,1);
+        pointer-events: none;
+      }
+      .bubble::after {
+        content: "";
+        position: absolute;
+        right: 18px; bottom: -6px;
+        width: 0; height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 8px solid #fff;
+      }
+      .stage.talking .bubble {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Personagens · 3 alternativas</h1>
+      <p class="lead">Toca em cada um — acena com a mão e fala. CSS-only, ~12 KB cada.</p>
+
+      <div class="grid">
+
+        <!-- =================== CHARACTER 1 — SOFIA =================== -->
+        <article class="card">
+          <header><span>Sofia · designer</span><span>tap to interact</span></header>
+          <div class="stage" data-msg="Olá! Sou a Sofia, posso ajudar-te com o dashboard?">
+            <div class="bubble">Olá! Sou a Sofia, posso ajudar-te com o dashboard?</div>
+            <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="floor1" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#000" stop-opacity="0.45"/>
+                  <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="100" cy="248" rx="42" ry="6" fill="url(#floor1)"/>
+
+              <g class="person">
+                <g class="body">
+                  <!-- legs -->
+                  <rect x="83" y="180" width="14" height="58" rx="5" fill="#2a3340"/>
+                  <rect x="103" y="180" width="14" height="58" rx="5" fill="#2a3340"/>
+                  <ellipse cx="90" cy="244" rx="9" ry="4" fill="#0f1318"/>
+                  <ellipse cx="110" cy="244" rx="9" ry="4" fill="#0f1318"/>
+
+                  <!-- torso (hoodie, lava) -->
+                  <path d="M 70 120
+                           Q 68 116 76 112
+                           L 124 112
+                           Q 132 116 130 120
+                           L 132 184
+                           Q 132 190 124 190
+                           L 76 190
+                           Q 68 190 68 184 Z"
+                        fill="#e26a2c"/>
+                  <!-- hood neckline -->
+                  <path d="M 84 112 Q 100 125 116 112" stroke="#b04a17" stroke-width="2.5" fill="none"/>
+                  <!-- hoodie pocket -->
+                  <path d="M 78 150 L 122 150 L 116 168 L 84 168 Z" fill="#b04a17" opacity="0.55"/>
+                  <line x1="100" y1="150" x2="100" y2="168" stroke="#7a2f0d" stroke-width="1" opacity="0.4"/>
+                  <!-- drawstrings -->
+                  <path d="M 88 112 L 86 130" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                  <path d="M 112 112 L 114 130" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+
+                  <!-- left arm (down, holding tablet) -->
+                  <g>
+                    <path d="M 70 122 Q 60 145 56 175 L 70 178 Q 76 152 82 130 Z" fill="#e26a2c"/>
+                    <!-- hand -->
+                    <circle cx="60" cy="178" r="7" fill="#f3c9a4"/>
+                    <!-- tablet -->
+                    <rect x="40" y="172" width="36" height="26" rx="3" fill="#1a1d24" stroke="#3a414c" stroke-width="1"/>
+                    <rect x="44" y="176" width="28" height="18" rx="1" fill="#1d6fa5"/>
+                    <!-- tablet "screen content" -->
+                    <line x1="46" y1="180" x2="60" y2="180" stroke="#5e91b0" stroke-width="1"/>
+                    <line x1="46" y1="184" x2="68" y2="184" stroke="#5e91b0" stroke-width="1"/>
+                    <line x1="46" y1="188" x2="56" y2="188" stroke="#5e91b0" stroke-width="1"/>
+                  </g>
+
+                  <!-- right arm (waves on click) -->
+                  <g class="arm-r" style="--shoulder: 130px 122px;">
+                    <path d="M 130 122 Q 142 138 148 162 L 134 168 Q 128 145 122 130 Z" fill="#e26a2c"/>
+                    <circle cx="146" cy="167" r="7" fill="#f3c9a4"/>
+                  </g>
+                </g>
+
+                <!-- head -->
+                <g class="head" transform="translate(0 0)">
+                  <!-- neck -->
+                  <rect x="93" y="100" width="14" height="16" fill="#f3c9a4"/>
+                  <!-- face -->
+                  <ellipse cx="100" cy="84" rx="22" ry="26" fill="#f3c9a4"/>
+                  <!-- hair (bun + bangs, dark brown) -->
+                  <path d="M 78 78
+                           Q 78 56 100 52
+                           Q 124 54 124 80
+                           Q 124 70 116 66
+                           Q 110 64 100 66
+                           Q 90 64 84 66
+                           Q 78 70 78 78 Z"
+                        fill="#3a2418"/>
+                  <!-- bun -->
+                  <circle cx="100" cy="48" r="9" fill="#3a2418"/>
+                  <!-- bangs sweep -->
+                  <path d="M 82 76 Q 92 70 110 74 L 110 82 Q 96 78 82 84 Z" fill="#2a1810"/>
+                  <!-- ears -->
+                  <ellipse cx="78" cy="86" rx="3" ry="5" fill="#e2b08a"/>
+                  <ellipse cx="122" cy="86" rx="3" ry="5" fill="#e2b08a"/>
+
+                  <!-- eyes -->
+                  <g>
+                    <ellipse cx="90" cy="86" rx="3" ry="4" fill="#fff"/>
+                    <circle cx="90" cy="87" r="1.8" fill="#1a1208"/>
+                    <rect class="eye-lid" x="85" y="82" width="10" height="9" fill="#f3c9a4"/>
+                  </g>
+                  <g>
+                    <ellipse cx="110" cy="86" rx="3" ry="4" fill="#fff"/>
+                    <circle cx="110" cy="87" r="1.8" fill="#1a1208"/>
+                    <rect class="eye-lid delay" x="105" y="82" width="10" height="9" fill="#f3c9a4"/>
+                  </g>
+                  <!-- brows -->
+                  <path d="M 86 80 Q 90 78 94 80" stroke="#2a1810" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M 106 80 Q 110 78 114 80" stroke="#2a1810" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <!-- cheeks -->
+                  <ellipse cx="86" cy="93" rx="3" ry="2" fill="#e26a2c" opacity="0.35"/>
+                  <ellipse cx="114" cy="93" rx="3" ry="2" fill="#e26a2c" opacity="0.35"/>
+                  <!-- mouth shapes -->
+                  <g class="mouth-frame m-0">
+                    <path d="M 94 98 Q 100 101 106 98" stroke="#7a2f0d" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+                  </g>
+                  <g class="mouth-frame m-1">
+                    <ellipse cx="100" cy="100" rx="3" ry="2" fill="#5a2a1a"/>
+                  </g>
+                  <g class="mouth-frame m-2">
+                    <ellipse cx="100" cy="100" rx="4" ry="3" fill="#5a2a1a"/>
+                    <path d="M 96 99 Q 100 100 104 99" stroke="#fff" stroke-width="0.8" fill="none"/>
+                  </g>
+                </g>
+              </g>
+            </svg>
+            <div class="hint">Toca para falar</div>
+          </div>
+          <div class="meta">Hoodie laranja, cabelo apanhado em bun. Acessório: tablet com gráfico.</div>
+        </article>
+
+        <!-- =================== CHARACTER 2 — DAVID =================== -->
+        <article class="card">
+          <header><span>David · engineer</span><span>tap to interact</span></header>
+          <div class="stage" data-msg="Boas! Sou o David. Posso explicar-te qualquer widget — basta perguntares.">
+            <div class="bubble">Boas! Sou o David. Posso explicar-te qualquer widget — basta perguntares.</div>
+            <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="248" rx="46" ry="6" fill="url(#floor1)"/>
+
+              <g class="person">
+                <g class="body">
+                  <!-- legs (jeans, slightly darker) -->
+                  <rect x="82" y="180" width="15" height="58" rx="5" fill="#2e3a4a"/>
+                  <rect x="103" y="180" width="15" height="58" rx="5" fill="#2e3a4a"/>
+                  <ellipse cx="89" cy="244" rx="10" ry="4" fill="#0f1318"/>
+                  <ellipse cx="111" cy="244" rx="10" ry="4" fill="#0f1318"/>
+
+                  <!-- torso — navy bomber jacket, slightly wider build -->
+                  <path d="M 66 122
+                           Q 64 116 74 112
+                           L 126 112
+                           Q 136 116 134 122
+                           L 136 184
+                           Q 136 192 126 192
+                           L 74 192
+                           Q 64 192 64 184 Z"
+                        fill="#1d2a40"/>
+                  <!-- jacket inner shadow on edges -->
+                  <path d="M 66 122 Q 70 150 66 192" stroke="#0e1828" stroke-width="2" fill="none" opacity="0.6"/>
+                  <path d="M 134 122 Q 130 150 134 192" stroke="#0e1828" stroke-width="2" fill="none" opacity="0.6"/>
+                  <!-- collar (stand-up bomber) -->
+                  <path d="M 80 112 L 86 120 L 100 124 L 114 120 L 120 112 Z" fill="#162032"/>
+                  <!-- forest green undershirt at the V -->
+                  <path d="M 88 122 Q 100 134 112 122 L 112 134 Q 100 138 88 134 Z" fill="#2e4a36"/>
+                  <!-- zipper down centre -->
+                  <line x1="100" y1="124" x2="100" y2="190" stroke="#3a414c" stroke-width="1.6"/>
+                  <!-- tiny zipper teeth -->
+                  <g stroke="#5a6270" stroke-width="0.8">
+                    <line x1="98" y1="130" x2="102" y2="130"/>
+                    <line x1="98" y1="138" x2="102" y2="138"/>
+                    <line x1="98" y1="146" x2="102" y2="146"/>
+                    <line x1="98" y1="154" x2="102" y2="154"/>
+                    <line x1="98" y1="162" x2="102" y2="162"/>
+                    <line x1="98" y1="170" x2="102" y2="170"/>
+                    <line x1="98" y1="178" x2="102" y2="178"/>
+                  </g>
+                  <!-- zipper pull -->
+                  <rect x="98" y="125" width="4" height="3" fill="#8a92a0"/>
+
+                  <!-- left arm down -->
+                  <g>
+                    <path d="M 66 122 Q 56 148 56 180 L 70 184 Q 76 156 80 132 Z" fill="#1d2a40"/>
+                    <!-- jacket cuff -->
+                    <rect x="56" y="178" width="18" height="6" rx="2" fill="#162032"/>
+                    <circle cx="62" cy="186" r="7" fill="#e8b48a"/>
+                  </g>
+
+                  <!-- right arm holds laptop, waves on click -->
+                  <g class="arm-r" style="--shoulder: 134px 122px;">
+                    <path d="M 134 122 Q 146 140 146 168 L 132 170 Q 126 144 122 130 Z" fill="#1d2a40"/>
+                    <rect x="130" y="166" width="18" height="6" rx="2" fill="#162032"/>
+                    <circle cx="142" cy="172" r="7" fill="#e8b48a"/>
+                    <!-- laptop -->
+                    <rect x="116" y="160" width="38" height="22" rx="2" fill="#a6adba"/>
+                    <rect x="119" y="163" width="32" height="14" rx="1" fill="#0b0e12"/>
+                    <rect x="121" y="166" width="6" height="2" fill="#4f7a3a"/>
+                    <rect x="129" y="166" width="14" height="1.5" fill="#5e91b0"/>
+                    <rect x="121" y="170" width="22" height="1.5" fill="#5e91b0"/>
+                    <rect x="121" y="173" width="14" height="1.5" fill="#5e91b0"/>
+                  </g>
+                </g>
+
+                <g class="head">
+                  <!-- neck (thick) -->
+                  <rect x="91" y="100" width="18" height="16" fill="#e8b48a"/>
+                  <!-- face — wider, rounder jaw — heavier build -->
+                  <path d="M 74 84
+                           Q 74 64 100 60
+                           Q 126 64 126 84
+                           Q 126 100 122 108
+                           Q 116 116 100 117
+                           Q 84 116 78 108
+                           Q 74 100 74 84 Z"
+                        fill="#e8b48a"/>
+                  <!-- jaw / chin shadow -->
+                  <path d="M 80 102 Q 100 116 120 102 Q 116 113 100 115 Q 84 113 80 102 Z"
+                        fill="#d99c6f" opacity="0.45"/>
+                  <!-- hair — short, dark brown, slightly receding (higher forehead, temples back) -->
+                  <path d="M 80 76
+                           Q 80 64 100 60
+                           Q 120 64 120 76
+                           L 118 70
+                           Q 110 64 100 65
+                           Q 90 66 86 71
+                           L 84 75
+                           Q 82 73 80 76 Z"
+                        fill="#2a1810"/>
+                  <!-- temple recession hint -->
+                  <path d="M 80 76 Q 78 80 80 86" stroke="#e8b48a" stroke-width="2" fill="none"/>
+                  <path d="M 120 76 Q 122 80 120 86" stroke="#e8b48a" stroke-width="2" fill="none"/>
+                  <!-- hair texture wave -->
+                  <path d="M 86 68 Q 100 64 114 68" stroke="#1a0e08" stroke-width="1.2" fill="none" opacity="0.6"/>
+                  <path d="M 90 72 Q 100 68 110 72" stroke="#1a0e08" stroke-width="1" fill="none" opacity="0.4"/>
+                  <!-- ears (slightly larger) -->
+                  <ellipse cx="74" cy="90" rx="4" ry="6" fill="#d99c6f"/>
+                  <ellipse cx="126" cy="90" rx="4" ry="6" fill="#d99c6f"/>
+                  <!-- rectangular glasses, dark thick frame -->
+                  <g stroke="#0b0e12" stroke-width="2" fill="none">
+                    <rect x="80" y="80" width="16" height="12" rx="2" fill="#b8d0e0" fill-opacity="0.15"/>
+                    <rect x="104" y="80" width="16" height="12" rx="2" fill="#b8d0e0" fill-opacity="0.15"/>
+                    <line x1="96" y1="86" x2="104" y2="86" stroke-width="1.8"/>
+                    <line x1="80" y1="83" x2="74" y2="86"/>
+                    <line x1="120" y1="83" x2="126" y2="86"/>
+                  </g>
+                  <!-- eyes (behind glasses) -->
+                  <g>
+                    <ellipse cx="88" cy="87" rx="3" ry="3.2" fill="#fff"/>
+                    <circle cx="88" cy="88" r="1.7" fill="#3a2a1a"/>
+                    <rect class="eye-lid" x="83" y="83" width="11" height="9" fill="#e8b48a"/>
+                  </g>
+                  <g>
+                    <ellipse cx="112" cy="87" rx="3" ry="3.2" fill="#fff"/>
+                    <circle cx="112" cy="88" r="1.7" fill="#3a2a1a"/>
+                    <rect class="eye-lid delay" x="107" y="83" width="11" height="9" fill="#e8b48a"/>
+                  </g>
+                  <!-- thick dark brows -->
+                  <path d="M 81 77 Q 88 73 96 77" stroke="#0e0804" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                  <path d="M 104 77 Q 112 73 119 77" stroke="#0e0804" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                  <!-- nose (more prominent, wider tip) -->
+                  <path d="M 100 88 Q 96 96 98 100 Q 100 102 102 100 Q 104 96 100 88 Z" fill="#d99c6f" opacity="0.7"/>
+                  <circle cx="98" cy="99" r="0.8" fill="#a86b3a" opacity="0.6"/>
+                  <circle cx="102" cy="99" r="0.8" fill="#a86b3a" opacity="0.6"/>
+
+                  <!-- stubble / beard — denser shading (3 layers: cheeks, jaw, chin) -->
+                  <!-- soft shadow base -->
+                  <path d="M 80 96 Q 86 110 100 114 Q 114 110 120 96 L 118 108 Q 114 116 100 117 Q 86 116 82 108 Z"
+                        fill="#3a2418" opacity="0.18"/>
+                  <!-- denser dots -->
+                  <g fill="#1a0e06" opacity="0.55">
+                    <!-- left cheek -->
+                    <circle cx="78" cy="98"  r="0.8"/>
+                    <circle cx="80" cy="102" r="0.8"/>
+                    <circle cx="82" cy="106" r="0.8"/>
+                    <circle cx="84" cy="100" r="0.8"/>
+                    <circle cx="84" cy="104" r="0.8"/>
+                    <circle cx="86" cy="108" r="0.8"/>
+                    <circle cx="88" cy="102" r="0.8"/>
+                    <circle cx="88" cy="106" r="0.8"/>
+                    <circle cx="88" cy="110" r="0.8"/>
+                    <circle cx="90" cy="104" r="0.8"/>
+                    <circle cx="90" cy="108" r="0.8"/>
+                    <circle cx="92" cy="106" r="0.8"/>
+                    <circle cx="92" cy="110" r="0.8"/>
+                    <circle cx="92" cy="113" r="0.8"/>
+                    <circle cx="94" cy="108" r="0.8"/>
+                    <circle cx="94" cy="112" r="0.8"/>
+                    <!-- chin -->
+                    <circle cx="96" cy="110" r="0.8"/>
+                    <circle cx="96" cy="113" r="0.8"/>
+                    <circle cx="98" cy="111" r="0.8"/>
+                    <circle cx="98" cy="114" r="0.8"/>
+                    <circle cx="100" cy="112" r="0.8"/>
+                    <circle cx="100" cy="115" r="0.8"/>
+                    <circle cx="102" cy="111" r="0.8"/>
+                    <circle cx="102" cy="114" r="0.8"/>
+                    <circle cx="104" cy="110" r="0.8"/>
+                    <circle cx="104" cy="113" r="0.8"/>
+                    <!-- right cheek -->
+                    <circle cx="106" cy="108" r="0.8"/>
+                    <circle cx="106" cy="112" r="0.8"/>
+                    <circle cx="108" cy="106" r="0.8"/>
+                    <circle cx="108" cy="110" r="0.8"/>
+                    <circle cx="110" cy="104" r="0.8"/>
+                    <circle cx="110" cy="108" r="0.8"/>
+                    <circle cx="112" cy="102" r="0.8"/>
+                    <circle cx="112" cy="106" r="0.8"/>
+                    <circle cx="112" cy="110" r="0.8"/>
+                    <circle cx="114" cy="100" r="0.8"/>
+                    <circle cx="114" cy="104" r="0.8"/>
+                    <circle cx="114" cy="108" r="0.8"/>
+                    <circle cx="116" cy="102" r="0.8"/>
+                    <circle cx="116" cy="106" r="0.8"/>
+                    <circle cx="118" cy="100" r="0.8"/>
+                    <circle cx="120" cy="98"  r="0.8"/>
+                  </g>
+                  <!-- moustache (small, dark) -->
+                  <path d="M 91 97 Q 100 95 109 97 L 108 100 Q 100 99 92 100 Z"
+                        fill="#1a0e06" opacity="0.85"/>
+                  <!-- mouth shapes (under moustache, neutral/serious resting expression) -->
+                  <g class="mouth-frame m-0">
+                    <path d="M 94 103 L 106 103" stroke="#5a2a1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+                  </g>
+                  <g class="mouth-frame m-1">
+                    <ellipse cx="100" cy="103" rx="3" ry="1.5" fill="#4a1f10"/>
+                  </g>
+                  <g class="mouth-frame m-2">
+                    <ellipse cx="100" cy="103" rx="4" ry="2.4" fill="#4a1f10"/>
+                  </g>
+                </g>
+              </g>
+            </svg>
+            <div class="hint">Toca para falar</div>
+          </div>
+          <div class="meta">Bomber navy + t-shirt verde-escuro, óculos retangulares, barba curta. Acessório: portátil com terminal.</div>
+        </article>
+
+        <!-- =================== CHARACTER 3 — KAI =================== -->
+        <article class="card">
+          <header><span>Kai · explorer</span><span>tap to interact</span></header>
+          <div class="stage" data-msg="Hey! Posso mostrar-te o que está a acontecer pelo mundo.">
+            <div class="bubble">Hey! Posso mostrar-te o que está a acontecer pelo mundo.</div>
+            <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="100" cy="248" rx="42" ry="6" fill="url(#floor1)"/>
+
+              <g class="person">
+                <g class="body">
+                  <!-- legs (cargo, moss) -->
+                  <rect x="83" y="180" width="14" height="58" rx="5" fill="#3e5e2e"/>
+                  <rect x="103" y="180" width="14" height="58" rx="5" fill="#3e5e2e"/>
+                  <!-- pocket detail -->
+                  <rect x="86" y="200" width="8" height="10" fill="#2e4720" opacity="0.6"/>
+                  <rect x="106" y="200" width="8" height="10" fill="#2e4720" opacity="0.6"/>
+                  <!-- boots -->
+                  <ellipse cx="90" cy="244" rx="10" ry="5" fill="#3a2418"/>
+                  <ellipse cx="110" cy="244" rx="10" ry="5" fill="#3a2418"/>
+
+                  <!-- torso (jacket, dark) -->
+                  <path d="M 70 120
+                           Q 68 116 76 112
+                           L 124 112
+                           Q 132 116 130 120
+                           L 132 184
+                           Q 132 190 124 190
+                           L 76 190
+                           Q 68 190 68 184 Z"
+                        fill="#3a414c"/>
+                  <!-- under-shirt moss -->
+                  <path d="M 88 112 L 100 132 L 112 112 Z" fill="#87ad6d"/>
+                  <!-- jacket zipper -->
+                  <line x1="100" y1="118" x2="100" y2="186" stroke="#1a1d24" stroke-width="1.2"/>
+
+                  <!-- left arm (holds map) -->
+                  <g>
+                    <path d="M 70 122 Q 58 142 56 170 L 70 174 Q 76 148 82 130 Z" fill="#3a414c"/>
+                    <circle cx="60" cy="174" r="7" fill="#a86b3a"/>
+                    <!-- rolled map -->
+                    <rect x="42" y="166" width="34" height="14" rx="2" fill="#f3c9a4"/>
+                    <rect x="42" y="166" width="34" height="3" fill="#d99c6f"/>
+                    <line x1="48" y1="174" x2="68" y2="174" stroke="#5e91b0" stroke-width="0.8"/>
+                    <circle cx="60" cy="173" r="1.5" fill="#e26a2c"/>
+                  </g>
+
+                  <!-- right arm (waves) -->
+                  <g class="arm-r" style="--shoulder: 130px 122px;">
+                    <path d="M 130 122 Q 142 140 146 168 L 132 172 Q 128 145 122 130 Z" fill="#3a414c"/>
+                    <circle cx="144" cy="171" r="7" fill="#a86b3a"/>
+                  </g>
+                </g>
+
+                <g class="head">
+                  <rect x="93" y="100" width="14" height="16" fill="#a86b3a"/>
+                  <ellipse cx="100" cy="84" rx="22" ry="26" fill="#a86b3a"/>
+                  <!-- beanie (lava) -->
+                  <path d="M 76 78
+                           Q 76 56 100 52
+                           Q 124 54 124 80
+                           Q 124 78 124 76
+                           L 76 76 Z"
+                        fill="#e26a2c"/>
+                  <path d="M 76 78 L 124 78 L 124 84 L 76 84 Z" fill="#b04a17"/>
+                  <!-- pompom -->
+                  <circle cx="100" cy="50" r="6" fill="#fff" opacity="0.85"/>
+                  <!-- ears -->
+                  <ellipse cx="78" cy="88" rx="3" ry="5" fill="#8a5328"/>
+                  <ellipse cx="122" cy="88" rx="3" ry="5" fill="#8a5328"/>
+                  <!-- hair sticking out -->
+                  <path d="M 80 85 Q 76 92 80 96 Z" fill="#1a1208"/>
+                  <path d="M 120 85 Q 124 92 120 96 Z" fill="#1a1208"/>
+                  <!-- eyes -->
+                  <g>
+                    <ellipse cx="90" cy="88" rx="3" ry="4" fill="#fff"/>
+                    <circle cx="90" cy="89" r="1.8" fill="#1a1208"/>
+                    <rect class="eye-lid" x="85" y="84" width="10" height="9" fill="#a86b3a"/>
+                  </g>
+                  <g>
+                    <ellipse cx="110" cy="88" rx="3" ry="4" fill="#fff"/>
+                    <circle cx="110" cy="89" r="1.8" fill="#1a1208"/>
+                    <rect class="eye-lid delay" x="105" y="84" width="10" height="9" fill="#a86b3a"/>
+                  </g>
+                  <!-- brows -->
+                  <path d="M 86 82 Q 90 80 94 82" stroke="#1a0e06" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M 106 82 Q 110 80 114 82" stroke="#1a0e06" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <!-- cheeks (warm) -->
+                  <ellipse cx="86" cy="95" rx="3" ry="2" fill="#e26a2c" opacity="0.45"/>
+                  <ellipse cx="114" cy="95" rx="3" ry="2" fill="#e26a2c" opacity="0.45"/>
+                  <!-- mouth shapes (smiling slightly) -->
+                  <g class="mouth-frame m-0">
+                    <path d="M 92 100 Q 100 105 108 100" stroke="#3a1a0a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                  </g>
+                  <g class="mouth-frame m-1">
+                    <ellipse cx="100" cy="102" rx="3" ry="2" fill="#2a1208"/>
+                  </g>
+                  <g class="mouth-frame m-2">
+                    <path d="M 92 100 Q 100 108 108 100 Q 104 104 100 104 Q 96 104 92 100 Z" fill="#2a1208"/>
+                  </g>
+                </g>
+              </g>
+            </svg>
+            <div class="hint">Toca para falar</div>
+          </div>
+          <div class="meta">Casaco escuro com camisola moss, beanie laranja. Acessório: mapa enrolado.</div>
+        </article>
+
+      </div>
+
+      <p class="lead" style="margin-top: 28px; font-size: 13px;">
+        Cada SVG está riggado: <code>head</code>, <code>eye-lid</code>, <code>mouth-frame</code>,
+        <code>arm-r</code>, <code>body</code> são grupos independentes. Para o widget seria a mesma
+        coisa em React, com props <code>speaking</code>, <code>message</code>, <code>onTap</code>.
+      </p>
+    </main>
+
+    <script>
+      document.querySelectorAll(".stage").forEach((stage) => {
+        stage.addEventListener("click", () => {
+          if (stage.classList.contains("waving")) return;
+          stage.classList.add("waving", "talking");
+          setTimeout(() => stage.classList.remove("waving"), 1400);
+          setTimeout(() => stage.classList.remove("talking"), 3200);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -19,6 +19,14 @@ with relative links so the entry stays clickable.
   reachable at `/<repo>/character-preview.html` for mobile previews.
   Static frame strips (PNG) for offline review live alongside in
   [docs/character-previews/](docs/character-previews/).
+- **People preview page** at
+  [docs/people-preview.html](docs/people-preview.html) — three
+  full-body cartoon SVG humans (Sofia · designer, David · engineer,
+  Kai · explorer) riggados (head/eyes/mouth/arm-r/body em grupos
+  separados) com idle animations (respirar, piscar, bobblehead) e
+  interação por toque: ao clicar acena com o braço direito + cicla
+  formas de boca enquanto um balão de fala aparece. Também copiado
+  para o artefacto Pages.
 
 ### Removed
 - **Reddit and Wikinews news presets** — `*.rss` on Reddit started

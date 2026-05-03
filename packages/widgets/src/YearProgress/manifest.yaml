@@ -1,0 +1,8 @@
+name: year-progress
+title: Year progress
+description: Percent of the calendar year elapsed.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: chart

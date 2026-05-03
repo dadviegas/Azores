@@ -1,0 +1,8 @@
+name: roi-calc
+title: ROI calculator
+description: Total return, annualized return (CAGR), and gain/loss.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: chart

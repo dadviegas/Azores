@@ -1,0 +1,8 @@
+name: date-diff
+title: Date difference
+description: Days, weeks, and months between two dates.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: calendar

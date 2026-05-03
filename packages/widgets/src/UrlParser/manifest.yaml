@@ -1,0 +1,8 @@
+name: url-parser
+title: URL parser
+description: Break a URL into protocol, host, path, query, and fragment.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: link

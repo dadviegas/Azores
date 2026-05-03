@@ -1,0 +1,8 @@
+name: html-entities
+title: HTML entities
+description: Encode and decode HTML entities in text.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: code

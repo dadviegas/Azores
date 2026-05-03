@@ -1,0 +1,8 @@
+name: compound-interest
+title: Compound interest
+description: Project savings growth with monthly contributions.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: chart

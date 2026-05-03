@@ -1,0 +1,8 @@
+name: http-status
+title: HTTP status codes
+description: Searchable reference of HTTP response codes.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: table

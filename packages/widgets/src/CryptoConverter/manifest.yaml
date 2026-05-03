@@ -1,0 +1,8 @@
+name: crypto-converter
+title: Crypto converter
+description: Convert between BTC and fiat using a manually-entered rate.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: coins

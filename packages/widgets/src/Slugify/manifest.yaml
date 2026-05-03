@@ -1,0 +1,8 @@
+name: slugify
+title: Slugify
+description: Turn any text into a URL-safe slug.
+sources: []
+defaultSize:
+  w: 4
+  h: 2
+icon: link

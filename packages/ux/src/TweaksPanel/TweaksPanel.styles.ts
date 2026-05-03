@@ -52,6 +52,31 @@ export const AccentGrid = styled.div({
   gap: tokens.s[2],
 });
 
+export const Field = styled.label({
+  display: "flex",
+  flexDirection: "column",
+  gap: 4,
+  fontSize: 11,
+  color: tokens.text3,
+});
+
+export const Input = styled.input({
+  background: tokens.bg2,
+  color: tokens.text,
+  border: `1px solid ${tokens.line}`,
+  borderRadius: tokens.r.sm,
+  padding: "6px 8px",
+  fontFamily: "var(--az-font-mono)",
+  fontSize: 12,
+  outline: "none",
+});
+
+export const Hint = styled.div({
+  fontSize: 10,
+  color: tokens.text3,
+  lineHeight: 1.4,
+});
+
 export const AccentButton = styled.button<{ $active: boolean; $color: string }>(
   ({ $active, $color }) => ({
     appearance: "none",

@@ -1,0 +1,8 @@
+name: uuid-gen
+title: UUID generator
+description: Generate v4 UUIDs and copy with one click.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: fingerprint

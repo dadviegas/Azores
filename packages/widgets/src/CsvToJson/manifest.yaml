@@ -1,0 +1,8 @@
+name: csv-to-json
+title: CSV ↔ JSON
+description: Convert CSV to JSON array of objects, and vice versa.
+sources: []
+defaultSize:
+  w: 6
+  h: 3
+icon: code

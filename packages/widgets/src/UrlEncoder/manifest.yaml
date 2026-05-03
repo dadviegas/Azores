@@ -1,0 +1,8 @@
+name: url-encoder
+title: URL encoder
+description: encodeURIComponent / decodeURIComponent.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: link

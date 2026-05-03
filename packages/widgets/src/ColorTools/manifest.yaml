@@ -1,0 +1,8 @@
+name: color-tools
+title: Color tools
+description: HEX/RGB/HSL conversion and WCAG contrast check.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: palette

@@ -6,8 +6,10 @@ export {
   widgetRegistry,
   widgetCatalog,
   collectAllowedSources,
+  WIDGET_CATEGORY_ORDER,
   type WidgetEntry,
   type CatalogEntry,
+  type WidgetCategory,
 } from "./registry.js";
 export { NEWS_PRESETS, type NewsPreset, type NewsRegion } from "./News/presets.js";
 export type { WidgetProps } from "./widget.js";

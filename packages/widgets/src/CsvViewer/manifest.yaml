@@ -1,0 +1,8 @@
+name: csv-viewer
+title: CSV viewer
+description: Paste CSV and render it as a sortable table.
+sources: []
+defaultSize:
+  w: 6
+  h: 3
+icon: table

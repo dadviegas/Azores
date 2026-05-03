@@ -1,0 +1,8 @@
+name: tz-converter
+title: Timezone converter
+description: Find the same moment across multiple zones.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: globe

@@ -1,0 +1,8 @@
+name: regex-tester
+title: Regex tester
+description: Test JS regex patterns against a sample string.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: filter

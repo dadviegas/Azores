@@ -1,0 +1,8 @@
+name: unix-time
+title: Unix time
+description: Live timestamp + converter (seconds and milliseconds).
+sources: []
+defaultSize:
+  w: 4
+  h: 2
+icon: alarm

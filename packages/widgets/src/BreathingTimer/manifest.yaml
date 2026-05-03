@@ -1,0 +1,8 @@
+name: breathing-timer
+title: Box breathing
+description: 4-4-4-4 box-breathing guide with animated cue.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: leaf

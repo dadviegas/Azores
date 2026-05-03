@@ -1,0 +1,8 @@
+name: password-gen
+title: Password generator
+description: Cryptographically random passwords with length and set toggles.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: key

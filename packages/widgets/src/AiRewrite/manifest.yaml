@@ -1,0 +1,8 @@
+name: ai-rewrite
+title: AI rewrite
+description: Rewrite text in a different tone — formal, casual, shorter, clearer.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: type

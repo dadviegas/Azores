@@ -1,0 +1,8 @@
+name: salary-calc
+title: Salary calculator
+description: Convert hourly ↔ daily / weekly / monthly / annual.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: coins

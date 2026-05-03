@@ -3,12 +3,16 @@ import { Drawer } from "../Drawer/Drawer.js";
 import {
   AccentButton,
   AccentGrid,
+  Field,
+  Hint,
+  Input,
   SectionTitle,
   SegButton,
   SegGroup,
   Section,
 } from "./TweaksPanel.styles.js";
 import type { AccentId, ThemeMode } from "./useTweaks.js";
+import type { AiSettings } from "./useAiSettings.js";
 
 const ACCENTS: ReadonlyArray<{ id: AccentId; label: string; swatch: string }> = [
   { id: "ocean", label: "Ocean", swatch: "var(--az-ocean-500)" },
@@ -24,6 +28,12 @@ export type TweaksPanelProps = {
   accent: AccentId;
   onThemeChange: (theme: ThemeMode) => void;
   onAccentChange: (accent: AccentId) => void;
+  // AI section is optional so the panel still renders without an AI config —
+  // useful for embeds that don't ship an AI-capable widget.
+  aiSettings?: AiSettings;
+  onAiUrlChange?: (url: string) => void;
+  onAiKeyChange?: (key: string) => void;
+  onAiModelChange?: (model: string) => void;
 };
 
 export const TweaksPanel = ({
@@ -33,6 +43,10 @@ export const TweaksPanel = ({
   accent,
   onThemeChange,
   onAccentChange,
+  aiSettings,
+  onAiUrlChange,
+  onAiKeyChange,
+  onAiModelChange,
 }: TweaksPanelProps): JSX.Element => (
   <Drawer open={open} onClose={onClose} side="right" width="320px" title="Tweaks">
     <Section>
@@ -74,5 +88,49 @@ export const TweaksPanel = ({
         ))}
       </AccentGrid>
     </Section>
+
+    {aiSettings && onAiUrlChange && onAiKeyChange && onAiModelChange ? (
+      <Section>
+        <SectionTitle>AI</SectionTitle>
+        <Field>
+          API URL
+          <Input
+            type="url"
+            value={aiSettings.apiUrl}
+            onChange={(e) => onAiUrlChange(e.target.value)}
+            placeholder="https://abc123.ngrok-free.app"
+            spellCheck={false}
+            autoComplete="off"
+          />
+        </Field>
+        <Field>
+          API Key
+          <Input
+            type="password"
+            value={aiSettings.apiKey}
+            onChange={(e) => onAiKeyChange(e.target.value)}
+            placeholder="sk-…"
+            spellCheck={false}
+            autoComplete="off"
+          />
+        </Field>
+        <Field>
+          Model
+          <Input
+            type="text"
+            value={aiSettings.model}
+            onChange={(e) => onAiModelChange(e.target.value)}
+            placeholder="gpt-4o-mini"
+            spellCheck={false}
+            autoComplete="off"
+          />
+        </Field>
+        <Hint>
+          Sent as <code>POST {"{apiUrl}"}/v1/chat/completions</code> with{" "}
+          <code>Authorization: Bearer …</code>. Stored locally only — never
+          sent anywhere except the URL above.
+        </Hint>
+      </Section>
+    ) : null}
   </Drawer>
 );

@@ -1,0 +1,8 @@
+name: ai-code-explain
+title: AI explain code
+description: Paste code, get a plain-English walkthrough.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: code

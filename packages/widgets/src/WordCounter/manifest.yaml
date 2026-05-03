@@ -1,0 +1,8 @@
+name: word-counter
+title: Word counter
+description: Words, characters, sentences, reading time.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: type

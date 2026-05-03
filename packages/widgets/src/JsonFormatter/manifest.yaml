@@ -1,0 +1,8 @@
+name: json-formatter
+title: JSON formatter
+description: Pretty-print, minify, and validate JSON.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: code

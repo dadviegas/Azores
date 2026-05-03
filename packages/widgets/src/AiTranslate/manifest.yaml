@@ -1,0 +1,8 @@
+name: ai-translate
+title: AI translate
+description: Translate text into any target language.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: globe

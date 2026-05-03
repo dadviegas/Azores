@@ -1,0 +1,8 @@
+name: tax-calc
+title: Take-home calculator
+description: Estimated take-home pay at a flat marginal rate.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: coins

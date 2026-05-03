@@ -1,0 +1,8 @@
+name: case-converter
+title: Case converter
+description: camelCase, snake_case, kebab-case, CONSTANT_CASE, Title Case.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: type

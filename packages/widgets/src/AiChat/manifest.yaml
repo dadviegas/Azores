@@ -1,0 +1,8 @@
+name: ai-chat
+title: AI chat
+description: Chat with any OpenAI-compatible endpoint — set URL/key in Tweaks.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: chat

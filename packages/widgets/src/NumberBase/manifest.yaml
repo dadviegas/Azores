@@ -1,0 +1,8 @@
+name: number-base
+title: Number base converter
+description: Convert between binary, octal, decimal, and hex.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: type

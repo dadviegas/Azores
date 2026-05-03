@@ -1,0 +1,8 @@
+name: text-sort
+title: Sort & dedupe lines
+description: Sort, reverse, dedupe, shuffle, trim — line-based.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: align

@@ -1,0 +1,8 @@
+name: ai-prompt
+title: AI prompts
+description: Saved prompts you can run with one click against your AI endpoint.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: zap

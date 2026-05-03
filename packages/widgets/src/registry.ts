@@ -58,6 +58,52 @@ import unitConverterManifestRaw from "./UnitConverter/manifest.yaml";
 import stopwatchManifestRaw from "./Stopwatch/manifest.yaml";
 import diceManifestRaw from "./Dice/manifest.yaml";
 import coinFlipManifestRaw from "./CoinFlip/manifest.yaml";
+import jsonFormatterManifestRaw from "./JsonFormatter/manifest.yaml";
+import base64ManifestRaw from "./Base64/manifest.yaml";
+import urlEncoderManifestRaw from "./UrlEncoder/manifest.yaml";
+import jwtDecoderManifestRaw from "./JwtDecoder/manifest.yaml";
+import regexTesterManifestRaw from "./RegexTester/manifest.yaml";
+import hashGenManifestRaw from "./HashGen/manifest.yaml";
+import uuidGenManifestRaw from "./UuidGen/manifest.yaml";
+import numberBaseManifestRaw from "./NumberBase/manifest.yaml";
+import colorToolsManifestRaw from "./ColorTools/manifest.yaml";
+import httpStatusManifestRaw from "./HttpStatus/manifest.yaml";
+import asciiTableManifestRaw from "./AsciiTable/manifest.yaml";
+import htmlEntitiesManifestRaw from "./HtmlEntities/manifest.yaml";
+import markdownPreviewManifestRaw from "./MarkdownPreview/manifest.yaml";
+import slugifyManifestRaw from "./Slugify/manifest.yaml";
+import caseConverterManifestRaw from "./CaseConverter/manifest.yaml";
+import notesMultiManifestRaw from "./NotesMulti/manifest.yaml";
+import kanbanManifestRaw from "./Kanban/manifest.yaml";
+import wordCounterManifestRaw from "./WordCounter/manifest.yaml";
+import passwordGenManifestRaw from "./PasswordGen/manifest.yaml";
+import loremManifestRaw from "./Lorem/manifest.yaml";
+import textStatsManifestRaw from "./TextStats/manifest.yaml";
+import textSortManifestRaw from "./TextSort/manifest.yaml";
+import csvViewerManifestRaw from "./CsvViewer/manifest.yaml";
+import csvToJsonManifestRaw from "./CsvToJson/manifest.yaml";
+import urlParserManifestRaw from "./UrlParser/manifest.yaml";
+import waterTrackerManifestRaw from "./WaterTracker/manifest.yaml";
+import workoutTimerManifestRaw from "./WorkoutTimer/manifest.yaml";
+import breathingTimerManifestRaw from "./BreathingTimer/manifest.yaml";
+import expenseLogManifestRaw from "./ExpenseLog/manifest.yaml";
+import timeTrackerManifestRaw from "./TimeTracker/manifest.yaml";
+import tipCalcManifestRaw from "./TipCalc/manifest.yaml";
+import mortgageCalcManifestRaw from "./MortgageCalc/manifest.yaml";
+import loanCalcManifestRaw from "./LoanCalc/manifest.yaml";
+import compoundInterestManifestRaw from "./CompoundInterest/manifest.yaml";
+import salaryCalcManifestRaw from "./SalaryCalc/manifest.yaml";
+import taxCalcManifestRaw from "./TaxCalc/manifest.yaml";
+import inflationCalcManifestRaw from "./InflationCalc/manifest.yaml";
+import savingsGoalManifestRaw from "./SavingsGoal/manifest.yaml";
+import roiCalcManifestRaw from "./RoiCalc/manifest.yaml";
+import cryptoConverterManifestRaw from "./CryptoConverter/manifest.yaml";
+import aiChatManifestRaw from "./AiChat/manifest.yaml";
+import aiSummarizeManifestRaw from "./AiSummarize/manifest.yaml";
+import aiTranslateManifestRaw from "./AiTranslate/manifest.yaml";
+import aiRewriteManifestRaw from "./AiRewrite/manifest.yaml";
+import aiCodeExplainManifestRaw from "./AiCodeExplain/manifest.yaml";
+import aiPromptManifestRaw from "./AiPrompt/manifest.yaml";
 
 export type WidgetEntry = {
   manifest: WidgetManifest;
@@ -125,6 +171,52 @@ export const widgetRegistry: Readonly<Record<string, WidgetEntry>> = {
   stopwatch: make(stopwatchManifestRaw, () => import("./Stopwatch/Stopwatch.js")),
   dice: make(diceManifestRaw, () => import("./Dice/Dice.js")),
   coinflip: make(coinFlipManifestRaw, () => import("./CoinFlip/CoinFlip.js")),
+  jsonformatter: make(jsonFormatterManifestRaw, () => import("./JsonFormatter/JsonFormatter.js")),
+  base64: make(base64ManifestRaw, () => import("./Base64/Base64.js")),
+  urlencoder: make(urlEncoderManifestRaw, () => import("./UrlEncoder/UrlEncoder.js")),
+  jwtdecoder: make(jwtDecoderManifestRaw, () => import("./JwtDecoder/JwtDecoder.js")),
+  regextester: make(regexTesterManifestRaw, () => import("./RegexTester/RegexTester.js")),
+  hashgen: make(hashGenManifestRaw, () => import("./HashGen/HashGen.js")),
+  uuidgen: make(uuidGenManifestRaw, () => import("./UuidGen/UuidGen.js")),
+  numberbase: make(numberBaseManifestRaw, () => import("./NumberBase/NumberBase.js")),
+  colortools: make(colorToolsManifestRaw, () => import("./ColorTools/ColorTools.js")),
+  httpstatus: make(httpStatusManifestRaw, () => import("./HttpStatus/HttpStatus.js")),
+  asciitable: make(asciiTableManifestRaw, () => import("./AsciiTable/AsciiTable.js")),
+  htmlentities: make(htmlEntitiesManifestRaw, () => import("./HtmlEntities/HtmlEntities.js")),
+  markdownpreview: make(markdownPreviewManifestRaw, () => import("./MarkdownPreview/MarkdownPreview.js")),
+  slugify: make(slugifyManifestRaw, () => import("./Slugify/Slugify.js")),
+  caseconverter: make(caseConverterManifestRaw, () => import("./CaseConverter/CaseConverter.js")),
+  notesmulti: make(notesMultiManifestRaw, () => import("./NotesMulti/NotesMulti.js")),
+  kanban: make(kanbanManifestRaw, () => import("./Kanban/Kanban.js")),
+  wordcounter: make(wordCounterManifestRaw, () => import("./WordCounter/WordCounter.js")),
+  passwordgen: make(passwordGenManifestRaw, () => import("./PasswordGen/PasswordGen.js")),
+  lorem: make(loremManifestRaw, () => import("./Lorem/Lorem.js")),
+  textstats: make(textStatsManifestRaw, () => import("./TextStats/TextStats.js")),
+  textsort: make(textSortManifestRaw, () => import("./TextSort/TextSort.js")),
+  csvviewer: make(csvViewerManifestRaw, () => import("./CsvViewer/CsvViewer.js")),
+  csvtojson: make(csvToJsonManifestRaw, () => import("./CsvToJson/CsvToJson.js")),
+  urlparser: make(urlParserManifestRaw, () => import("./UrlParser/UrlParser.js")),
+  watertracker: make(waterTrackerManifestRaw, () => import("./WaterTracker/WaterTracker.js")),
+  workouttimer: make(workoutTimerManifestRaw, () => import("./WorkoutTimer/WorkoutTimer.js")),
+  breathingtimer: make(breathingTimerManifestRaw, () => import("./BreathingTimer/BreathingTimer.js")),
+  expenselog: make(expenseLogManifestRaw, () => import("./ExpenseLog/ExpenseLog.js")),
+  timetracker: make(timeTrackerManifestRaw, () => import("./TimeTracker/TimeTracker.js")),
+  tipcalc: make(tipCalcManifestRaw, () => import("./TipCalc/TipCalc.js")),
+  mortgagecalc: make(mortgageCalcManifestRaw, () => import("./MortgageCalc/MortgageCalc.js")),
+  loancalc: make(loanCalcManifestRaw, () => import("./LoanCalc/LoanCalc.js")),
+  compoundinterest: make(compoundInterestManifestRaw, () => import("./CompoundInterest/CompoundInterest.js")),
+  salarycalc: make(salaryCalcManifestRaw, () => import("./SalaryCalc/SalaryCalc.js")),
+  taxcalc: make(taxCalcManifestRaw, () => import("./TaxCalc/TaxCalc.js")),
+  inflationcalc: make(inflationCalcManifestRaw, () => import("./InflationCalc/InflationCalc.js")),
+  savingsgoal: make(savingsGoalManifestRaw, () => import("./SavingsGoal/SavingsGoal.js")),
+  roicalc: make(roiCalcManifestRaw, () => import("./RoiCalc/RoiCalc.js")),
+  cryptoconverter: make(cryptoConverterManifestRaw, () => import("./CryptoConverter/CryptoConverter.js")),
+  aichat: make(aiChatManifestRaw, () => import("./AiChat/AiChat.js")),
+  aisummarize: make(aiSummarizeManifestRaw, () => import("./AiSummarize/AiSummarize.js")),
+  aitranslate: make(aiTranslateManifestRaw, () => import("./AiTranslate/AiTranslate.js")),
+  airewrite: make(aiRewriteManifestRaw, () => import("./AiRewrite/AiRewrite.js")),
+  aicodeexplain: make(aiCodeExplainManifestRaw, () => import("./AiCodeExplain/AiCodeExplain.js")),
+  aiprompt: make(aiPromptManifestRaw, () => import("./AiPrompt/AiPrompt.js")),
 };
 
 // One entry per row in the dashboard widget library. Most map 1:1 to a
@@ -132,12 +224,141 @@ export const widgetRegistry: Readonly<Record<string, WidgetEntry>> = {
 // multiple presets that all render through the same Component with
 // different `data` payloads. The library uses `id` as its key and as the
 // "already added" check, so two news presets can coexist on a dashboard.
+export type WidgetCategory =
+  | "AI"
+  | "Time & Calendar"
+  | "Weather & Sky"
+  | "Finance"
+  | "News & Reading"
+  | "Developer"
+  | "Earth & World"
+  | "Productivity"
+  | "Fun & Random";
+
+export const WIDGET_CATEGORY_ORDER: ReadonlyArray<WidgetCategory> = [
+  "AI",
+  "Time & Calendar",
+  "Weather & Sky",
+  "News & Reading",
+  "Finance",
+  "Earth & World",
+  "Developer",
+  "Productivity",
+  "Fun & Random",
+];
+
+// Categorization is a library/UI concern, not part of the widget contract,
+// so it lives here rather than in each manifest.yaml.
+const WIDGET_CATEGORIES: Record<string, WidgetCategory> = {
+  aichat: "AI",
+  aisummarize: "AI",
+  aitranslate: "AI",
+  airewrite: "AI",
+  aicodeexplain: "AI",
+  aiprompt: "AI",
+  clock: "Time & Calendar",
+  worldclocks: "Time & Calendar",
+  countdown: "Time & Calendar",
+  calendarmonth: "Time & Calendar",
+  pomodoro: "Time & Calendar",
+  stopwatch: "Time & Calendar",
+  holidays: "Time & Calendar",
+  onthisday: "Time & Calendar",
+  sunrise: "Time & Calendar",
+
+  weather: "Weather & Sky",
+  airquality: "Weather & Sky",
+  aurora: "Weather & Sky",
+  moonphase: "Weather & Sky",
+  iss: "Weather & Sky",
+  apod: "Weather & Sky",
+
+  fx: "Finance",
+  crypto: "Finance",
+  bitcoin: "Finance",
+  tipcalc: "Finance",
+  mortgagecalc: "Finance",
+  loancalc: "Finance",
+  compoundinterest: "Finance",
+  salarycalc: "Finance",
+  taxcalc: "Finance",
+  inflationcalc: "Finance",
+  savingsgoal: "Finance",
+  roicalc: "Finance",
+  cryptoconverter: "Finance",
+
+  news: "News & Reading",
+  hackernews: "News & Reading",
+  wikipedia: "News & Reading",
+  wikifeatured: "News & Reading",
+
+  github: "Developer",
+  githubrepo: "Developer",
+  githubstatus: "Developer",
+  npmdownloads: "Developer",
+  jsonformatter: "Developer",
+  base64: "Developer",
+  urlencoder: "Developer",
+  jwtdecoder: "Developer",
+  regextester: "Developer",
+  hashgen: "Developer",
+  uuidgen: "Developer",
+  numberbase: "Developer",
+  colortools: "Developer",
+  httpstatus: "Developer",
+  asciitable: "Developer",
+  htmlentities: "Developer",
+  markdownpreview: "Developer",
+  slugify: "Developer",
+  caseconverter: "Developer",
+
+  atlas: "Earth & World",
+  earthquakes: "Earth & World",
+  worldbank: "Earth & World",
+  ipinfo: "Earth & World",
+
+  todo: "Productivity",
+  scratchpad: "Productivity",
+  bookmarks: "Productivity",
+  calculator: "Productivity",
+  unitconverter: "Productivity",
+  notesmulti: "Productivity",
+  kanban: "Productivity",
+  wordcounter: "Productivity",
+  passwordgen: "Productivity",
+  lorem: "Productivity",
+  textstats: "Productivity",
+  textsort: "Productivity",
+  csvviewer: "Productivity",
+  csvtojson: "Productivity",
+  watertracker: "Productivity",
+  workouttimer: "Productivity",
+  breathingtimer: "Productivity",
+  expenselog: "Productivity",
+  timetracker: "Productivity",
+  urlparser: "Developer",
+
+  coinflip: "Fun & Random",
+  dice: "Fun & Random",
+  trivia: "Fun & Random",
+  joke: "Fun & Random",
+  catfact: "Fun & Random",
+  dog: "Fun & Random",
+  quote: "Fun & Random",
+  advice: "Fun & Random",
+  cocktail: "Fun & Random",
+  meal: "Fun & Random",
+};
+
+const DEFAULT_CATEGORY: WidgetCategory = "Fun & Random";
+
 export type CatalogEntry = {
   id: string;
   type: string;
   title: string;
   description?: string;
   icon?: string;
+  category: WidgetCategory;
   defaultSize: { w: number; h: number };
   ttlMs: number | null;
   sources: ReadonlyArray<string>;
@@ -154,6 +375,7 @@ const baseCatalog: CatalogEntry[] = Object.entries(widgetRegistry).map(
     title: entry.manifest.title,
     description: entry.manifest.description,
     icon: entry.manifest.icon,
+    category: WIDGET_CATEGORIES[id] ?? DEFAULT_CATEGORY,
     defaultSize: entry.manifest.defaultSize,
     ttlMs: entry.ttlMs,
     sources: entry.manifest.sources,
@@ -172,6 +394,7 @@ const newsPresetCatalog: CatalogEntry[] = NEWS_PRESETS.filter(
   defaultSize: newsEntry.manifest.defaultSize,
   ttlMs: newsEntry.ttlMs,
   sources: newsEntry.manifest.sources,
+  category: "News & Reading",
   data: { url: p.url, title: p.label },
 }));
 

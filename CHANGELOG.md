@@ -11,6 +11,154 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **Five more AI widgets sharing one client.** Added
+  [AiSummarize](packages/widgets/src/AiSummarize/) (short / medium /
+  detailed bullet summaries),
+  [AiTranslate](packages/widgets/src/AiTranslate/) (any source → 21
+  target languages, auto-detect source),
+  [AiRewrite](packages/widgets/src/AiRewrite/) (tone presets:
+  formal / casual / shorter / clearer / more confident /
+  friendlier / more concise / academic),
+  [AiCodeExplain](packages/widgets/src/AiCodeExplain/) (modes:
+  explain / review / improve / tests),
+  [AiPrompt](packages/widgets/src/AiPrompt/) (saved system prompts
+  with one-click run, persisted seed list).
+
+  Extracted [`_ai/client.ts`](packages/widgets/src/_ai/client.ts) —
+  shared `chat()` helper that reads settings via the
+  `azores:ai-settings` `localStorage` contract, builds the
+  `/v1/chat/completions` endpoint (auto-strips trailing slash, honors
+  user-pasted full path), and includes the `ngrok-skip-browser-warning`
+  header so free-tier ngrok tunnels don't return a splash page.
+  `AiChat` was refactored to use the shared client.
+
+- **AI chat widget + Tweaks → AI settings.** New
+  [AiChat](packages/widgets/src/AiChat/) widget under a new **AI**
+  category — sends an OpenAI-compatible
+  `POST {apiUrl}/v1/chat/completions` request with `Authorization:
+  Bearer {apiKey}` and `ngrok-skip-browser-warning: true` (so
+  free-tier ngrok tunnels don't return the splash page). Works with
+  OpenAI, OpenRouter, LM Studio, or any local LLM exposed via ngrok.
+  Endpoint URL, API key, and model are configured in **Tweaks → AI**
+  ([useAiSettings](packages/ux/src/TweaksPanel/useAiSettings.ts) +
+  [TweaksPanel](packages/ux/src/TweaksPanel/TweaksPanel.tsx)) and
+  persisted in `localStorage` under `azores:ai-settings` — the key
+  never leaves the browser except in the request to the URL the user
+  configured. Widget UI: chat-bubble log, error bubbles for HTTP
+  failures, Enter-to-send / Shift+Enter for newline, auto-scroll, a
+  Clear button, and a "not configured" empty state with setup
+  instructions.
+
+### Fixed
+- **Dashboard widgets stacking on top of each other** when the
+  catalog grew past ~60 occupied rows.
+  [packWidgets](packages/ux/src/Dashboard/layout.ts) had a hard
+  `ROWS_MAX = 60` cap on its first-fit search; widgets that didn't
+  fit fell through to a fallback that placed them at `(0,
+  occ.length)` *without* marking the cell, so every overflowing
+  widget piled into the same coordinate. Bumped the cap to a
+  practical-infinity value, added a `cols <= 0` guard, and the
+  fallback now `mark()`s its cells too — duplicates can't pile up
+  even if the cap is hit.
+
+### Added
+- **Batch 3 of 200-widget expansion — ten finance calculators.**
+  All offline (no network):
+  [TipCalc](packages/widgets/src/TipCalc/) (tip + bill split),
+  [MortgageCalc](packages/widgets/src/MortgageCalc/) (monthly +
+  interest total),
+  [LoanCalc](packages/widgets/src/LoanCalc/) (APR-based monthly),
+  [CompoundInterest](packages/widgets/src/CompoundInterest/) (yearly
+  bar chart of growth with monthly contributions),
+  [SalaryCalc](packages/widgets/src/SalaryCalc/) (hourly ↔ daily ↔
+  weekly ↔ monthly ↔ annual, configurable hrs/wks),
+  [TaxCalc](packages/widgets/src/TaxCalc/) (flat-rate take-home with
+  monthly + hourly net),
+  [InflationCalc](packages/widgets/src/InflationCalc/) (real value
+  of an amount after N years),
+  [SavingsGoal](packages/widgets/src/SavingsGoal/) (months to reach
+  a target with deposits + interest),
+  [RoiCalc](packages/widgets/src/RoiCalc/) (total return + CAGR with
+  positive/negative tinting),
+  [CryptoConverter](packages/widgets/src/CryptoConverter/) (BTC ↔
+  USD ↔ sats with manually-entered rate — pair with the live
+  `Bitcoin` widget).
+
+- **Batch 2 of 200-widget expansion — fifteen productivity widgets.**
+  Mostly offline + persisted via `@azores/core` storage:
+  [NotesMulti](packages/widgets/src/NotesMulti/) (multiple notes,
+  search, autosave),
+  [Kanban](packages/widgets/src/Kanban/) (3-column board with
+  drag-between-lanes, persisted),
+  [WordCounter](packages/widgets/src/WordCounter/) (words / chars /
+  sentences / read-time),
+  [PasswordGen](packages/widgets/src/PasswordGen/) (CSPRNG via
+  `crypto.getRandomValues`, set toggles, length 6-64),
+  [Lorem](packages/widgets/src/Lorem/) (deterministic placeholder
+  paragraphs),
+  [TextStats](packages/widgets/src/TextStats/) (unique-words /
+  longest / avg length),
+  [TextSort](packages/widgets/src/TextSort/) (sort, reverse, dedupe,
+  shuffle, trim — line-based),
+  [CsvViewer](packages/widgets/src/CsvViewer/) (paste CSV → sortable
+  table; quote-aware parser),
+  [CsvToJson](packages/widgets/src/CsvToJson/) (round-trip CSV ↔
+  JSON),
+  [UrlParser](packages/widgets/src/UrlParser/) (break URL into
+  protocol/host/path/query parts — Developer category),
+  [WaterTracker](packages/widgets/src/WaterTracker/) (daily count
+  + 7-day bar chart),
+  [WorkoutTimer](packages/widgets/src/WorkoutTimer/) (work / rest /
+  rounds — HIIT-style),
+  [BreathingTimer](packages/widgets/src/BreathingTimer/) (animated
+  4-4-4-4 box breathing),
+  [ExpenseLog](packages/widgets/src/ExpenseLog/) (entries +
+  running total),
+  [TimeTracker](packages/widgets/src/TimeTracker/) (start/stop
+  timers per task with persisted totals).
+
+- **Batch 1 of 200-widget expansion — fifteen self-contained dev tools.**
+  All offline (no network sources, no CORS surface), categorized under
+  **Developer**, click-to-copy where useful:
+  [JsonFormatter](packages/widgets/src/JsonFormatter/) (pretty/minify/validate),
+  [Base64](packages/widgets/src/Base64/) (Unicode-safe encode/decode),
+  [UrlEncoder](packages/widgets/src/UrlEncoder/) (encodeURIComponent / decode),
+  [JwtDecoder](packages/widgets/src/JwtDecoder/) (header + payload, no
+  signature check),
+  [RegexTester](packages/widgets/src/RegexTester/) (pattern + flags + match
+  list with capture groups),
+  [HashGen](packages/widgets/src/HashGen/) (SHA-1/256/384/512 via
+  SubtleCrypto),
+  [UuidGen](packages/widgets/src/UuidGen/) (v4 batch generator + copy-all),
+  [NumberBase](packages/widgets/src/NumberBase/) (BIN/OCT/DEC/HEX live
+  conversion),
+  [ColorTools](packages/widgets/src/ColorTools/) (HEX/RGB/HSL + WCAG
+  contrast pill),
+  [HttpStatus](packages/widgets/src/HttpStatus/) (searchable code reference),
+  [AsciiTable](packages/widgets/src/AsciiTable/) (printable + control codes),
+  [HtmlEntities](packages/widgets/src/HtmlEntities/) (encode/decode),
+  [MarkdownPreview](packages/widgets/src/MarkdownPreview/) (live render —
+  inline mini-parser, no marked.js dep),
+  [Slugify](packages/widgets/src/Slugify/) (URL-safe slug),
+  [CaseConverter](packages/widgets/src/CaseConverter/)
+  (camel/Pascal/snake/kebab/CONSTANT/Title/sentence/dot/path).
+
+- **Widget library: search, categories, bulk actions, live preview.**
+  The Atlas library drawer
+  ([AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx)) now groups widgets
+  into eight categories (Time & Calendar, Weather & Sky, News &
+  Reading, Finance, Earth & World, Developer, Productivity, Fun &
+  Random — defined in
+  [registry.ts](packages/widgets/src/registry.ts)), with a search
+  field that filters by title / description / category. Each row
+  expands inline to render a live preview of the widget. Header
+  actions: **Add all** (adds every visible non-duplicate entry,
+  respecting the current filter), **Remove all** (clears the
+  dashboard), **Reset** (back to seed). Drawer widened to 420px to
+  fit previews. Public API: new `WIDGET_CATEGORY_ORDER` and
+  `WidgetCategory` exports from `@azores/widgets`; `CatalogEntry`
+  gains a `category` field.
+
 - **Twenty more dashboard widgets** (fourth batch). Twelve external,
   eight local. External: Aurora forecast
   ([Aurora](packages/widgets/src/Aurora/) — NOAA SWPC planetary

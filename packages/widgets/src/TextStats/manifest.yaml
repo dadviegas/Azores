@@ -1,0 +1,8 @@
+name: text-stats
+title: Text stats
+description: Detailed text analysis — unique words, longest, avg length.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: chart

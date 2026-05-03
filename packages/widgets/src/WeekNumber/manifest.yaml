@@ -1,0 +1,8 @@
+name: week-number
+title: Week number
+description: ISO week number, day of year, and quarter.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: calendar

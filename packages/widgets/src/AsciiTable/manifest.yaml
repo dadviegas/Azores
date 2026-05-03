@@ -1,0 +1,8 @@
+name: ascii-table
+title: ASCII table
+description: Printable + control codes with hex / oct / dec.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: table

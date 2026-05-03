@@ -1,0 +1,8 @@
+name: jwt-decoder
+title: JWT decoder
+description: Decode JWT header and payload (no signature verification).
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: key

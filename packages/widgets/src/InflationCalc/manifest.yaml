@@ -1,0 +1,8 @@
+name: inflation-calc
+title: Inflation calculator
+description: What an amount today is worth after N years of inflation.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: coins

@@ -1,0 +1,8 @@
+name: lorem
+title: Lorem ipsum
+description: Generate placeholder paragraphs.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: bookopen

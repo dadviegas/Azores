@@ -1,0 +1,8 @@
+name: tip-calc
+title: Tip calculator
+description: Tip percentage and bill split.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: wallet

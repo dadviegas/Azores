@@ -1,0 +1,8 @@
+name: time-tracker
+title: Time tracker
+description: Start/stop timers per task with totals.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: alarm

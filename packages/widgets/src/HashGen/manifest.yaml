@@ -1,0 +1,8 @@
+name: hash-gen
+title: Hash generator
+description: SHA-1, SHA-256, SHA-384, SHA-512 of input text via SubtleCrypto.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: hash

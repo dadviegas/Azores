@@ -1,0 +1,8 @@
+name: savings-goal
+title: Savings goal
+description: How long until you reach a target with monthly deposits.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: trophy

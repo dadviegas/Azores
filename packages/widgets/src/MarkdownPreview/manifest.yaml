@@ -1,0 +1,8 @@
+name: markdown-preview
+title: Markdown preview
+description: Live-rendered Markdown — paste on the left, see it on the right.
+sources: []
+defaultSize:
+  w: 6
+  h: 3
+icon: bookopen

@@ -1,0 +1,8 @@
+name: mortgage-calc
+title: Mortgage calculator
+description: Monthly payment, total interest, and amortization summary.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: wallet

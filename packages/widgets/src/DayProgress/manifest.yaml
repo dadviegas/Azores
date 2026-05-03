@@ -1,0 +1,8 @@
+name: day-progress
+title: Day progress
+description: Percent of the day elapsed plus a working-hours bar.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: chart

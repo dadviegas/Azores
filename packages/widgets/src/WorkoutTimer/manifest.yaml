@@ -1,0 +1,8 @@
+name: workout-timer
+title: Interval timer
+description: Configurable work / rest interval timer for HIIT.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: target

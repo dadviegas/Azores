@@ -14,12 +14,17 @@ export type GridItem = {
 
 export type PlacedItem<T extends GridItem> = T & { col: number; row: number };
 
-const ROWS_MAX = 60;
+// Hard ceiling on the loose-pass row search. Sized far above any realistic
+// dashboard so the search effectively never trips it; only there to defend
+// against a pathological `cols=0` (also guarded explicitly) so the loop can't
+// run forever.
+const ROW_SEARCH_HARD_CAP = 10_000;
 
 export const packWidgets = <T extends GridItem>(
   items: ReadonlyArray<T>,
   cols: number,
 ): PlacedItem<T>[] => {
+  if (cols <= 0) return [];
   const occ: boolean[][] = [];
   const ensureRow = (r: number): void => {
     while (occ.length <= r) occ.push(new Array(cols).fill(false));
@@ -72,7 +77,7 @@ export const packWidgets = <T extends GridItem>(
     const w = Math.min(it.w, cols);
     const h = it.h;
     let placed = false;
-    for (let r = 0; r < ROWS_MAX && !placed; r++) {
+    for (let r = 0; r < ROW_SEARCH_HARD_CAP && !placed; r++) {
       for (let c = 0; c <= cols - w && !placed; c++) {
         if (fits(r, c, w, h)) {
           mark(r, c, w, h);
@@ -81,7 +86,15 @@ export const packWidgets = <T extends GridItem>(
         }
       }
     }
-    if (!placed) out[i] = { ...it, col: 0, row: occ.length, w, h };
+    // Defensive fallback: if the search somehow walks the entire cap without
+    // placing, append at the bottom AND mark the cells. The previous version
+    // skipped marking, so multiple unplaced widgets would all stack at the
+    // same `(0, occ.length)` cell — now they advance row-by-row instead.
+    if (!placed) {
+      const r = occ.length;
+      mark(r, 0, w, h);
+      out[i] = { ...it, col: 0, row: r, w, h };
+    }
   }
   return out.filter((x): x is PlacedItem<T> => x != null);
 };

@@ -1,0 +1,8 @@
+name: expense-log
+title: Expense log
+description: Quick log of expenses with running total.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: wallet

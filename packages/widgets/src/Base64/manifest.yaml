@@ -1,0 +1,8 @@
+name: base64
+title: Base64
+description: Encode and decode text to Base64.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: binary

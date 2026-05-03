@@ -6,3 +6,9 @@ export {
   type AccentId,
   type UseTweaksResult,
 } from "./useTweaks.js";
+export {
+  useAiSettings,
+  readAiSettings,
+  type AiSettings,
+  type UseAiSettingsResult,
+} from "./useAiSettings.js";

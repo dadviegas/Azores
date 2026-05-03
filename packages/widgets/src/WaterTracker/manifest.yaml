@@ -1,0 +1,8 @@
+name: water-tracker
+title: Water tracker
+description: Daily glasses of water with a 7-day history.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: cup

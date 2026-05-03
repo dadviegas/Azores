@@ -1,0 +1,8 @@
+name: ai-summarize
+title: AI summarize
+description: Paste long text, get a bullet-point summary.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: bookopen

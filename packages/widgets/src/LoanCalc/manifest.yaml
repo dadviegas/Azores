@@ -1,0 +1,8 @@
+name: loan-calc
+title: Loan calculator
+description: Monthly payment for any term + total interest paid.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: wallet

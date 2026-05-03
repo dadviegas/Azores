@@ -1,0 +1,8 @@
+name: kanban
+title: Kanban board
+description: Three-column todo / doing / done with drag between columns.
+sources: []
+defaultSize:
+  w: 6
+  h: 4
+icon: blocks

@@ -1,0 +1,8 @@
+name: age-calc
+title: Age calculator
+description: Years, months, days — plus total weeks, days, and seconds.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: calendar

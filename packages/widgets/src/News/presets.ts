@@ -3,10 +3,13 @@
 //
 // `corsFriendly: true` means the upstream serves
 // `Access-Control-Allow-Origin: *` (or equivalent), so the browser can fetch
-// it directly. Most major outlets (BBC, Reuters, AP, NYT, Le Monde, …)
-// publish RSS but do NOT set CORS — they're listed here as `false` so a
-// future picker UI can disable them, or route them through a proxy when one
-// exists. Don't promote a non-CORS feed to the default.
+// it directly. Most major outlets (BBC, Reuters, AP, NYT, Le Monde, Al
+// Jazeera, NPR, …) publish RSS but do NOT set CORS — they're useless from
+// page JS without a proxy. The registry filters this list with
+// `.filter((p) => p.corsFriendly)` before exposing it to the widget
+// library, so non-CORS entries here are dead weight. Keep this list to
+// genuinely browser-fetchable feeds; route everything else through a proxy
+// when one exists.
 
 export type NewsRegion = "world" | "europe" | "americas" | "tech";
 
@@ -24,113 +27,7 @@ export type NewsPreset = {
 };
 
 export const NEWS_PRESETS: ReadonlyArray<NewsPreset> = [
-  // ── World ──────────────────────────────────────────────────────────────
-  // Reddit's `*.rss` and Wikinews' Special:NewsFeed used to be flagged
-  // `corsFriendly: true` here, but Reddit started blocking unauthenticated
-  // cross-origin browser requests (403 / no `Access-Control-Allow-Origin`)
-  // and Wikinews' filtered feed rate-limits hard. Both surfaced as
-  // "Feed unavailable. Load failed" tiles on the seeded Atlas dashboard
-  // and have been removed from the catalog. Reintroduce behind a proxy.
-  {
-    id: "aljazeera-world",
-    label: "Al Jazeera · World",
-    url: "https://www.aljazeera.com/xml/rss/all.xml",
-    region: "world",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "bbc-world",
-    label: "BBC News · World",
-    url: "https://feeds.bbci.co.uk/news/world/rss.xml",
-    region: "world",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "reuters-world",
-    label: "Reuters · World",
-    url: "https://www.reutersagency.com/feed/?best-regions=world&post_type=best",
-    region: "world",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-
-  // ── Europe ─────────────────────────────────────────────────────────────
-  // Reddit r/europe removed for the same reason as r/worldnews above.
-  {
-    id: "euronews-en",
-    label: "Euronews (English)",
-    url: "https://www.euronews.com/rss?level=theme&name=news",
-    region: "europe",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "politico-eu",
-    label: "Politico Europe",
-    url: "https://www.politico.eu/feed/",
-    region: "europe",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "dw-en-top",
-    label: "Deutsche Welle · Top stories (EN)",
-    url: "https://rss.dw.com/rdf/rss-en-top",
-    region: "europe",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-
-  // ── Americas ───────────────────────────────────────────────────────────
-  // Reddit r/news and r/canada removed; see r/worldnews note above.
-  {
-    id: "npr-news",
-    label: "NPR · News",
-    url: "https://feeds.npr.org/1001/rss.xml",
-    region: "americas",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "propublica",
-    label: "ProPublica",
-    url: "https://www.propublica.org/feeds/propublica/main",
-    region: "americas",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-  {
-    id: "cbc-topstories",
-    label: "CBC · Top stories",
-    url: "https://www.cbc.ca/webfeed/rss/rss-topstories",
-    region: "americas",
-    kind: "rss",
-    corsFriendly: false,
-    note: "Needs CORS proxy",
-  },
-
-  // ── Tech ───────────────────────────────────────────────────────────────
-  // Hacker News (`hnrss.org`) and Lobste.rs were originally flagged
-  // `corsFriendly: true`, but both upstreams respond 200 *without* an
-  // `Access-Control-Allow-Origin` header, so the browser blocks the
-  // response from page JS and `fetch()` rejects with "Failed to fetch".
-  // Removed for the same reason as Reddit / Wikinews above; reintroduce
-  // behind a proxy.
+  // Empty until a CORS-friendly feed is added. The user can still drop a
+  // generic `News feed` widget and paste any URL — the catalog presets are
+  // for one-click adds only.
 ];
-
-export const presetsByRegion = (
-  region: NewsRegion,
-): ReadonlyArray<NewsPreset> => NEWS_PRESETS.filter((p) => p.region === region);
-
-export const findPreset = (id: string): NewsPreset | undefined =>
-  NEWS_PRESETS.find((p) => p.id === id);

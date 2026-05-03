@@ -49,6 +49,17 @@ with relative links so the entry stays clickable.
   Clear button, and a "not configured" empty state with setup
   instructions.
 
+### Removed
+- **All non-CORS news presets** from
+  [News/presets.ts](packages/widgets/src/News/presets.ts) — every
+  entry was `corsFriendly: false`, which the registry filters out
+  before they reach the catalog, so they were dead weight (Al
+  Jazeera, BBC, Reuters, Euronews, Politico EU, DW, NPR, ProPublica,
+  CBC). Also dropped the unused `presetsByRegion` / `findPreset`
+  helpers. The list is now empty; users can still create a generic
+  News widget and paste any URL. Reintroduce specific feeds only
+  when a CORS-friendly one is found (or behind a proxy).
+
 ### Fixed
 - **Dashboard widgets stacking on top of each other** when the
   catalog grew past ~60 occupied rows.

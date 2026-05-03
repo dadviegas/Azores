@@ -415,11 +415,12 @@ export const Dashboard = <T,>({
             $w={w.w}
             $h={w.h}
             $dragging={dragging}
-            draggable
-            onDragStart={onDragStartCell(w.id)}
-            onDragEnd={() => setDragState(null)}
           >
-            <Header>
+            <Header
+              draggable
+              onDragStart={onDragStartCell(w.id)}
+              onDragEnd={() => setDragState(null)}
+            >
               <DragHandle aria-label="Drag widget" tabIndex={-1}>
                 <Icon name="drag" size={12} />
               </DragHandle>

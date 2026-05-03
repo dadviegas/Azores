@@ -11,6 +11,68 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **Phase 14 sync-adapter groundwork** — sketch only, no UI to wire it
+  yet. Three pieces in [`@azores/core/storage`](packages/core/src/storage/):
+  - [`identity.ts`](packages/core/src/storage/identity.ts) — anonymous
+    `deviceId` (UUID) generated on first read and persisted via the
+    same `getStorage()` proxy. `upgradeIdentity({ accountId, email })`
+    is the seam for a future auth flow; adapters key writes by
+    `accountId ?? deviceId` so anonymous data stays addressable
+    after upgrade.
+  - [`supabase.ts`](packages/core/src/storage/supabase.ts) — fetch-based
+    `createSupabaseAdapter({ url, apiKey, table?, schemaVersion? })`.
+    No `@supabase/supabase-js` dep; talks straight to PostgREST. The
+    expected `kv` table shape with row-level-security policy is in the
+    file's preamble. Conflict policy: last-write-wins on `(identity,
+    key)`, with a `v` column for a future server-side schema-bump
+    guard.
+  - Both exported from [`@azores/core`](packages/core/src/index.ts).
+    Bootstrap stays unchanged until the Tweaks UI ships;
+    `setStorageAdapter(createSupabaseAdapter(...))` is the one-line
+    swap when it does.
+
+- **Eleven offline game widgets — new `Games` category.** Every
+  widget runs without a network call, scores live state-only, and
+  follows the existing Emotion + tokens pattern:
+  [TicTacToe](packages/widgets/src/TicTacToe/) (local two-player,
+  win-line highlight),
+  [NumberGuess](packages/widgets/src/NumberGuess/) (1–100 with
+  higher/lower hints, tries counter),
+  [RockPaperScissors](packages/widgets/src/RockPaperScissors/) (vs
+  random, running W/L/D),
+  [Memory](packages/widgets/src/Memory/) (4×3 board, six pairs,
+  move counter),
+  [Hangman](packages/widgets/src/Hangman/) (sea-themed wordlist,
+  six wrong guesses, on-screen keyboard),
+  [Slide15](packages/widgets/src/Slide15/) (4×4 sliding puzzle,
+  scrambled by 200 legal moves so it stays solvable),
+  [Mastermind](packages/widgets/src/Mastermind/) (4-color code, 8
+  rounds, black/white peg feedback),
+  [Reaction](packages/widgets/src/Reaction/) (red→green pad, ms
+  timing via `performance.now`, best-time tracker, early-click
+  detection),
+  [Whack](packages/widgets/src/Whack/) (3×3 grid, mole pops every
+  700 ms, 30 s round),
+  [HighLow](packages/widgets/src/HighLow/) (1–13 cards, streak +
+  best-streak),
+  [Snake](packages/widgets/src/Snake/) (12×12 grid, arrows or WASD,
+  reverse-direction guard, focus-on-start so the keyboard hooks
+  immediately).
+
+  Registered in [`registry.ts`](packages/widgets/src/registry.ts);
+  `Games` slots into [`WIDGET_CATEGORY_ORDER`](packages/widgets/src/registry.ts)
+  between Productivity and Fun & Random.
+
+- **Streaming AiChat replies.** New
+  [`chatStream`](packages/widgets/src/_ai/client.ts) helper consumes
+  the OpenAI SSE format (`data: {…}\n\n`, `[DONE]` terminator) via
+  `fetch` + `ReadableStream`, tolerating chunk-boundary splits and
+  non-JSON keep-alive pings. AiChat now renders tokens as they
+  arrive in a live "in-flight" bubble, then commits the final text
+  into the message log when the stream completes. The non-streaming
+  `chat()` stays for the other AI widgets — they each return a
+  single payload and don't benefit from streaming.
+
 - **Five more AI widgets sharing one client.** Added
   [AiSummarize](packages/widgets/src/AiSummarize/) (short / medium /
   detailed bullet summaries),

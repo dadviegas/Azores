@@ -1,0 +1,8 @@
+name: memory
+title: Memory match
+description: Flip pairs to match six emoji. Tracks moves to clear the board.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: grid

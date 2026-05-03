@@ -6,13 +6,17 @@ that exercises every surface — foundations, components, UI showcase,
 UX dashboard, and the markdown renderer — with a clean separation
 between **UI** (chrome) and **UX** (behavior).
 
-Status: phases 1–8, 9, and 10 shipped. Phase 9 landed end-to-end:
-`@azores/dataprovider` (sources + `<DataProvider>` + `useSource` +
-widget-manifest schema) on top of `@azores/core` fetch, `@azores/widgets`
-with four live widgets (Weather, Atlas, Wikipedia, FX), and a new
-`apps/atlas` federated remote that mounts them all in a shared
-`<Dashboard>`. The Atlas tile in the home shell is now `live`.
-See [`CHANGELOG.md`](../CHANGELOG.md) for what landed.
+Status: phases 1–11 shipped. Phase 9 landed end-to-end
+(`@azores/dataprovider` + four live widgets); phase 10 wired the home
+shell to federated remotes; phase 11 added storage-backed grid
+persistence with a versioned schema. The catalog has since grown past
+100 widgets across three expansion batches (dev tools, productivity,
+finance), the Tweaks panel now configures AI provider settings, and a
+suite of OpenAI-compatible AI widgets (chat, summarize, translate,
+rewrite, code-explain, prompt) ships against any user-configured
+endpoint. Drag/drop now supports drop-anywhere pins, and a Tidy action
+re-packs the grid. See [`CHANGELOG.md`](../CHANGELOG.md) for what
+landed.
 
 ---
 
@@ -86,7 +90,7 @@ Called out so future PRs pick them up:
   list constrains what they can request. Cache lives in `@azores/core`
   and is shared across MF remotes via a `globalThis` singleton.
 
-## 4. Phase 9 — live data widgets (in progress)
+## 4. Phase 9 — live data widgets (shipped)
 
 Foundation shipped: `@azores/core` exposes `FetchCache`,
 `registerSource`, `createFetcher`, and built-in sources for `weather`,
@@ -154,23 +158,115 @@ unauthenticated), CoinGecko (`api.coingecko.com`), ISS live position
 TheMealDB, PokeAPI, world-time-api. Each could become a fifth or
 sixth live widget if the four above land cleanly.
 
-## 5. Phase 11 — widget grid persistence (planned)
+## 5. Phase 11 — widget grid persistence (shipped)
 
-Once live data lands, the grid layout itself becomes worth keeping
-between sessions. Pieces that need to compose:
+Storage seam landed in [`@azores/core/storage`](../packages/core/src/storage/adapter.ts)
+as an adapter-based key/value proxy. Default adapter is IndexedDB;
+`setStorageAdapter()` swaps it for any remote KV (Supabase planned —
+see Phase 14). The Atlas page persists under
+`atlas:dashboard:layout` with a versioned envelope (`{ v: 4, widgets:
+[...] }`); unknown versions are discarded forward, and a debounced
+save (250 ms) keeps drag/resize gestures from thrashing storage.
+Reset and Remove-all are wired into the header and library drawer.
 
-- **Storage seam** — same `globalThis` singleton trick as
-  `FetchCache`, backed by IDB store `layout`. Key by user id once we
-  have one; for now key by `"default"`.
-- **Layout schema** — versioned (`{ v: 1, widgets: [...] }`) so we
-  can migrate without nuking saved grids. Reject unknown versions
-  forward.
-- **Reset action** — surface a "reset layout" item in the existing
-  Dashboard menu. Cheap to add, expensive to omit when a user wedges
-  their grid.
+What followed naturally and shipped alongside:
 
-Not started; called out so the data-widget phase doesn't accidentally
-couple itself to ad-hoc `localStorage` writes.
+- **Drop-where-you-want pins.** Widgets gained optional `col`/`row`
+  coordinates; the packer respects them and the schema bumped to v4
+  to persist them. Tidy clears pins and re-packs first-fit.
+- **Responsive column count.** [`colsForWidth`](../apps/atlas/src/AtlasPage.tsx)
+  picks 4/8/12/16/20/24 columns by viewport width so cells stay
+  roughly square across phones, laptops, and ultrawides.
+- **External drag from the library.** The library drawer drags
+  catalog entries onto the grid with a sized ghost reflecting the
+  pocket the widget will actually land in.
+
+## 6. Phase 12 — catalog scaling to ~200 widgets (in progress)
+
+The catalog crossed 100 entries with three landed batches: dev
+tools, productivity, and finance calculators. The shape of the
+remaining work:
+
+- **Offline-first bias.** Net-new widgets default to no network. CORS
+  has bitten the News presets repeatedly (every non-CORS preset was
+  removed in the last batch); prefer the platform — `Intl`, `crypto`,
+  `Notification`, `localStorage`, `Canvas`, `Web Audio` — before
+  reaching for an API.
+- **Categories, not a flat list.** [`WIDGET_CATEGORY_ORDER`](../packages/widgets/src/index.ts)
+  is the canonical ordering used by the library drawer. New widgets
+  declare a `category`; if a batch needs a new one, add it to the
+  order array in the same PR.
+- **Configurable presets.** The pattern from News (one widget,
+  `data` payload picks the source) is the right shape for any
+  widget that's "one component, many sources" (RSS, GitHub repo,
+  city clock, color palette, etc.). Configurable widgets can have
+  multiple instances on a dashboard; fixed widgets are blocked once
+  added.
+- **Per-widget refresh cadence.** Widgets that hit the network
+  declare `ttlMs` on their registry entry; the dashboard chrome
+  exposes a refresh action via `widgetActions`. No widget sets up
+  its own polling loop.
+- **Shared primitives over per-widget chrome.** Anything that looks
+  like a list, table, gauge, or sparkline should live in
+  [`packages/ui`](../packages/ui/src/) before the third widget
+  ships it. `LoadingShimmer` is the precedent.
+
+### Open candidates
+
+Solid net-new categories the next batches can pull from: world-time,
+RSS-readable feeds (with proxy, deferred), unit conversions beyond
+the basics, more text/encoding tools, simple games (2048, snake,
+minesweeper), small science demos (pendulum, double-pendulum, FFT
+visualizer), small data-viz (sortable table, bar/line chart with
+paste-in CSV).
+
+## 7. Phase 13 — AI widget surface (shipped, extending)
+
+The AI widget suite ships against any OpenAI-compatible endpoint
+([`packages/widgets/src/_ai/client.ts`](../packages/widgets/src/_ai/client.ts))
+with the user's URL/key/model held in `azores:ai-settings`
+`localStorage`. Six widgets shipped: AiChat, AiSummarize, AiTranslate,
+AiRewrite, AiCodeExplain, AiPrompt. Tweaks → AI is the configuration
+seam.
+
+Extension work that's natural from here, none committed:
+
+- **Streaming responses.** Today every widget waits for the full
+  reply. Switching to `stream: true` and rendering tokens as they
+  arrive is mostly a client-side change in `_ai/client.ts`; the
+  widgets need to render partial state without flicker.
+- **Per-widget prompt overrides.** AiPrompt persists a seed list;
+  the others hard-code a system prompt. A small "Edit prompt" affordance
+  on each widget header would unify them without a new widget.
+- **Tool/function calling.** Out of scope until there's a concrete
+  use case; the contract is open-ended and the widget surface is
+  small.
+- **Local model defaults.** A "Use LM Studio at localhost:1234"
+  shortcut in Tweaks → AI removes a copy-paste step for the most
+  common offline setup.
+
+## 8. Phase 14 — sync adapter (planned)
+
+The storage proxy was built with this phase in mind: layouts and AI
+settings already flow through `getStorage()`, so swapping the adapter
+swaps the backend. Pieces:
+
+- **Auth seam.** No login flow today. Anything that touches a remote
+  KV needs an identity to key by. Pick the smallest workable shape
+  (anonymous device id → upgradeable to email magic-link) before
+  wiring Supabase.
+- **Conflict policy.** Two devices editing the same dashboard need a
+  rule. Default to last-write-wins on the layout envelope (already
+  versioned); revisit if it bites.
+- **Migration on schema bump.** Layout `v` bumps currently discard
+  forward. With sync, a stale device should refuse to overwrite a
+  newer record — server-side `v` check on write.
+- **Settings sync, opt-in.** AI keys in particular shouldn't roam
+  silently across devices. Layouts should; secrets shouldn't.
+
+Not started. Called out so Phase 12 batches don't accidentally
+introduce widgets that write directly to `localStorage` and bypass
+the adapter.
 
 Decisions land in this file as we make them. Anything that ships goes
 into [`CHANGELOG.md`](../CHANGELOG.md).

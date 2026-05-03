@@ -1,0 +1,8 @@
+name: reaction
+title: Reaction time
+description: Click the moment the screen turns green. Best of five.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: zap

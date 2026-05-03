@@ -1,0 +1,8 @@
+name: numberguess
+title: Number guess
+description: Guess the secret number between 1 and 100. Higher / lower hints.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: target

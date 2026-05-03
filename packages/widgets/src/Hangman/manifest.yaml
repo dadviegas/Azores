@@ -1,0 +1,8 @@
+name: hangman
+title: Hangman
+description: Guess the hidden word one letter at a time. Six wrong guesses ends it.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: type

@@ -1,0 +1,8 @@
+name: snake
+title: Snake
+description: Classic snake on a 12×12 grid. Arrow keys or WASD.
+sources: []
+defaultSize:
+  w: 3
+  h: 4
+icon: activity

@@ -1,0 +1,8 @@
+name: rps
+title: Rock paper scissors
+description: Play RPS against the dashboard. Tracks wins, losses, draws.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: hand

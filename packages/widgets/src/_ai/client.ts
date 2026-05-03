@@ -90,3 +90,84 @@ export const chat = async (
   if (typeof reply !== "string") throw new Error("Unexpected response shape");
   return reply.trim();
 };
+
+// Streaming variant. Emits each delta token via `onToken` and resolves with
+// the concatenated reply once the upstream sends `data: [DONE]`. Errors
+// (HTTP non-2xx, malformed SSE, missing settings) reject; AbortSignal
+// cancels mid-stream and rejects with a DOMException("AbortError").
+//
+// The OpenAI SSE shape: `data: {json}\n\n` lines, where each json has
+// `choices[0].delta.content` (string fragment). The terminator is the
+// literal `data: [DONE]`. We tolerate keep-alive comments (`: ping`) and
+// chunked boundary splits across reads.
+export const chatStream = async (
+  messages: ReadonlyArray<ChatMessage>,
+  onToken: (delta: string) => void,
+  opts: ChatOptions = {},
+): Promise<string> => {
+  const settings = readAiSettings();
+  if (!isAiConfigured(settings)) {
+    throw new Error("Set API URL and key in Tweaks → AI.");
+  }
+  const body: Record<string, unknown> = {
+    model: opts.model ?? settings.model,
+    messages,
+    stream: true,
+  };
+  if (opts.maxTokens && opts.maxTokens > 0) body.max_tokens = opts.maxTokens;
+  const res = await fetch(buildEndpoint(settings.apiUrl), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+      Authorization: `Bearer ${settings.apiKey}`,
+      "ngrok-skip-browser-warning": "true",
+    },
+    body: JSON.stringify(body),
+    signal: opts.signal,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`HTTP ${res.status}${text ? ` · ${text.slice(0, 200)}` : ""}`);
+  }
+  if (!res.body) throw new Error("No response body");
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let full = "";
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      // SSE events are separated by a blank line. Process whole events from
+      // the buffer; leftover partial event stays in `buf` for the next read.
+      let idx;
+      while ((idx = buf.indexOf("\n\n")) !== -1) {
+        const event = buf.slice(0, idx);
+        buf = buf.slice(idx + 2);
+        for (const line of event.split("\n")) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+          if (payload === "[DONE]") return full;
+          try {
+            const json = JSON.parse(payload) as {
+              choices?: Array<{ delta?: { content?: unknown } }>;
+            };
+            const delta = json.choices?.[0]?.delta?.content;
+            if (typeof delta === "string" && delta) {
+              full += delta;
+              onToken(delta);
+            }
+          } catch {
+            // Ignore malformed chunks; some providers emit non-JSON pings.
+          }
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return full;
+};

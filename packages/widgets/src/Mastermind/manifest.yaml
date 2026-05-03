@@ -1,0 +1,8 @@
+name: mastermind
+title: Mastermind
+description: Crack the four-color code in eight guesses. Black peg = right color & spot.
+sources: []
+defaultSize:
+  w: 4
+  h: 4
+icon: target

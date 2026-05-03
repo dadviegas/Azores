@@ -104,6 +104,17 @@ import aiTranslateManifestRaw from "./AiTranslate/manifest.yaml";
 import aiRewriteManifestRaw from "./AiRewrite/manifest.yaml";
 import aiCodeExplainManifestRaw from "./AiCodeExplain/manifest.yaml";
 import aiPromptManifestRaw from "./AiPrompt/manifest.yaml";
+import ticTacToeManifestRaw from "./TicTacToe/manifest.yaml";
+import numberGuessManifestRaw from "./NumberGuess/manifest.yaml";
+import rpsManifestRaw from "./RockPaperScissors/manifest.yaml";
+import memoryManifestRaw from "./Memory/manifest.yaml";
+import hangmanManifestRaw from "./Hangman/manifest.yaml";
+import slide15ManifestRaw from "./Slide15/manifest.yaml";
+import mastermindManifestRaw from "./Mastermind/manifest.yaml";
+import reactionManifestRaw from "./Reaction/manifest.yaml";
+import whackManifestRaw from "./Whack/manifest.yaml";
+import highLowManifestRaw from "./HighLow/manifest.yaml";
+import snakeManifestRaw from "./Snake/manifest.yaml";
 
 export type WidgetEntry = {
   manifest: WidgetManifest;
@@ -217,6 +228,17 @@ export const widgetRegistry: Readonly<Record<string, WidgetEntry>> = {
   airewrite: make(aiRewriteManifestRaw, () => import("./AiRewrite/AiRewrite.js")),
   aicodeexplain: make(aiCodeExplainManifestRaw, () => import("./AiCodeExplain/AiCodeExplain.js")),
   aiprompt: make(aiPromptManifestRaw, () => import("./AiPrompt/AiPrompt.js")),
+  tictactoe: make(ticTacToeManifestRaw, () => import("./TicTacToe/TicTacToe.js")),
+  numberguess: make(numberGuessManifestRaw, () => import("./NumberGuess/NumberGuess.js")),
+  rps: make(rpsManifestRaw, () => import("./RockPaperScissors/RockPaperScissors.js")),
+  memory: make(memoryManifestRaw, () => import("./Memory/Memory.js")),
+  hangman: make(hangmanManifestRaw, () => import("./Hangman/Hangman.js")),
+  slide15: make(slide15ManifestRaw, () => import("./Slide15/Slide15.js")),
+  mastermind: make(mastermindManifestRaw, () => import("./Mastermind/Mastermind.js")),
+  reaction: make(reactionManifestRaw, () => import("./Reaction/Reaction.js")),
+  whack: make(whackManifestRaw, () => import("./Whack/Whack.js")),
+  highlow: make(highLowManifestRaw, () => import("./HighLow/HighLow.js")),
+  snake: make(snakeManifestRaw, () => import("./Snake/Snake.js")),
 };
 
 // One entry per row in the dashboard widget library. Most map 1:1 to a
@@ -233,6 +255,7 @@ export type WidgetCategory =
   | "Developer"
   | "Earth & World"
   | "Productivity"
+  | "Games"
   | "Fun & Random";
 
 export const WIDGET_CATEGORY_ORDER: ReadonlyArray<WidgetCategory> = [
@@ -244,6 +267,7 @@ export const WIDGET_CATEGORY_ORDER: ReadonlyArray<WidgetCategory> = [
   "Earth & World",
   "Developer",
   "Productivity",
+  "Games",
   "Fun & Random",
 ];
 
@@ -341,6 +365,18 @@ const WIDGET_CATEGORIES: Record<string, WidgetCategory> = {
   coinflip: "Fun & Random",
   dice: "Fun & Random",
   trivia: "Fun & Random",
+
+  tictactoe: "Games",
+  numberguess: "Games",
+  rps: "Games",
+  memory: "Games",
+  hangman: "Games",
+  slide15: "Games",
+  mastermind: "Games",
+  reaction: "Games",
+  whack: "Games",
+  highlow: "Games",
+  snake: "Games",
   joke: "Fun & Random",
   catfact: "Fun & Random",
   dog: "Fun & Random",

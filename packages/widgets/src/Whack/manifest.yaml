@@ -1,0 +1,8 @@
+name: whack
+title: Whack a mole
+description: Click the mole as it pops up. Thirty seconds, score per hit.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: target

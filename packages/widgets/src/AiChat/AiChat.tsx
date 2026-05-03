@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { chat, isAiConfigured, readAiSettings } from "../_ai/client.js";
+import { chatStream, isAiConfigured, readAiSettings } from "../_ai/client.js";
 import {
   Btn,
   Bubble,
@@ -20,6 +20,10 @@ export const AiChat = (): JSX.Element => {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState(false);
+  // Streaming reply accumulator, separate from `messages` so we don't
+  // re-render the full log on every token. Committed into `messages` once
+  // the stream completes.
+  const [streaming, setStreaming] = useState("");
   const logRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll the chat to the bottom whenever a new message lands so the
@@ -27,7 +31,7 @@ export const AiChat = (): JSX.Element => {
   useEffect(() => {
     const el = logRef.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [messages, pending]);
+  }, [messages, pending, streaming]);
 
   const send = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
@@ -37,13 +41,15 @@ export const AiChat = (): JSX.Element => {
     setMessages(next);
     setDraft("");
     setPending(true);
+    setStreaming("");
     try {
       // Drop local-only "error" entries before forwarding the conversation
       // — they're UI artifacts, not part of the dialogue.
-      const reply = await chat(
+      const reply = await chatStream(
         next
           .filter((m): m is Msg & { role: "user" | "assistant" } => m.role !== "error")
           .map((m) => ({ role: m.role, content: m.content })),
+        (delta) => setStreaming((s) => s + delta),
       );
       setMessages((m) => [...m, { role: "assistant", content: reply }]);
     } catch (err) {
@@ -53,6 +59,7 @@ export const AiChat = (): JSX.Element => {
       ]);
     } finally {
       setPending(false);
+      setStreaming("");
     }
   };
 
@@ -82,7 +89,9 @@ export const AiChat = (): JSX.Element => {
         ) : (
           messages.map((m, i) => <Bubble key={i} $role={m.role}>{m.content}</Bubble>)
         )}
-        {pending ? <Bubble $role="assistant">…</Bubble> : null}
+        {pending ? (
+          <Bubble $role="assistant">{streaming || "…"}</Bubble>
+        ) : null}
       </Log>
       <Form onSubmit={send}>
         <Input

@@ -151,16 +151,34 @@ export const Dashboard = <T,>({
   useLayoutEffect(() => {
     const grid = gridRef.current;
     if (!grid) return;
+    let raf = 0;
+    let last = 0;
     const measure = (): void => {
       const w = grid.getBoundingClientRect().width;
       if (w <= 0) return;
       const colW = (w - gap * (cols - 1)) / cols;
-      setMeasuredRowH(Math.max(40, Math.round(colW)));
+      const next = Math.max(40, Math.round(colW));
+      // Skip sub-pixel jitter (typical scrollbar appear/disappear feedback
+      // — without this the page-level scrollbar can toggle on every measure
+      // and retrigger the observer, hanging the layout in a loop).
+      if (Math.abs(next - last) < 2) return;
+      last = next;
+      setMeasuredRowH(next);
     };
     measure();
-    const ro = new ResizeObserver(measure);
+    // Defer the observer's callback to the next frame. ResizeObserver will
+    // throw a "loop limit exceeded" warning if observed boxes change inside
+    // the callback synchronously; rAF moves the state update out of the
+    // callback's microtask, breaking any feedback cycle.
+    const ro = new ResizeObserver(() => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(measure);
+    });
     ro.observe(grid);
-    return () => ro.disconnect();
+    return () => {
+      ro.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, [cols, gap]);
   const effectiveRowH = measuredRowH ?? rowHeight;
 
@@ -252,6 +270,28 @@ export const Dashboard = <T,>({
       if (!w) return;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("text/plain", id);
+
+      // Custom drag image — a compact chip showing the widget title. The
+      // default browser drag image is a screenshot of the entire cell,
+      // which on a large widget is oversized and often blurry. The chip
+      // lives off-screen long enough for the browser to snapshot it, then
+      // is removed on the next tick.
+      const titleText =
+        e.currentTarget.querySelector<HTMLElement>("[data-az-widget-title]")
+          ?.textContent ?? "Widget";
+      const chip = document.createElement("div");
+      chip.textContent = titleText;
+      chip.style.cssText =
+        "position:absolute;top:-1000px;left:-1000px;padding:6px 12px;" +
+        "background:var(--az-surface);border:1px solid var(--az-line);" +
+        "border-radius:8px;font:600 11px/1.2 system-ui,sans-serif;" +
+        "color:var(--az-text);letterSpacing:0.04em;text-transform:uppercase;" +
+        "box-shadow:0 6px 18px rgba(0,0,0,0.25);pointer-events:none;" +
+        "white-space:nowrap;";
+      document.body.appendChild(chip);
+      e.dataTransfer.setDragImage(chip, 18, 18);
+      setTimeout(() => chip.remove(), 0);
+
       setDragState({ id, w: w.w, h: w.h, ghost: null });
     };
 

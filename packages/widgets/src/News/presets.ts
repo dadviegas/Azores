@@ -1,15 +1,11 @@
 // Curated free news feeds grouped by region. Used by the News widget when
 // the user picks from a catalog rather than typing a URL.
 //
-// `corsFriendly: true` means the upstream serves
-// `Access-Control-Allow-Origin: *` (or equivalent), so the browser can fetch
-// it directly. Most major outlets (BBC, Reuters, AP, NYT, Le Monde, Al
-// Jazeera, NPR, …) publish RSS but do NOT set CORS — they're useless from
-// page JS without a proxy. The registry filters this list with
-// `.filter((p) => p.corsFriendly)` before exposing it to the widget
-// library, so non-CORS entries here are dead weight. Keep this list to
-// genuinely browser-fetchable feeds; route everything else through a proxy
-// when one exists.
+// Only feeds that serve `Access-Control-Allow-Origin: *` (or equivalent)
+// belong here — anything else is unreachable from page JS. The registry
+// filters this list with `.filter((p) => p.corsFriendly)` before surfacing
+// it, so a `false` entry is dead weight. Add a feed only after confirming
+// the response carries the CORS header from the browser.
 
 export type NewsRegion = "world" | "europe" | "americas" | "tech";
 

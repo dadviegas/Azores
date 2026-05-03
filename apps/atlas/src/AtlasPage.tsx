@@ -84,23 +84,26 @@ const initial = (): Widget[] =>
     data: entry.data,
   }));
 
+// Pick a column count that keeps each cell roughly square at a comfortable
+// physical size. The dashboard renders square cells (rowH = column width), so
+// more columns on a wide screen means more widgets per row, not bigger gaps.
+const colsForWidth = (w: number): number => {
+  if (w <= 480) return 4;
+  if (w <= 1024) return 8;
+  if (w <= 1440) return 12;
+  if (w <= 1920) return 16;
+  if (w <= 2560) return 20;
+  return 24;
+};
+
 const useResponsiveCols = (): number => {
-  const [cols, setCols] = useState<number>(() => {
-    if (typeof window === "undefined") return 12;
-    if (window.matchMedia("(max-width: 480px)").matches) return 4;
-    if (window.matchMedia("(max-width: 1024px)").matches) return 8;
-    return 12;
-  });
+  const [cols, setCols] = useState<number>(() =>
+    typeof window === "undefined" ? 12 : colsForWidth(window.innerWidth),
+  );
   useEffect(() => {
-    const sm = window.matchMedia("(max-width: 480px)");
-    const md = window.matchMedia("(max-width: 1024px)");
-    const update = (): void => setCols(sm.matches ? 4 : md.matches ? 8 : 12);
-    sm.addEventListener("change", update);
-    md.addEventListener("change", update);
-    return () => {
-      sm.removeEventListener("change", update);
-      md.removeEventListener("change", update);
-    };
+    const update = (): void => setCols(colsForWidth(window.innerWidth));
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
   return cols;
 };
@@ -300,9 +303,7 @@ export const AtlasPage = (): JSX.Element => {
           style={{
             position: "relative",
             zIndex: 1,
-            maxWidth: 1180,
-            margin: "0 auto",
-            padding: "32px clamp(16px, 4vw, 24px)",
+            padding: "32px clamp(16px, 3vw, 32px)",
           }}
         >
           <header
@@ -372,18 +373,6 @@ export const AtlasPage = (): JSX.Element => {
               </Button>
             </div>
           </header>
-
-          <div style={{ marginBottom: 24 }}>
-            <div className="az-page-eyebrow">ATLAS · LIVE DATA</div>
-            <h1 className="az-page-title" style={{ marginBottom: 6 }}>
-              The world, on a slow drip.
-            </h1>
-            <p style={{ color: "var(--az-text-2)", margin: 0, fontSize: 15 }}>
-              Weather you can dress for, a country you've never heard of, a Wikipedia
-              rabbit-hole, and rates that make your euros feel something. Drag tiles
-              around — IndexedDB remembers, even if you don't.
-            </p>
-          </div>
 
           <Dashboard<unknown>
             widgets={widgets}

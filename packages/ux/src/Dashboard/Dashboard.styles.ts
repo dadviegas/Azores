@@ -85,6 +85,12 @@ export const Header = styled.div({
   background: tokens.bg2,
   fontSize: tokens.fs.xs,
   color: tokens.text2,
+  // Header is the drag source for the cell — body content (textareas,
+  // lists, canvases) is interactive and must not initiate a drag. The grab
+  // cursor signals where to grab; nested buttons override to `pointer`.
+  cursor: "grab",
+  userSelect: "none",
+  "&:active": { cursor: "grabbing" },
 });
 
 export const DragHandle = styled.button({

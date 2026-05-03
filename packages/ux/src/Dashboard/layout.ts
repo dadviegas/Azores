@@ -5,6 +5,11 @@ export type GridItem = {
   id: string;
   w: number;
   h: number;
+  // Optional pinned position. When set, `packWidgets` honors it instead of
+  // first-fit packing. Pinned items render at their declared cell; everything
+  // else flows around them. Use `tidyWidgets` to clear all pins.
+  col?: number;
+  row?: number;
 };
 
 export type PlacedItem<T extends GridItem> = T & { col: number; row: number };
@@ -40,8 +45,30 @@ export const packWidgets = <T extends GridItem>(
     }
   };
 
-  const out: PlacedItem<T>[] = [];
-  for (const it of items) {
+  // Two-pass: first place pinned items at their declared cell (so subsequent
+  // first-fit packing flows around them); then place loose items.
+  const out: PlacedItem<T>[] = new Array(items.length);
+
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    if (!it) continue;
+    if (it.col == null || it.row == null) continue;
+    const w = Math.min(it.w, cols);
+    const h = it.h;
+    const c = Math.max(0, Math.min(it.col, cols - w));
+    const r = Math.max(0, it.row);
+    if (fits(r, c, w, h)) {
+      mark(r, c, w, h);
+      out[i] = { ...it, col: c, row: r, w, h };
+    }
+    // If a pin doesn't fit (collides with another pin), defer to the loose
+    // pass below so the item still appears somewhere instead of vanishing.
+  }
+
+  for (let i = 0; i < items.length; i++) {
+    if (out[i]) continue;
+    const it = items[i];
+    if (!it) continue;
     const w = Math.min(it.w, cols);
     const h = it.h;
     let placed = false;
@@ -49,15 +76,20 @@ export const packWidgets = <T extends GridItem>(
       for (let c = 0; c <= cols - w && !placed; c++) {
         if (fits(r, c, w, h)) {
           mark(r, c, w, h);
-          out.push({ ...it, col: c, row: r, w, h });
+          out[i] = { ...it, col: c, row: r, w, h };
           placed = true;
         }
       }
     }
-    if (!placed) out.push({ ...it, col: 0, row: occ.length, w, h });
+    if (!placed) out[i] = { ...it, col: 0, row: occ.length, w, h };
   }
-  return out;
+  return out.filter((x): x is PlacedItem<T> => x != null);
 };
+
+// Strip every pin so subsequent renders fall back to first-fit packing.
+// Used by the dashboard's "Tidy up" affordance.
+export const tidyWidgets = <T extends GridItem>(items: ReadonlyArray<T>): T[] =>
+  items.map(({ col: _c, row: _r, ...rest }) => rest as T);
 
 // Find the largest empty rectangle inside the current packed grid that fits
 // within `[minW..maxW] × [minH..maxH]`. Used when adding a widget from the

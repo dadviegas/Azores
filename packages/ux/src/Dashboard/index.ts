@@ -12,6 +12,7 @@ export {
   findFirstGap,
   packWidgets,
   reorderForInsertion,
+  tidyWidgets,
   type GridItem,
   type PlacedItem,
 } from "./layout.js";

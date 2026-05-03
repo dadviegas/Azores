@@ -9,7 +9,6 @@ import {
 import { Icon } from "@azores/ui";
 import {
   packWidgets,
-  reorderForInsertion,
   type GridItem,
   type PlacedItem,
 } from "./layout.js";
@@ -166,16 +165,15 @@ export const Dashboard = <T,>({
   const effectiveRowH = measuredRowH ?? rowHeight;
 
   const layout = useMemo<PlacedItem<DashboardWidget<T>>[]>(() => {
+    // While dragging, project the dragged widget onto the ghost cell so the
+    // packed layout previews where it'll land. Pinning means the packer
+    // honors that cell directly — no reorder dance required.
     const list =
       dragState && dragState.ghost
-        ? reorderForInsertion(
-            widgets,
-            dragState.id,
-            dragState.ghost.col,
-            dragState.ghost.row,
-            cols,
-            dragState.w,
-            dragState.h,
+        ? widgets.map((w) =>
+            w.id === dragState.id
+              ? { ...w, col: dragState.ghost!.col, row: dragState.ghost!.row }
+              : w,
           )
         : [...widgets];
     return packWidgets(list, cols);
@@ -293,14 +291,12 @@ export const Dashboard = <T,>({
       return;
     }
     if (dragState) {
-      const next = reorderForInsertion(
-        widgets,
-        dragState.id,
-        cell.col,
-        cell.row,
-        cols,
-        dragState.w,
-        dragState.h,
+      // Pin the dragged widget to the drop cell. The packing layer respects
+      // pins (`col`/`row`) and flows other tiles around them. If the drop
+      // collides with another pinned tile the layout layer falls back to
+      // first-fit so nothing vanishes.
+      const next = widgets.map((w) =>
+        w.id === dragState.id ? { ...w, col: cell.col, row: cell.row } : w,
       );
       onChange(next);
       setDragState(null);

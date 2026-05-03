@@ -21,6 +21,7 @@ import {
   TweaksPanel,
   findFirstGap,
   packWidgets,
+  tidyWidgets,
   useTweaks,
   type DashboardWidget,
 } from "@azores/ux";
@@ -44,14 +45,26 @@ const sources = collectAllowedSources();
 // longer fetch them cross-origin); existing v1 layouts are discarded so
 // the saved widget URLs don't keep surfacing "Load failed" tiles.
 const LAYOUT_KEY = "atlas:dashboard:layout";
-const LAYOUT_VERSION = 3;
+// v4: widgets gained optional `col`/`row` pins so users can drop tiles
+// anywhere on the grid; the seed remains unpinned (tidy) so existing
+// dashboards re-pack normally on load. Bumping discards v3 layouts so
+// saved arrays don't carry stale widget IDs from before the recent batch
+// of new widgets.
+const LAYOUT_VERSION = 4;
 type StoredLayout = { v: number; widgets: Widget[] };
 
-// `GridItem` is just `{id, w, h}` — column/row come from packing in
-// declaration order. So the persisted shape mirrors `Widget` 1:1; the array
-// order is what encodes "where each tile goes".
+// Persist the optional pin coordinates alongside the rest of the widget so
+// drop-where-you-want survives reload. Anything else stays implicit.
 const serializeWidgets = (widgets: Widget[]): Widget[] =>
-  widgets.map(({ id, type, w, h, data }) => ({ id, type, w, h, data }));
+  widgets.map(({ id, type, w, h, data, col, row }) => ({
+    id,
+    type,
+    w,
+    h,
+    data,
+    ...(col != null ? { col } : {}),
+    ...(row != null ? { row } : {}),
+  }));
 
 const isValidLayout = (raw: unknown): raw is StoredLayout =>
   typeof raw === "object" &&
@@ -187,14 +200,24 @@ export const AtlasPage = (): JSX.Element => {
   const remove = (id: string): void =>
     setWidgets((prev) => prev.filter((w) => w.id !== id));
 
-  const addFromCatalog = (catalogId: string): void => {
+  const addFromCatalog = (
+    catalogId: string,
+    cell?: { col: number; row: number },
+  ): void => {
     const entry = widgetCatalog.find((c) => c.id === catalogId);
     if (!entry) return;
-    // Append so first-fit packing slots the new widget into the first
-    // existing gap that fits — `makeFromCatalog` already shrunk the size
-    // to match an open pocket when one was available.
-    setWidgets((prev) => [...prev, makeFromCatalog(entry, prev, cols)]);
+    setWidgets((prev) => {
+      const fresh = makeFromCatalog(entry, prev, cols);
+      // No drop coordinates (library click): leave the new widget unpinned
+      // so first-fit packing slots it into the first open pocket.
+      if (!cell) return [...prev, fresh];
+      // Dropped on the grid: pin the new widget at the drop cell so it
+      // lands exactly where the cursor was. The packer respects pins.
+      return [...prev, { ...fresh, col: cell.col, row: cell.row }];
+    });
   };
+
+  const tidy = (): void => setWidgets((prev) => tidyWidgets(prev));
 
   // Configurable widgets (presets carry a `data` payload) can have multiple
   // instances on the dashboard, so we never mark them "added". Fixed widgets
@@ -268,6 +291,10 @@ export const AtlasPage = (): JSX.Element => {
                 <Icon name="plus" size={14} />
                 Add widget
               </Button>
+              <Button variant="ghost" size="sm" onClick={tidy} title="Re-pack tiles, clearing any drop pins">
+                <Icon name="grid" size={14} />
+                Tidy
+              </Button>
               <Button variant="ghost" size="sm" onClick={reset}>
                 <Icon name="refresh" size={14} />
                 Reset
@@ -323,8 +350,8 @@ export const AtlasPage = (): JSX.Element => {
                       dragEntry.defaultSize.w,
                       dragEntry.defaultSize.h,
                     ),
-                    onDrop: () => {
-                      if (dragId) addFromCatalog(dragId);
+                    onDrop: (cell) => {
+                      if (dragId) addFromCatalog(dragId, cell);
                       setDragId(null);
                     },
                   }

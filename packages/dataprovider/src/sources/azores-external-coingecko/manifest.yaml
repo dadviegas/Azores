@@ -1,0 +1,4 @@
+name: azores-external-coingecko
+url: https://www.coingecko.com
+description: Crypto market data — top coins by market cap, no key required.
+ttl: 5m

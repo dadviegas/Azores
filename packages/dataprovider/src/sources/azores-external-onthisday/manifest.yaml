@@ -1,0 +1,4 @@
+name: azores-external-onthisday
+url: https://en.wikipedia.org
+description: Historical events for today's date, from the Wikipedia "On this day" feed.
+ttl: 12h

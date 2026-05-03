@@ -1,0 +1,4 @@
+name: azores-external-hackernews
+url: https://hn.algolia.com
+description: Hacker News front-page stories via the Algolia search API.
+ttl: 10m

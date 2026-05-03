@@ -1,0 +1,10 @@
+name: wikifeatured
+title: Wikipedia · today's featured
+description: The Wikipedia "today's featured article" for the current date.
+sources:
+  - azores-external-wikifeatured
+ttl: 12h
+defaultSize:
+  w: 4
+  h: 3
+icon: bookopen

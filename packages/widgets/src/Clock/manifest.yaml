@@ -1,0 +1,8 @@
+name: clock
+title: Clock
+description: Local time and date, ticking every second.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: clock

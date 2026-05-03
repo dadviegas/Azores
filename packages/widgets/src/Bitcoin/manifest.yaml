@@ -1,0 +1,10 @@
+name: bitcoin
+title: Bitcoin fees
+description: Recommended sat/vB fee tiers from mempool.space.
+sources:
+  - azores-external-mempool
+ttl: 1m
+defaultSize:
+  w: 4
+  h: 2
+icon: cube

@@ -1,0 +1,4 @@
+name: azores-external-ipinfo
+url: https://ipapi.co
+description: Caller's public IP, city, country and ISP via ipapi.co.
+ttl: 24h

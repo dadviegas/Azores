@@ -1,0 +1,8 @@
+name: scratchpad
+title: Scratchpad
+description: A persistent text note saved in your browser.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: pencil

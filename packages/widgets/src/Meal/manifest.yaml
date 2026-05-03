@@ -1,0 +1,10 @@
+name: meal
+title: Random meal
+description: A random meal recipe with image, area, and a short instruction snippet.
+sources:
+  - azores-external-meal
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 3
+icon: utensils

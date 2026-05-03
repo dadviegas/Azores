@@ -1,0 +1,10 @@
+name: cocktail
+title: Random cocktail
+description: A random cocktail recipe with image and instructions.
+sources:
+  - azores-external-cocktail
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 3
+icon: wine

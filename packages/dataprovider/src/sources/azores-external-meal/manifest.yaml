@@ -1,0 +1,4 @@
+name: azores-external-meal
+url: https://www.themealdb.com
+description: A random meal recipe from TheMealDB.
+ttl: 1h

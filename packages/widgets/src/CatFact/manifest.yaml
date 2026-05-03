@@ -1,0 +1,10 @@
+name: catfact
+title: Cat fact
+description: A random fact about cats, refreshed hourly.
+sources:
+  - azores-external-catfact
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 2
+icon: cat

@@ -1,0 +1,10 @@
+name: holidays
+title: Public holidays
+description: Upcoming public holidays in Portugal this year.
+sources:
+  - azores-external-holidays
+ttl: 24h
+defaultSize:
+  w: 4
+  h: 3
+icon: calendar

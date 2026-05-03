@@ -1,0 +1,4 @@
+name: azores-external-github
+url: https://api.github.com
+description: GitHub public search API — top-starred repos, unauthenticated tier.
+ttl: 1h

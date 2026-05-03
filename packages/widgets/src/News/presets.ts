@@ -119,31 +119,13 @@ export const NEWS_PRESETS: ReadonlyArray<NewsPreset> = [
     note: "Needs CORS proxy",
   },
 
-  // ── Tech (CORS-clean, useful out of the box) ───────────────────────────
-  {
-    id: "hn-frontpage",
-    label: "Hacker News · Front page",
-    url: "https://hnrss.org/frontpage",
-    region: "tech",
-    kind: "rss",
-    corsFriendly: true,
-  },
-  {
-    id: "hn-best",
-    label: "Hacker News · Best",
-    url: "https://hnrss.org/best",
-    region: "tech",
-    kind: "rss",
-    corsFriendly: true,
-  },
-  {
-    id: "lobsters",
-    label: "Lobste.rs",
-    url: "https://lobste.rs/rss",
-    region: "tech",
-    kind: "rss",
-    corsFriendly: true,
-  },
+  // ── Tech ───────────────────────────────────────────────────────────────
+  // Hacker News (`hnrss.org`) and Lobste.rs were originally flagged
+  // `corsFriendly: true`, but both upstreams respond 200 *without* an
+  // `Access-Control-Allow-Origin` header, so the browser blocks the
+  // response from page JS and `fetch()` rejects with "Failed to fetch".
+  // Removed for the same reason as Reddit / Wikinews above; reintroduce
+  // behind a proxy.
 ];
 
 export const presetsByRegion = (

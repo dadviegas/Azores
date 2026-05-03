@@ -1,0 +1,8 @@
+name: bookmarks
+title: Bookmarks
+description: Pinned links that follow you across sessions.
+sources: []
+defaultSize:
+  w: 4
+  h: 3
+icon: bookmark

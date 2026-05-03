@@ -44,7 +44,7 @@ const sources = collectAllowedSources();
 // longer fetch them cross-origin); existing v1 layouts are discarded so
 // the saved widget URLs don't keep surfacing "Load failed" tiles.
 const LAYOUT_KEY = "atlas:dashboard:layout";
-const LAYOUT_VERSION = 2;
+const LAYOUT_VERSION = 3;
 type StoredLayout = { v: number; widgets: Widget[] };
 
 // `GridItem` is just `{id, w, h}` — column/row come from packing in

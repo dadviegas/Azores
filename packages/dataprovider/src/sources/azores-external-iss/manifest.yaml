@@ -1,0 +1,4 @@
+name: azores-external-iss
+url: https://wheretheiss.at
+description: Live position (lat/lon, altitude, velocity) of the ISS, no key.
+ttl: 15s

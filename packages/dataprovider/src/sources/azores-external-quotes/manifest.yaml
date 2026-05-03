@@ -1,0 +1,4 @@
+name: azores-external-quotes
+url: https://api.quotable.io
+description: Random English-language quote with author, no key.
+ttl: 30m

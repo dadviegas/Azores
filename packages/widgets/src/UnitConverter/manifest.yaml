@@ -1,0 +1,8 @@
+name: unitconverter
+title: Unit converter
+description: Convert lengths, weights and temperatures between common units.
+sources: []
+defaultSize:
+  w: 4
+  h: 2
+icon: equals

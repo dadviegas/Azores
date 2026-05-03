@@ -1,0 +1,10 @@
+name: githubrepo
+title: GitHub repo
+description: Stars, forks and open issues for facebook/react.
+sources:
+  - azores-external-githubrepo
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 2
+icon: git

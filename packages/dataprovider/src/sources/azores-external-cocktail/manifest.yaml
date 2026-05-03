@@ -1,0 +1,4 @@
+name: azores-external-cocktail
+url: https://www.thecocktaildb.com
+description: A random cocktail recipe from TheCocktailDB.
+ttl: 1h

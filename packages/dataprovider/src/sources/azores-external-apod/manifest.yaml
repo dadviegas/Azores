@@ -1,0 +1,4 @@
+name: azores-external-apod
+url: https://api.nasa.gov
+description: NASA Astronomy Picture of the Day, served via NASA's shared DEMO_KEY.
+ttl: 6h

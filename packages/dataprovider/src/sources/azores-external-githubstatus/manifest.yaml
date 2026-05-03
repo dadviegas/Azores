@@ -1,0 +1,4 @@
+name: azores-external-githubstatus
+url: https://www.githubstatus.com
+description: GitHub system status (operational, degraded, partial outage, major).
+ttl: 5m

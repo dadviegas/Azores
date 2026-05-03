@@ -1,0 +1,10 @@
+name: hackernews
+title: Hacker News
+description: Top stories on HN, refreshed every 10 minutes.
+sources:
+  - azores-external-hackernews
+ttl: 10m
+defaultSize:
+  w: 4
+  h: 3
+icon: flame

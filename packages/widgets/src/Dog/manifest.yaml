@@ -1,0 +1,10 @@
+name: dog
+title: Random dog
+description: A random dog photo from the Dog API.
+sources:
+  - azores-external-dog
+ttl: 30m
+defaultSize:
+  w: 3
+  h: 3
+icon: dog

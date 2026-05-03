@@ -1,0 +1,10 @@
+name: crypto
+title: Crypto
+description: Top coins by market cap, with 24h price change.
+sources:
+  - azores-external-coingecko
+ttl: 5m
+defaultSize:
+  w: 4
+  h: 3
+icon: dollar

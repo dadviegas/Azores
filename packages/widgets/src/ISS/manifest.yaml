@@ -1,0 +1,10 @@
+name: iss
+title: ISS live position
+description: Where the International Space Station is right now.
+sources:
+  - azores-external-iss
+ttl: 15s
+defaultSize:
+  w: 4
+  h: 2
+icon: rocket

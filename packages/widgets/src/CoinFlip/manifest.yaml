@@ -1,0 +1,8 @@
+name: coinflip
+title: Coin flip
+description: Flip a virtual coin. Tracks the running heads/tails tally.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: coins

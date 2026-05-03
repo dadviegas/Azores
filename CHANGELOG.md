@@ -11,6 +11,97 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **Twenty more dashboard widgets** (fourth batch). Twelve external,
+  eight local. External: Aurora forecast
+  ([Aurora](packages/widgets/src/Aurora/) — NOAA SWPC planetary
+  K-index with banded color), Bitcoin fees
+  ([Bitcoin](packages/widgets/src/Bitcoin/) — mempool.space
+  recommended sat/vB tiers, 1m TTL), Wikipedia featured
+  ([WikiFeatured](packages/widgets/src/WikiFeatured/) — today's
+  featured article via the REST feed API), Advice slip
+  ([Advice](packages/widgets/src/Advice/) — adviceslip.com), GitHub
+  repo stats ([GitHubRepo](packages/widgets/src/GitHubRepo/) —
+  facebook/react stars/forks/issues), Your IP
+  ([IpInfo](packages/widgets/src/IpInfo/) — ipapi.co), GitHub status
+  ([GitHubStatus](packages/widgets/src/GitHubStatus/) — overall
+  banner plus component breakdown), Astronomy picture
+  ([Apod](packages/widgets/src/Apod/) — NASA APOD via shared
+  DEMO_KEY), Random cocktail
+  ([Cocktail](packages/widgets/src/Cocktail/) — TheCocktailDB),
+  Random meal ([Meal](packages/widgets/src/Meal/) — TheMealDB), Dog
+  photo ([Dog](packages/widgets/src/Dog/) — dog.ceo), and Trivia
+  ([Trivia](packages/widgets/src/Trivia/) — Open Trivia DB with
+  hidden answer reveal). Local: To-do
+  ([Todo](packages/widgets/src/Todo/) — add/check/remove, persisted),
+  Bookmarks ([Bookmarks](packages/widgets/src/Bookmarks/) — pinned
+  links, persisted), Calculator
+  ([Calculator](packages/widgets/src/Calculator/) — basic
+  four-function), Calendar
+  ([CalendarMonth](packages/widgets/src/CalendarMonth/) — current
+  month with today highlighted, Monday-first), Unit converter
+  ([UnitConverter](packages/widgets/src/UnitConverter/) — length,
+  weight, temperature), Stopwatch
+  ([Stopwatch](packages/widgets/src/Stopwatch/) — start / stop / lap
+  / reset at 100ms granularity), Dice roller
+  ([Dice](packages/widgets/src/Dice/) — 1-4 d6), and Coin flip
+  ([CoinFlip](packages/widgets/src/CoinFlip/) — animated, with
+  running heads/tails tally). All 20 registered in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts);
+  twelve new sources self-register from
+  [packages/dataprovider/src/sources/](packages/dataprovider/src/sources/)
+  via the barrel.
+- **Five more dashboard widgets** (third batch) — four external, one
+  local. External: Sunrise & sunset
+  ([Sunrise](packages/widgets/src/Sunrise/) via sunrise-sunset.org for
+  the Azores, with day-length), Cat fact
+  ([CatFact](packages/widgets/src/CatFact/) via catfact.ninja), Joke
+  ([Joke](packages/widgets/src/Joke/) via official-joke-api, setup +
+  punchline), and npm downloads
+  ([NpmDownloads](packages/widgets/src/NpmDownloads/) — last-week
+  count for `react`, hardcoded until per-instance edit lands). Local:
+  World clocks ([WorldClocks](packages/widgets/src/WorldClocks/) —
+  London, New York, Tokyo, São Paulo, ticking every 30s). Sources for
+  externals under
+  [packages/dataprovider/src/sources/](packages/dataprovider/src/sources/);
+  all five registered in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts).
+  [docs/WIDGETS_PLAN.md](docs/WIDGETS_PLAN.md) updated.
+- **Five more dashboard widgets** — three external, two local.
+  External: On this day
+  ([OnThisDay](packages/widgets/src/OnThisDay/) via Wikipedia's
+  `feed/onthisday/events` REST endpoint, 12h TTL), Air quality
+  ([AirQuality](packages/widgets/src/AirQuality/) via
+  Open-Meteo's air-quality API with banded European AQI), and Public
+  holidays ([Holidays](packages/widgets/src/Holidays/) via
+  date.nager.at, defaulting to PT, with days-away counter). Local:
+  Pomodoro ([Pomodoro](packages/widgets/src/Pomodoro/) — 25/5 cycles,
+  start/pause/reset, auto-flips phase) and Moon phase
+  ([MoonPhase](packages/widgets/src/MoonPhase/) — pure JS
+  illumination/cycle math, no network). Sources for the externals live
+  under [packages/dataprovider/src/sources/](packages/dataprovider/src/sources/);
+  all five registered in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts).
+  [docs/WIDGETS_PLAN.md](docs/WIDGETS_PLAN.md) updated.
+- **Eight new dashboard widgets** — five pulling from key-free public
+  APIs and three local-only. External: Hacker News
+  ([HackerNews](packages/widgets/src/HackerNews/) via Algolia HN API),
+  Crypto ([Crypto](packages/widgets/src/Crypto/) via CoinGecko top
+  coins + 24h change), GitHub trending
+  ([GitHub](packages/widgets/src/GitHub/) via the Search API,
+  last-7-days repos by stars), Quote of the day
+  ([Quote](packages/widgets/src/Quote/) via Quotable), and ISS live
+  position ([ISS](packages/widgets/src/ISS/) via wheretheiss.at, 15s
+  TTL). Each registers its own source under
+  [packages/dataprovider/src/sources/](packages/dataprovider/src/sources/)
+  and is wired through the dataprovider barrel. Local-only (no
+  network): Clock ([Clock](packages/widgets/src/Clock/), ticking
+  HH:MM:SS), Countdown ([Countdown](packages/widgets/src/Countdown/)
+  to next New Year), Scratchpad
+  ([Scratchpad](packages/widgets/src/Scratchpad/), persisted via
+  `getStorage()`). All eight registered in
+  [packages/widgets/src/registry.ts](packages/widgets/src/registry.ts) so
+  they appear in Atlas's widget library automatically. Remaining
+  widget ideas tracked in [docs/WIDGETS_PLAN.md](docs/WIDGETS_PLAN.md).
 - **Character preview page** at
   [docs/character-preview.html](docs/character-preview.html) — standalone
   HTML mock of three CSS-only animated SVG mascots (whale, volcano,
@@ -27,6 +118,20 @@ with relative links so the entry stays clickable.
   interação por toque: ao clicar acena com o braço direito + cicla
   formas de boca enquanto um balão de fala aparece. Também copiado
   para o artefacto Pages.
+
+### Removed
+- **Hacker News and Lobste.rs news presets** — `hnrss.org/frontpage`,
+  `hnrss.org/best`, and `lobste.rs/rss` were flagged `corsFriendly:
+  true` in [packages/widgets/src/News/presets.ts](packages/widgets/src/News/presets.ts)
+  but all three respond 200 *without* `Access-Control-Allow-Origin`, so
+  the browser blocks the body from page JS and `fetch()` rejects with
+  `TypeError: Failed to fetch`. Same failure mode as the prior
+  Reddit/Wikinews removal — surfaced as "Feed unavailable. Failed to
+  fetch" tiles. Dropped from the preset list entirely (not just
+  demoted) so they no longer seed via `widgetCatalog`. `LAYOUT_VERSION`
+  bumped 2 → 3 in [apps/atlas/src/AtlasPage.tsx](apps/atlas/src/AtlasPage.tsx)
+  so existing persisted dashboards re-seed instead of holding onto the
+  dead URLs. Reintroduce behind a CORS proxy.
 
 ### Removed
 - **Reddit and Wikinews news presets** — `*.rss` on Reddit started

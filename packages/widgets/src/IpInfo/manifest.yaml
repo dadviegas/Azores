@@ -1,0 +1,10 @@
+name: ipinfo
+title: Your IP
+description: Public IP, location and ISP detected from your browser.
+sources:
+  - azores-external-ipinfo
+ttl: 24h
+defaultSize:
+  w: 4
+  h: 2
+icon: network

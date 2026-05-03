@@ -1,0 +1,10 @@
+name: quote
+title: Quote of the day
+description: A random quote, refreshed every 30 minutes.
+sources:
+  - azores-external-quotes
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 2
+icon: quote

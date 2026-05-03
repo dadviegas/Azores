@@ -1,0 +1,10 @@
+name: advice
+title: Advice slip
+description: A short piece of advice, refreshed every 30 minutes.
+sources:
+  - azores-external-advice
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 2
+icon: sparkle

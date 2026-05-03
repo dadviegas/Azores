@@ -1,0 +1,10 @@
+name: joke
+title: Joke
+description: A random setup-and-punchline joke.
+sources:
+  - azores-external-joke
+ttl: 1h
+defaultSize:
+  w: 4
+  h: 2
+icon: smile

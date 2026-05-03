@@ -1,0 +1,8 @@
+name: worldclocks
+title: World clocks
+description: Current time in four cities — London, New York, Tokyo, São Paulo.
+sources: []
+defaultSize:
+  w: 4
+  h: 2
+icon: globe

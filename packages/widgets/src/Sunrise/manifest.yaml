@@ -1,0 +1,10 @@
+name: sunrise
+title: Sunrise & sunset
+description: Sun times and day length for the Azores.
+sources:
+  - azores-external-sunrise
+ttl: 6h
+defaultSize:
+  w: 4
+  h: 2
+icon: sunrise

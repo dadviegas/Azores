@@ -1,0 +1,4 @@
+name: azores-external-wikifeatured
+url: https://en.wikipedia.org
+description: Wikipedia "featured article of the day" via the REST feed API.
+ttl: 12h

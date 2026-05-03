@@ -20,6 +20,44 @@ import newsManifestRaw from "./News/manifest.yaml";
 import weatherManifestRaw from "./Weather/manifest.yaml";
 import wikipediaManifestRaw from "./Wikipedia/manifest.yaml";
 import worldBankManifestRaw from "./WorldBank/manifest.yaml";
+import hackerNewsManifestRaw from "./HackerNews/manifest.yaml";
+import cryptoManifestRaw from "./Crypto/manifest.yaml";
+import gitHubManifestRaw from "./GitHub/manifest.yaml";
+import quoteManifestRaw from "./Quote/manifest.yaml";
+import issManifestRaw from "./ISS/manifest.yaml";
+import clockManifestRaw from "./Clock/manifest.yaml";
+import countdownManifestRaw from "./Countdown/manifest.yaml";
+import scratchpadManifestRaw from "./Scratchpad/manifest.yaml";
+import onThisDayManifestRaw from "./OnThisDay/manifest.yaml";
+import airQualityManifestRaw from "./AirQuality/manifest.yaml";
+import holidaysManifestRaw from "./Holidays/manifest.yaml";
+import pomodoroManifestRaw from "./Pomodoro/manifest.yaml";
+import moonPhaseManifestRaw from "./MoonPhase/manifest.yaml";
+import sunriseManifestRaw from "./Sunrise/manifest.yaml";
+import catFactManifestRaw from "./CatFact/manifest.yaml";
+import jokeManifestRaw from "./Joke/manifest.yaml";
+import npmDownloadsManifestRaw from "./NpmDownloads/manifest.yaml";
+import worldClocksManifestRaw from "./WorldClocks/manifest.yaml";
+import auroraManifestRaw from "./Aurora/manifest.yaml";
+import bitcoinManifestRaw from "./Bitcoin/manifest.yaml";
+import wikiFeaturedManifestRaw from "./WikiFeatured/manifest.yaml";
+import adviceManifestRaw from "./Advice/manifest.yaml";
+import gitHubRepoManifestRaw from "./GitHubRepo/manifest.yaml";
+import ipInfoManifestRaw from "./IpInfo/manifest.yaml";
+import gitHubStatusManifestRaw from "./GitHubStatus/manifest.yaml";
+import apodManifestRaw from "./Apod/manifest.yaml";
+import cocktailManifestRaw from "./Cocktail/manifest.yaml";
+import mealManifestRaw from "./Meal/manifest.yaml";
+import dogManifestRaw from "./Dog/manifest.yaml";
+import triviaManifestRaw from "./Trivia/manifest.yaml";
+import todoManifestRaw from "./Todo/manifest.yaml";
+import bookmarksManifestRaw from "./Bookmarks/manifest.yaml";
+import calculatorManifestRaw from "./Calculator/manifest.yaml";
+import calendarMonthManifestRaw from "./CalendarMonth/manifest.yaml";
+import unitConverterManifestRaw from "./UnitConverter/manifest.yaml";
+import stopwatchManifestRaw from "./Stopwatch/manifest.yaml";
+import diceManifestRaw from "./Dice/manifest.yaml";
+import coinFlipManifestRaw from "./CoinFlip/manifest.yaml";
 
 export type WidgetEntry = {
   manifest: WidgetManifest;
@@ -49,6 +87,44 @@ export const widgetRegistry: Readonly<Record<string, WidgetEntry>> = {
   earthquakes: make(earthquakesManifestRaw, () => import("./Earthquakes/Earthquakes.js")),
   news: make(newsManifestRaw, () => import("./News/News.js")),
   worldbank: make(worldBankManifestRaw, () => import("./WorldBank/WorldBank.js")),
+  hackernews: make(hackerNewsManifestRaw, () => import("./HackerNews/HackerNews.js")),
+  crypto: make(cryptoManifestRaw, () => import("./Crypto/Crypto.js")),
+  github: make(gitHubManifestRaw, () => import("./GitHub/GitHub.js")),
+  quote: make(quoteManifestRaw, () => import("./Quote/Quote.js")),
+  iss: make(issManifestRaw, () => import("./ISS/ISS.js")),
+  clock: make(clockManifestRaw, () => import("./Clock/Clock.js")),
+  countdown: make(countdownManifestRaw, () => import("./Countdown/Countdown.js")),
+  scratchpad: make(scratchpadManifestRaw, () => import("./Scratchpad/Scratchpad.js")),
+  onthisday: make(onThisDayManifestRaw, () => import("./OnThisDay/OnThisDay.js")),
+  airquality: make(airQualityManifestRaw, () => import("./AirQuality/AirQuality.js")),
+  holidays: make(holidaysManifestRaw, () => import("./Holidays/Holidays.js")),
+  pomodoro: make(pomodoroManifestRaw, () => import("./Pomodoro/Pomodoro.js")),
+  moonphase: make(moonPhaseManifestRaw, () => import("./MoonPhase/MoonPhase.js")),
+  sunrise: make(sunriseManifestRaw, () => import("./Sunrise/Sunrise.js")),
+  catfact: make(catFactManifestRaw, () => import("./CatFact/CatFact.js")),
+  joke: make(jokeManifestRaw, () => import("./Joke/Joke.js")),
+  npmdownloads: make(npmDownloadsManifestRaw, () => import("./NpmDownloads/NpmDownloads.js")),
+  worldclocks: make(worldClocksManifestRaw, () => import("./WorldClocks/WorldClocks.js")),
+  aurora: make(auroraManifestRaw, () => import("./Aurora/Aurora.js")),
+  bitcoin: make(bitcoinManifestRaw, () => import("./Bitcoin/Bitcoin.js")),
+  wikifeatured: make(wikiFeaturedManifestRaw, () => import("./WikiFeatured/WikiFeatured.js")),
+  advice: make(adviceManifestRaw, () => import("./Advice/Advice.js")),
+  githubrepo: make(gitHubRepoManifestRaw, () => import("./GitHubRepo/GitHubRepo.js")),
+  ipinfo: make(ipInfoManifestRaw, () => import("./IpInfo/IpInfo.js")),
+  githubstatus: make(gitHubStatusManifestRaw, () => import("./GitHubStatus/GitHubStatus.js")),
+  apod: make(apodManifestRaw, () => import("./Apod/Apod.js")),
+  cocktail: make(cocktailManifestRaw, () => import("./Cocktail/Cocktail.js")),
+  meal: make(mealManifestRaw, () => import("./Meal/Meal.js")),
+  dog: make(dogManifestRaw, () => import("./Dog/Dog.js")),
+  trivia: make(triviaManifestRaw, () => import("./Trivia/Trivia.js")),
+  todo: make(todoManifestRaw, () => import("./Todo/Todo.js")),
+  bookmarks: make(bookmarksManifestRaw, () => import("./Bookmarks/Bookmarks.js")),
+  calculator: make(calculatorManifestRaw, () => import("./Calculator/Calculator.js")),
+  calendarmonth: make(calendarMonthManifestRaw, () => import("./CalendarMonth/CalendarMonth.js")),
+  unitconverter: make(unitConverterManifestRaw, () => import("./UnitConverter/UnitConverter.js")),
+  stopwatch: make(stopwatchManifestRaw, () => import("./Stopwatch/Stopwatch.js")),
+  dice: make(diceManifestRaw, () => import("./Dice/Dice.js")),
+  coinflip: make(coinFlipManifestRaw, () => import("./CoinFlip/CoinFlip.js")),
 };
 
 // One entry per row in the dashboard widget library. Most map 1:1 to a

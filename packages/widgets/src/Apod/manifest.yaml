@@ -1,0 +1,10 @@
+name: apod
+title: Astronomy picture
+description: NASA's Astronomy Picture of the Day, with caption.
+sources:
+  - azores-external-apod
+ttl: 6h
+defaultSize:
+  w: 4
+  h: 3
+icon: moonstars

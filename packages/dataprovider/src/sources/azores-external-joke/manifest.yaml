@@ -1,0 +1,4 @@
+name: azores-external-joke
+url: https://official-joke-api.appspot.com
+description: A random two-line joke (setup + punchline), no key.
+ttl: 1h

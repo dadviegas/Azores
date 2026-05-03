@@ -1,0 +1,4 @@
+name: azores-external-airquality
+url: https://open-meteo.com
+description: European AQI plus PM2.5/PM10 for a fixed location, via Open-Meteo.
+ttl: 30m

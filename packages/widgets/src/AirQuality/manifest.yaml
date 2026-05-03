@@ -1,0 +1,10 @@
+name: airquality
+title: Air quality
+description: European AQI plus PM2.5/PM10 for the Azores.
+sources:
+  - azores-external-airquality
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 2
+icon: wind

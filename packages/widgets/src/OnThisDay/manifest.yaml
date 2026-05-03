@@ -1,0 +1,10 @@
+name: onthisday
+title: On this day
+description: Historical events from Wikipedia for today's date.
+sources:
+  - azores-external-onthisday
+ttl: 12h
+defaultSize:
+  w: 4
+  h: 3
+icon: history

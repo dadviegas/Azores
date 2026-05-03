@@ -1,0 +1,8 @@
+name: pomodoro
+title: Pomodoro
+description: 25-minute focus timer with 5-minute breaks. Persists across reloads.
+sources: []
+defaultSize:
+  w: 3
+  h: 2
+icon: timer

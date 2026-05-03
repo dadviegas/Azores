@@ -1,0 +1,4 @@
+name: azores-external-holidays
+url: https://date.nager.at
+description: Public holidays for a country and year, via Nager.Date.
+ttl: 24h

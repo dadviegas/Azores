@@ -1,0 +1,4 @@
+name: azores-external-githubrepo
+url: https://api.github.com
+description: Stars, forks, open issues, latest release for a single GitHub repo.
+ttl: 1h

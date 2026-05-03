@@ -1,0 +1,4 @@
+name: azores-external-trivia
+url: https://opentdb.com
+description: A random multiple-choice trivia question from Open Trivia DB.
+ttl: 30m

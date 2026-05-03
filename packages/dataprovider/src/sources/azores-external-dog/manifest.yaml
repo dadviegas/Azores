@@ -1,0 +1,4 @@
+name: azores-external-dog
+url: https://dog.ceo
+description: A random dog photo from the Dog API.
+ttl: 30m

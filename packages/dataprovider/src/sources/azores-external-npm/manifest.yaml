@@ -1,0 +1,4 @@
+name: azores-external-npm
+url: https://api.npmjs.org
+description: Last-week download counts for an npm package.
+ttl: 6h

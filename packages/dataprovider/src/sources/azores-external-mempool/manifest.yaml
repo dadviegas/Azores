@@ -1,0 +1,4 @@
+name: azores-external-mempool
+url: https://mempool.space
+description: Bitcoin network state — block height and recommended fees.
+ttl: 1m

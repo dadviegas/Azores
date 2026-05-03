@@ -1,0 +1,10 @@
+name: trivia
+title: Trivia
+description: A multiple-choice trivia question with hidden answer.
+sources:
+  - azores-external-trivia
+ttl: 30m
+defaultSize:
+  w: 4
+  h: 3
+icon: brain

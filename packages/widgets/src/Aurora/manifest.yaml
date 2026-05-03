@@ -1,0 +1,10 @@
+name: aurora
+title: Aurora forecast
+description: Current planetary K-index from NOAA SWPC. Higher Kp = stronger aurora.
+sources:
+  - azores-external-aurora
+ttl: 30m
+defaultSize:
+  w: 3
+  h: 2
+icon: sparkles

@@ -1,0 +1,4 @@
+name: azores-external-catfact
+url: https://catfact.ninja
+description: A random cat fact, no key.
+ttl: 1h

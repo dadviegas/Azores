@@ -1,0 +1,10 @@
+name: npmdownloads
+title: npm downloads
+description: Last week's download count for the react package.
+sources:
+  - azores-external-npm
+ttl: 6h
+defaultSize:
+  w: 3
+  h: 2
+icon: package

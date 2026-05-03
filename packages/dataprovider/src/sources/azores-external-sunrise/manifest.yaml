@@ -1,0 +1,4 @@
+name: azores-external-sunrise
+url: https://sunrise-sunset.org
+description: Sunrise, sunset, and twilight times for a location.
+ttl: 6h

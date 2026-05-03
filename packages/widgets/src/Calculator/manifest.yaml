@@ -1,0 +1,8 @@
+name: calculator
+title: Calculator
+description: Basic four-function calculator with keyboard input.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: abacus

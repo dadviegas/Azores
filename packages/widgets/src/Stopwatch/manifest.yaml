@@ -1,0 +1,8 @@
+name: stopwatch
+title: Stopwatch
+description: Start, lap and reset — tracks elapsed time at 100ms granularity.
+sources: []
+defaultSize:
+  w: 3
+  h: 3
+icon: timer

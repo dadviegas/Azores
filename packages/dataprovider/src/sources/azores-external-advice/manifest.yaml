@@ -1,0 +1,4 @@
+name: azores-external-advice
+url: https://api.adviceslip.com
+description: A random short piece of advice from Advice Slip.
+ttl: 30m

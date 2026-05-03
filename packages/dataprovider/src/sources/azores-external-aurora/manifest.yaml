@@ -1,0 +1,4 @@
+name: azores-external-aurora
+url: https://services.swpc.noaa.gov
+description: Planetary K-index (geomagnetic / aurora forecast) from NOAA SWPC.
+ttl: 30m

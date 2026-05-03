@@ -1,0 +1,10 @@
+name: githubstatus
+title: GitHub status
+description: GitHub system status and component-level breakdown.
+sources:
+  - azores-external-githubstatus
+ttl: 5m
+defaultSize:
+  w: 4
+  h: 3
+icon: shieldcheck

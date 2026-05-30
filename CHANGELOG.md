@@ -10,6 +10,20 @@ with relative links so the entry stays clickable.
 
 ## Unreleased
 
+### Fixed
+- **Node-version guard for the dev/build flow.** The Module Federation
+  manifest plugin calls `util.styleText`, which only exists from Node
+  22 onward — running `pnpm dev` on Node 20 produced a 30-line stack
+  trace deep inside a transitive dep before the dev server even
+  started. Added a preflight check that reads `.nvmrc` and bails with
+  a one-line "Run nvm use" message instead.
+  - [`tools/check-node.mjs`](tools/check-node.mjs) — standalone
+    script wired as `predev` / `prebuild` in the root
+    [`package.json`](package.json).
+  - [`tools/rspack-config.mjs`](tools/rspack-config.mjs) — same guard
+    at the top of every app's bundler config, so per-app filters like
+    `pnpm --filter @azores/studio dev` are protected too.
+
 ### Added
 - **Markdown studio is live.** New federated remote at
   [`apps/studio`](apps/studio/) — port 5175, exposes `./StudioRoutes`,

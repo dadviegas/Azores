@@ -8,7 +8,11 @@
     "node": ">=24"
   },
   "scripts": {
+    "check-node": "node tools/check-node.mjs",
+    "predev": "node tools/check-node.mjs",
+    "prebuild": "node tools/check-node.mjs",
     "dev": "pnpm --parallel --filter \"./apps/*\" --stream dev",
+    "build": "pnpm -r --filter \"./apps/*\" build",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

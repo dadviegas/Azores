@@ -1,10 +1,38 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
-import { defineConfig } from "@rspack/cli";
-import { rspack } from "@rspack/core";
-import ReactRefreshPlugin from "@rspack/plugin-react-refresh";
-import { ModuleFederationPlugin } from "@module-federation/enhanced/rspack";
+import { readFileSync } from "node:fs";
+
+// Preflight: bail before importing federation plugins, which transitively
+// require Node 22+ (util.styleText). Without this guard, running on Node
+// 20 produces an unreadable stack trace deep inside the federation
+// manifest plugin. The required version comes from .nvmrc.
+const __preflightHere = path.dirname(fileURLToPath(import.meta.url));
+try {
+  const want = readFileSync(
+    path.resolve(__preflightHere, "..", ".nvmrc"),
+    "utf8",
+  ).trim();
+  const wantMajor = Number(want.split(".")[0]) || 0;
+  const haveMajor = Number(process.versions.node.split(".")[0]) || 0;
+  if (haveMajor < wantMajor) {
+    const red = "\x1b[31m";
+    const dim = "\x1b[2m";
+    const reset = "\x1b[0m";
+    process.stderr.write(
+      `\n${red}Node ${process.versions.node} is too old — this repo needs Node ${want}.${reset}\n` +
+        `${dim}Run ${reset}nvm use${dim} in this repo's root, then re-run.${reset}\n\n`,
+    );
+    process.exit(1);
+  }
+} catch {
+  // No .nvmrc readable from here — skip the guard rather than fail.
+}
+
+const { defineConfig } = await import("@rspack/cli");
+const { rspack } = await import("@rspack/core");
+const ReactRefreshPlugin = (await import("@rspack/plugin-react-refresh")).default;
+const { ModuleFederationPlugin } = await import("@module-federation/enhanced/rspack");
 
 const require = createRequire(import.meta.url);
 const isDev = process.env.NODE_ENV !== "production";

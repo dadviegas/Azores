@@ -169,7 +169,16 @@ export function createRspackConfig(opts) {
       historyApiFallback: true,
       hot: true,
       devMiddleware: { writeToDisk: false },
-      ...(cors ? { headers: { "Access-Control-Allow-Origin": "*" } } : {}),
+      // Federation remotes are fetched cross-origin in dev (the host page is
+      // served from a different port). webpack-dev-server 5.2.1+ ships a
+      // "cross-origin-header-check" that 403s cross-site `no-cors` requests —
+      // which is exactly what a <script>-tag chunk load looks like, so every
+      // remoteEntry/chunk fetch from the host gets blocked. `allowedHosts:
+      // "all"` opts this dev-only server out of that check; the ACAO header
+      // then lets the host actually read the responses.
+      ...(cors
+        ? { allowedHosts: "all", headers: { "Access-Control-Allow-Origin": "*" } }
+        : {}),
     },
     watchOptions: {
       ignored: ["**/node_modules/**", "**/dist/**", "**/@mf-types/**", "**/.mf/**"],

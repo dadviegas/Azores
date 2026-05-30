@@ -11,6 +11,18 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Fixed
+- **Federation remotes 403'd in dev (`Cross-Origin request blocked`).**
+  `webpack-dev-server` 5.2.1+ (pulled in transitively at 5.2.2) added a
+  `cross-origin-header-check` that returns `403` for cross-site
+  `no-cors` requests — which is precisely how `<script>`-tag chunk loads
+  appear. Every host→remote fetch (`remoteEntry.js`, expose chunks, CSS,
+  vendor chunks) was blocked, so the studio/atlas/showcase remotes failed
+  to load with `#RUNTIME-008`. Added `allowedHosts: "all"` to the
+  `cors`-enabled dev servers so they opt out of the check; the existing
+  ACAO header still lets the host read the responses. Dev-only — does not
+  affect production manifests.
+  - [`tools/rspack-config.mjs`](tools/rspack-config.mjs) — `devServer`
+    block, gated on the existing `cors` flag.
 - **Node-version guard for the dev/build flow.** The Module Federation
   manifest plugin calls `util.styleText`, which only exists from Node
   22 onward — running `pnpm dev` on Node 20 produced a 30-line stack

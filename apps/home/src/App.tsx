@@ -9,6 +9,7 @@ import { Launcher } from "./Launcher";
 // rspack.config.mjs.
 const Showcase = lazy(() => import("showcase/ShowcaseRoutes"));
 const Atlas = lazy(() => import("atlas/AtlasRoutes"));
+const Studio = lazy(() => import("studio/StudioRoutes"));
 
 const RemoteFallback = ({ label }: { label: string }): JSX.Element => (
   <div
@@ -43,6 +44,14 @@ export const App = (): JSX.Element => (
         element={
           <Suspense fallback={<RemoteFallback label="atlas" />}>
             <Atlas />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/apps/studio/*"
+        element={
+          <Suspense fallback={<RemoteFallback label="studio" />}>
+            <Studio />
           </Suspense>
         }
       />

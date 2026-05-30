@@ -16,3 +16,10 @@ declare module "atlas/AtlasRoutes" {
   export default AtlasRoutes;
   export { AtlasRoutes };
 }
+
+declare module "studio/StudioRoutes" {
+  import type { ComponentType } from "react";
+  const StudioRoutes: ComponentType;
+  export default StudioRoutes;
+  export { StudioRoutes };
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@azores/studio",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development rspack serve",
+    "build": "rspack build",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@azores/core": "workspace:*",
+    "@azores/ui": "workspace:*",
+    "@azores/ux": "workspace:*",
+    "@emotion/react": "catalog:",
+    "@emotion/styled": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@azores/build": "workspace:*",
+    "@module-federation/enhanced": "^2.4.0",
+    "@rspack/cli": "^1.1.4",
+    "@rspack/core": "^1.1.4",
+    "@rspack/plugin-react-refresh": "^1.0.0",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "react-refresh": "^0.14.2"
+  }
+}

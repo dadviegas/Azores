@@ -10,6 +10,8 @@ const showcaseManifest =
   process.env.AZORES_SHOWCASE_MANIFEST ?? "http://localhost:5173/mf-manifest.json";
 const atlasManifest =
   process.env.AZORES_ATLAS_MANIFEST ?? "http://localhost:5174/mf-manifest.json";
+const studioManifest =
+  process.env.AZORES_STUDIO_MANIFEST ?? "http://localhost:5175/mf-manifest.json";
 
 // Host's own `publicPath` — chunks/assets for `home` are served from here.
 // Defaults to root for local dev; CI sets `PAGES_BASE=/Azores/` so Pages
@@ -28,6 +30,7 @@ export default createRspackConfig({
     remotes: {
       showcase: `showcase@${showcaseManifest}`,
       atlas: `atlas@${atlasManifest}`,
+      studio: `studio@${studioManifest}`,
     },
     shared: ["react", "react-dom", "react-router-dom", "@emotion/react", "@emotion/styled"],
   },

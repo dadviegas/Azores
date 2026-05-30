@@ -11,6 +11,33 @@ with relative links so the entry stays clickable.
 ## Unreleased
 
 ### Added
+- **Markdown studio is live.** New federated remote at
+  [`apps/studio`](apps/studio/) — port 5175, exposes `./StudioRoutes`,
+  wired into the host shell at `/apps/studio`. The launcher tile in
+  [`apps/home/src/apps.ts`](apps/home/src/apps.ts) flipped from
+  `planned` to `live`. Federation manifest lives at
+  `AZORES_STUDIO_MANIFEST` (default `http://localhost:5175/mf-manifest.json`).
+
+  [StudioPage](apps/studio/src/StudioPage.tsx) is a split editor + live
+  preview built on `MarkdownView` from `@azores/ux`:
+  - Document index + bodies persisted via `getStorage()` under
+    `studio:docs:index` (versioned envelope `{ v: 1, docs: [...] }`)
+    and `studio:docs:<id>`. Once the Supabase adapter is wired, the
+    same documents sync across devices — no studio code change.
+  - Debounced save (500 ms) on title or body change, with a
+    `saving / saved` status pill in the header.
+  - Sidebar lists documents sorted by `updated`, with active-row
+    highlight, per-row delete (confirm-prompt), and a "New document"
+    affordance.
+  - Header actions: **Import** a `.md` / `.markdown` / `.txt` file
+    (creates a new document), **Export** the current document via
+    `Blob` download with a slugified filename, **New** starts a fresh
+    `Untitled`.
+  - First-run seed: a `Welcome` document with a short tour so the
+    preview pane isn't empty on initial load.
+
+  Registered in the root [`tsconfig.json`](tsconfig.json) `references`.
+
 - **Phase 14 sync-adapter groundwork** — sketch only, no UI to wire it
   yet. Three pieces in [`@azores/core/storage`](packages/core/src/storage/):
   - [`identity.ts`](packages/core/src/storage/identity.ts) — anonymous

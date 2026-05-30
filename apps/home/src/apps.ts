@@ -41,8 +41,8 @@ export const APPS: ReadonlyArray<LauncherApp> = [
     name: "Markdown studio",
     tagline: "Standalone editor + preview.",
     icon: "edit",
-    path: "",
-    status: "planned",
+    path: "/apps/studio",
+    status: "live",
     accent: "lava",
   },
 ];

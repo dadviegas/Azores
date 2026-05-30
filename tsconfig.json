@@ -10,6 +10,7 @@
     { "path": "./packages/widgets" },
     { "path": "./apps/web/tsconfig.app.json" },
     { "path": "./apps/home/tsconfig.app.json" },
-    { "path": "./apps/atlas/tsconfig.app.json" }
+    { "path": "./apps/atlas/tsconfig.app.json" },
+    { "path": "./apps/studio/tsconfig.app.json" }
   ]
 }
